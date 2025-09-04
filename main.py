@@ -7,7 +7,13 @@
 # tipo_vehiculo_estacionado: 1=moto, 2=auto, 3=camioneta, 4=bici, 0=vacío
 
 
+import funciones
+
+
+# TODO VALIDAR INGRESO DE PATENTE
 def ingresarAutoEnMatriz(matriz):
+    patente = input("Agrega el nro de patente: ")
+    tipo_slot = funciones.tipo_slot()
     return
 
 
@@ -91,9 +97,9 @@ garage = [
 # Representacion costos posicion0: precio por hora posicion1 precio por dia
 
 COSTOS = [
-    []  # vacio, seria el 0 que no representa nada,
-    [2200, 50000]  # 1 moto
-    [2400, 165000]  # auto
+    [],  # vacio, seria el 0 que no representa nada,
+    [2200, 50000],  # 1 moto
+    [2400, 165000],  # auto
     [3500, 200000]
 
 ]
@@ -103,3 +109,6 @@ pisos = 4
 filas_por_piso = 3
 columnas_por_piso = 4
 total_slots_por_piso = filas_por_piso * columnas_por_piso
+
+
+ingresarAutoEnMatriz(garage)
