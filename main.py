@@ -6,18 +6,17 @@
 # hora_entrada: timestamp o None si está vacío
 # tipo_vehiculo_estacionado: 1=moto, 2=auto, 3=camioneta, 4=bici, 0=vacío
 
-
 import funciones
 
 
 # TODO VALIDAR INGRESO DE PATENTE
-def ingresarAutoEnMatriz(matriz):
+def ingresar_auto_matriz(matriz):
     patente = input("Agrega el nro de patente: ")
     tipo_slot = funciones.tipo_slot()
     return
 
 
-def salidaTipoVehiculo(tipo_slot):
+def salida_tipo_vehiculo(tipo_slot):
     salida = ""
     if tipo_slot == 1:
         salida = "Moto"
@@ -28,8 +27,18 @@ def salidaTipoVehiculo(tipo_slot):
     return salida
 
 
+def busqueda_espacio_libre(garage, tipo_slot):
+    for piso in range(len(garage)):
+        for fila in range(len(garage[piso])):
+            for columna in range(len(garage[piso][fila])):
+                slot = garage[piso][fila][columna]
+                if not slot[3]:  # Si no está ocupado
+                    if slot[2] == tipo_slot or slot[2] == 4:  # Si el tipo de slot es adecuado
+                        return (piso, fila, columna)
+    return None  # No se encontró espacio libre
+
+
 # CONSTANTES
-# ? Matriz momentanea
 garage = [
     # PLANTA BAJA (piso 0) - 3x4 slots
     [
@@ -100,7 +109,7 @@ COSTOS = [
     [],  # vacio, seria el 0 que no representa nada,
     [2200, 50000],  # 1 moto
     [2400, 165000],  # auto
-    [3500, 200000]
+    [3500, 200000]  # camioneta
 
 ]
 
