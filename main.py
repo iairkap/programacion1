@@ -9,6 +9,82 @@
 import funciones
 
 
+#! TODO MODULARIZAR CODIGO -> MUCHA REPETICION DE FOR y de los bucles
+
+def busqueda_espacio_libre(garage, tipo_vehiculo):
+    for piso in range(len(garage)):
+        for fila in range(len(garage[piso])):
+            for columna in range(len(garage[piso][fila])):
+                slot = garage[piso][fila][columna]
+                if slot[3] == False:
+                    if slot[2] == tipo_vehiculo or slot[2] == 4:
+                        return (piso, fila, columna)
+    return (-1, -1, -1)
+
+
+def buscar_por_patente(garage, patente_buscada):
+    for piso in range(len(garage)):
+        for fila in range(len(garage[piso])):
+            for columna in range(len(garage[piso][fila])):
+                slot = garage[piso][fila][columna]
+                if slot[1] == patente_buscada and slot[3] == True:
+                    return (piso, fila, columna)
+    return (-1, -1, -1)
+
+
+def contar_espacios_libres(garage):
+    contador = 0
+    for piso in range(len(garage)):
+        for fila in range(len(garage[piso])):
+            for columna in range(len(garage[piso][fila])):
+                slot = garage[piso][fila][columna]
+                if slot[3] == False:
+                    contador += 1
+    return contador
+
+
+def contar_por_tipo_vehiculo(garage, tipo_buscado):
+    contador = 0
+    for piso in range(len(garage)):
+        for fila in range(len(garage[piso])):
+            for columna in range(len(garage[piso][fila])):
+                slot = garage[piso][fila][columna]
+                if slot[6] == tipo_buscado and slot[3] == True:
+                    contador += 1
+    return contador
+
+
+def ingresar_auto_matriz(garage):
+    patente = input("Agrega el nro de patente: ")
+    tipo_vehiculo = funciones.tipo_slot()
+
+    # Verificar si la patente ya existe
+    posicion_existente = buscar_por_patente(garage, patente)
+    if posicion_existente != (-1, -1, -1):
+        print(f"Error: La patente {patente} ya está en el garage")
+        return False
+
+    # Buscar espacio libre
+    posicion = busqueda_espacio_libre(garage, tipo_vehiculo)
+
+    if posicion == (-1, -1, -1):
+        print("No hay espacios disponibles para este tipo de vehículo")
+        return False
+
+    piso, fila, columna = posicion
+    slot = garage[piso][fila][columna]
+
+    # Actualizar el slot
+    slot[1] = patente
+    slot[3] = True
+    slot[5] = "2025-09-06 14:30"
+    slot[6] = tipo_vehiculo
+
+    print(
+        f"Vehículo {patente} estacionado en Piso {piso}, Fila {fila}, Columna {columna}")
+    return True
+
+
 # TODO VALIDAR INGRESO DE PATENTE
 def ingresar_auto_matriz(matriz):
     patente = input("Agrega el nro de patente: ")
@@ -118,6 +194,3 @@ pisos = 4
 filas_por_piso = 3
 columnas_por_piso = 4
 total_slots_por_piso = filas_por_piso * columnas_por_piso
-
-
-ingresarAutoEnMatriz(garage)
