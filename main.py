@@ -114,6 +114,46 @@ def busqueda_espacio_libre(garage, tipo_slot):
     return None  # No se encontró espacio libre
 
 
+#!  REGISTRO DE AUTO
+#! Verificar si la patente ya existe
+#! Consultar si es mensual o diairo
+#! Buscar espacio libre
+#! Actualizar el slot
+#! Mostrar mensaje de éxito o error
+
+
+#! REGISTRO SALIDA DE AUTO
+#! Ingresar patente a buscar
+#! Buscar la patente en el garage
+#! Si no se encuentra, mostrar mensaje de error
+#! Si se encuentra, calcular el tiempo y costo
+#! Actualizar el slot
+#! Mostrar mensaje de éxito con el costo
+
+
+#! SLOTS LIBRES POR PISO + Por garage en general + Por tipo de vehiculo
+#! Ingresar el piso a consultar
+#! Validar el piso
+#! Mostrar la cantidad de slots libres en ese piso
+#! Mostrar mensaje de error si el piso no es válido
+
+#! CANTIDAD DE AUTOS, MOTOS Y CAMIONETAS ESTACIONADOS
+#! Contar la cantidad de cada tipo de vehículo en el garage
+#! Mostrar los resultados
+
+
+#! Funcion para salida linda de lectura tipo de garage
+
+#!REUBICAR AUTO
+#! Ingresar patente a buscar
+#! Buscar la patente en el garage
+#! Si no se encuentra, mostrar mensaje de error
+#! Si se encuentra, buscar un nuevo espacio libre del mismo tipo
+#! Si no hay espacio libre, mostrar mensaje de error
+#! Si hay espacio libre, actualizar ambos slots (el antiguo y el nuevo)
+#! Mostrar mensaje de éxito con la nueva ubicación
+
+
 # CONSTANTES
 garage = [
     # PLANTA BAJA (piso 0) - 3x4 slots
