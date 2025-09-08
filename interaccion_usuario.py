@@ -1,0 +1,45 @@
+def pedir_piso(garage):
+    return pedir_num_natural(max =len(garage))
+
+
+def pedir_patente():
+    # estructura de patente 
+    # NUEVA = AB123CD
+    # VIEJA = ABC123
+    while True:
+        try:
+            patente = input("ingrese la patente:")
+            digitos = len(patente)
+            if digitos != 6 and digitos != 7:
+                print("las nuevas patentes tienen 7 digitos y las antiguas 6")
+            elif digitos == 6 :
+                if patente[:3].isalpha() and patente[3:].isdigit():
+                    return patente
+            elif digitos == 7 :
+                if patente[:2].isalpha() and patente[2:5].isdigit() and patente[5:].isalpha():
+                    return patente
+            else: 
+                print("la patente no tiene le formato correcto ej: AB123CD o ABC123")
+                
+            print("volve a intentarlo")
+
+        except Exception as e:
+            print(e)
+    
+
+def pedir_tipo_vehiculo():
+    return pedir_num_natural(min = 1, max = 4)
+
+
+    
+def pedir_num_natural(max,min = 0):
+    while True:
+        try:
+            num = int(input("ingresa el numero"))
+            if num < min or num > max:
+                print(f"el nuero ingresado tiene que ser un num valido, entre {min} y {max}")
+            else: return num
+        except ValueError:
+            print("por favor ingresa un numero")
+        except Exception as e : 
+            print(e)
