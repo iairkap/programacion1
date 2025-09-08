@@ -7,52 +7,42 @@
 # tipo_vehiculo_estacionado: 1=moto, 2=auto, 3=camioneta, 4=bici, 0=vacío
 
 import funciones
-
+from mockdata import GARAGE, COSTOS
+import random
 
 #! TODO MODULARIZAR CODIGO -> MUCHA REPETICION DE FOR y de los bucles
 
-def busqueda_espacio_libre(garage, tipo_vehiculo):
-    for piso in range(len(garage)):
-        for fila in range(len(garage[piso])):
-            for columna in range(len(garage[piso][fila])):
-                slot = garage[piso][fila][columna]
-                if slot[3] == False:
-                    if slot[2] == tipo_vehiculo or slot[2] == 4:
-                        return (piso, fila, columna)
-    return (-1, -1, -1)
-
-
-def buscar_por_patente(garage, patente_buscada):
-    for piso in range(len(garage)):
-        for fila in range(len(garage[piso])):
-            for columna in range(len(garage[piso][fila])):
-                slot = garage[piso][fila][columna]
-                if slot[1] == patente_buscada and slot[3] == True:
+def busqueda_espacio_libre(tipo_vehiculo, garage=GARAGE):
+    for piso, piso_data in enumerate(garage):
+        for fila, fila_data in enumerate(piso_data):
+            for columna, slot in enumerate(fila_data):
+                if not slot[3] and (slot[2] == tipo_vehiculo or slot[2] == 4):
                     return (piso, fila, columna)
     return (-1, -1, -1)
 
+def buscar_por_patente(garage, patente_buscada):
+    for piso, piso_data in enumerate(garage):
+        for fila, fila_data in enumerate(piso_data):
+            for columna, slot in enumerate(fila_data):
+                if slot[1] == patente_buscada and slot[3]:
+                    return (piso, fila, columna)
+    return (-1, -1, -1)
 
 def contar_espacios_libres(garage):
-    contador = 0
-    for piso in range(len(garage)):
-        for fila in range(len(garage[piso])):
-            for columna in range(len(garage[piso][fila])):
-                slot = garage[piso][fila][columna]
-                if slot[3] == False:
-                    contador += 1
-    return contador
-
+    return sum(
+        not slot[3]
+        for piso_data in garage
+        for fila_data in piso_data
+        for slot in fila_data
+    )
 
 def contar_por_tipo_vehiculo(garage, tipo_buscado):
-    contador = 0
-    for piso in range(len(garage)):
-        for fila in range(len(garage[piso])):
-            for columna in range(len(garage[piso][fila])):
-                slot = garage[piso][fila][columna]
-                if slot[6] == tipo_buscado and slot[3] == True:
-                    contador += 1
-    return contador
-
+    return sum(
+        slot[6] == tipo_buscado and slot[3]
+        for piso_data in garage
+        for fila_data in piso_data
+        for slot in fila_data
+    )
 
 def ingresar_auto_matriz(garage):
     patente = input("Agrega el nro de patente: ")
@@ -72,25 +62,52 @@ def ingresar_auto_matriz(garage):
         return False
 
     piso, fila, columna = posicion
-    slot = garage[piso][fila][columna]
 
-    # Actualizar el slot
-    slot[1] = patente
-    slot[3] = True
-    slot[5] = "2025-09-06 14:30"
-    slot[6] = tipo_vehiculo
-
+    actualizar_slot(patente, tipo_vehiculo, piso, fila, columna, garage)
     print(
         f"Vehículo {patente} estacionado en Piso {piso}, Fila {fila}, Columna {columna}")
     return True
 
+def generar_fecha_aleatoria():
+    """Genera una fecha y hora aleatoria en formato 'YYYY-MM-DD HH:MM'"""
+    year = "2025"
+    month = str(random.randint(1, 12)).zfill(2)
+    day = str(random.randint(1, 28)).zfill(2)
+    hour = str(random.randint(0, 23)).zfill(2)
+    minute = str(random.randint(0, 59)).zfill(2)
+    return f"{year}-{month}-{day} {hour}:{minute}"
+
+def eliminar_fila_por_valor(valor, garage=GARAGE):
+    """Elimina la primera fila que contiene el valor dado"""
+    for i, fila in enumerate(garage):
+        if valor in fila:
+            del garage[i]
+            return True
+    return False
+
+# ? Actualizar el slot
+def actualizar_slot(patente, tipo_de_vehículo, piso, fila, columna, garage=GARAGE ):
+    """Actualiza el slot con la nueva informacion"""
+    slot = garage[piso][fila][columna]
+    slot[1] = patente
+    slot[3] = False
+    slot[5] = generar_fecha_aleatoria()
+    slot[6] = tipo_de_vehículo
+    print(f"Slot actualizado: {slot}")
+    return True 
 
 # TODO VALIDAR INGRESO DE PATENTE
-def ingresar_auto_matriz(matriz):
-    patente = input("Agrega el nro de patente: ")
-    tipo_slot = funciones.tipo_slot()
-    return
 
+def ingresar_patente(patente):
+    if chequear_existencia_patente(patente):
+        print("Error: La patente ya existe en el sistema.")
+        return None
+    while True:
+        patente = input("Ingrese la patente (3 letras y 3 numeros, ej: ABC123): ").strip().upper()
+        if len(patente) == 6 and patente[:3].isalpha() and patente[3:].isdigit():
+            return patente
+        else:
+            print("Error: Formato de patente invalido. Intente nuevamente.")
 
 def salida_tipo_vehiculo(tipo_slot):
     salida = ""
@@ -101,7 +118,6 @@ def salida_tipo_vehiculo(tipo_slot):
     elif tipo_slot == 3:
         salida = "Camioneta"
     return salida
-
 
 def busqueda_espacio_libre(garage, tipo_slot):
     for piso in range(len(garage)):
@@ -116,19 +132,71 @@ def busqueda_espacio_libre(garage, tipo_slot):
 
 # ? MENU PRINCIPAL
 
-# ?  REGISTRO DE AUTO
+def acceder_a_info_de_patentes():
+    """Accede a los datos guardados de las patentes
+    retorna la info de todas la petentes en el sistema"""
+    datos = []
+    for d in GARAGE:
+        for pisos in d:
+            datos.append(pisos)
+    return datos
+
+
+# ? REGISTRO DE AUTO
 # ? Verificar si la patente ya existe
+def chequear_existencia_patente(patente):
+    """Chequea si la patente existe en el sistema
+    retorna True si existe, else False"""
+    info_patentes = acceder_a_info_de_patentes()
+    for info in info_patentes:
+        if patente in info:
+                return True
+    return False
+
 # ? Consultar si es mensual o diairio
+def es_subscripcion_mensual(patente):
+    """Chequea si la subscripcion es mensual o diaria"""
+    info_patentes = acceder_a_info_de_patentes()
+    for info in info_patentes:
+        if patente in info:
+            return info[3] 
+
 # ? Buscar espacio libre
-# ? Actualizar el slot
+def chequear_espacio_libre(garage = GARAGE):
+    """Chequea si hay espacio libre en el estacionamiento"""
+    for piso_idx, piso in enumerate(garage):
+        if len(piso) < 12:
+            fila = piso[-1][0] + 1
+            return (piso_idx, fila) ##Falta retornar algun dato mas??
+
+
 # ? Mostrar mensaje de éxito o error
-
-
 # ? REGISTRO SALIDA DE AUTO
 # ? Ingresar patente a buscar
+def buscar_patente(patente):
+    info_patentes= acceder_a_info_de_patentes()
+    for info in info_patentes:
+        if patente in info:
+            return info
 # ? Buscar la patente en el garage
 # ? Si no se encuentra, mostrar mensaje de error
 # ? Si se encuentra, calcular el tiempo y costo
+def calcular_costo_de_estadia(patente, hora_salida):
+    info_patente = buscar_patente(patente)
+    costo = 0
+    if not info_patente:
+        return "Patente no registrada"
+    tipo_de_slot = info_patente[-1]
+    if not es_subscripcion_mensual(patente):
+        min_entrada = info_patente[-2].split(" ")[1].replace(":", "")
+        min_transcurridos = int(hora_salida.replace(":", "")) - int(min_entrada)
+        horas_transcurridas = min_transcurridos / 60
+        print(f"Horas transcurridas: {horas_transcurridas}")
+        costo = COSTOS[tipo_de_slot][0] * horas_transcurridas
+    else:
+        costo = COSTOS[tipo_de_slot][1] ### Debemos agregar la {ultima fecha de pago??? 
+    return costo
+    
 # ? Actualizar el slot
 # ? Mostrar mensaje de éxito con el costo
 
@@ -154,80 +222,6 @@ def busqueda_espacio_libre(garage, tipo_slot):
 #! Si no hay espacio libre, mostrar mensaje de error
 #! Si hay espacio libre, actualizar ambos slots (el antiguo y el nuevo)
 #! Mostrar mensaje de éxito con la nueva ubicación
-# CONSTANTES
-garage = [
-    # PLANTA BAJA (piso 0) - 3x4 slots
-    [
-        [1, "", 1, False, False, None, 0],    [
-            2, "ABC123", 2, True, False, "2025-09-04 08:30", 2],
-        [3, "", 2, False, True, None, 0],    [
-            4, "DEF456", 3, True, False, "2025-09-04 09:15", 3],
-        [5, "GHI789", 1, True, False, "2025-09-04 07:45",
-            1], [6, "", 4, False, False, None, 0],
-        [7, "", 2, False, False, None, 0],   [
-            8, "JKL012", 2, True, True, "2025-09-04 10:00", 2],
-        [9, "", 1, False, False, None, 0],    [
-            10, "MNO345", 4, True, False, "2025-09-04 11:20", 4],
-        [11, "", 3, False, False, None, 0],  [12, "", 2, False, True, None, 0]
-    ],
-
-    # PISO 1 - 3x4 slots
-    [
-        [13, "", 2, False, False, None, 0],   [
-            14, "", 1, False, False, None, 0],
-        [15, "PQR678", 2, True, False, "2025-09-04 08:00",
-            2], [16, "", 4, False, False, None, 0],
-        [17, "STU901", 1, True, False, "2025-09-04 09:30",
-            1], [18, "", 3, False, True, None, 0],
-        [19, "", 2, False, False, None, 0],   [
-            20, "VWX234", 3, True, False, "2025-09-04 07:20", 3],
-        [21, "", 1, False, False, None, 0],   [
-            22, "", 4, False, False, None, 0],
-        [23, "YZA567", 1, True, False, "2025-09-04 10:45",
-            1], [24, "", 2, False, False, None, 0]
-    ],
-
-    # PISO 2 - 3x4 slots
-    [
-        [25, "BCD890", 2, True, False, "2025-09-04 06:30",
-            2], [26, "", 1, False, False, None, 0],
-        [27, "", 4, False, True, None, 0],    [
-            28, "", 2, False, False, None, 0],
-        [29, "", 3, False, False, None, 0],   [
-            30, "EFG123", 4, True, False, "2025-09-04 12:00", 4],
-        [31, "", 1, False, False, None, 0], [
-            32, "HIJ456", 2, True, False, "2025-09-04 08:45", 2],
-        [33, "", 2, False, False, None, 0],   [
-            34, "", 3, False, False, None, 0],
-        [35, "", 1, False, False, None, 0],  [
-            36, "KLM789", 1, True, True, "2025-09-04 09:00", 1]
-    ],
-
-    # PISO 3 - 3x4 slots
-    [
-        [37, "", 4, False, False, None, 0],   [
-            38, "", 2, False, False, None, 0],
-        [39, "", 1, False, False, None, 0],  [
-            40, "NOP012", 3, True, False, "2025-09-04 11:00", 3],
-        [41, "", 2, False, True, None, 0],    [
-            42, "QRS345", 2, True, False, "2025-09-04 07:00", 2],
-        [43, "", 4, False, False, None, 0], [44, "", 3, False, False, None, 0],
-        [45, "TUV678", 1, True, False, "2025-09-04 10:15",
-            1], [46, "", 1, False, False, None, 0],
-        [47, "", 2, False, False, None, 0],  [48, "", 4, False, False, None, 0]
-    ]
-]
-
-
-# Representacion costos posicion0: precio por hora posicion1 precio por dia
-
-COSTOS = [
-    [],  # vacio, seria el 0 que no representa nada,
-    [2200, 50000],  # 1 moto
-    [2400, 165000],  # auto
-    [3500, 200000]  # camioneta
-
-]
 
 # Configuración del edificio
 pisos = 4
