@@ -115,6 +115,35 @@ def busqueda_espacio_libre(garage, tipo_slot):
 
 
 # ? MENU PRINCIPAL
+def menu_principal():
+    while True:
+        print("\n--- Menú Principal ---")
+        print("1. Registrar auto")
+        print("2. Registrar salida de auto")
+        print("3. Mostrar slots libres por piso")
+        print("4. Mostrar cantidad de autos, motos y camionetas estacionados")
+        print("5. Reubicar auto")
+        print("6. Salir")
+
+        opcion = input("Seleccione una opción (1-6): ")
+
+        if opcion == '1':
+            ingresar_auto_matriz(garage)
+        elif opcion == '2':
+            funciones.registro_salida_auto(garage, COSTOS)
+        elif opcion == '3':
+            funciones.mostrar_slots_libres_por_piso(garage)
+        elif opcion == '4':
+            funciones.mostrar_cantidad_vehiculos(garage)
+        elif opcion == '5':
+            funciones.reubicar_auto(garage)
+        elif opcion == '6':
+            print("Saliendo del programa...")
+            break
+        else:
+            print("Opción no válida. Intente de nuevo.")
+
+'''menu_principal()'''
 
 # ?  REGISTRO DE AUTO
 # ? Verificar si la patente ya existe
