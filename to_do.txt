@@ -1,0 +1,3 @@
+en el menu: agregar validacion para la opcion que quiere del menu
+
+

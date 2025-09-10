@@ -24,6 +24,7 @@ def mostrar_menu():
 def menu():
     while True:
         mostrar_menu()
+
         opcion = input("Seleccione una opción: ")
 #! agregar validacion aca para el ingreso de opciones, pedir por parametro el num max de opciones
 

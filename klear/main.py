@@ -12,6 +12,61 @@ import random
 
 #! TODO MODULARIZAR CODIGO -> MUCHA REPETICION DE FOR y de los bucles
 
+def busqueda_espacio_libre(tipo_vehiculo, garage=GARAGE):
+    for piso, piso_data in enumerate(garage):
+        for fila, fila_data in enumerate(piso_data):
+            for columna, slot in enumerate(fila_data):
+                if not slot[3] and (slot[2] == tipo_vehiculo or slot[2] == 4):
+                    return (piso, fila, columna)
+    return (-1, -1, -1)
+
+def buscar_por_patente(garage, patente_buscada):
+    for piso, piso_data in enumerate(garage):
+        for fila, fila_data in enumerate(piso_data):
+            for columna, slot in enumerate(fila_data):
+                if slot[1] == patente_buscada and slot[3]:
+                    return (piso, fila, columna)
+    return (-1, -1, -1)
+
+def contar_espacios_libres(garage):
+    return sum(
+        not slot[3]
+        for piso_data in garage
+        for fila_data in piso_data
+        for slot in fila_data
+    )
+
+def contar_por_tipo_vehiculo(garage, tipo_buscado):
+    return sum(
+        slot[6] == tipo_buscado and slot[3]
+        for piso_data in garage
+        for fila_data in piso_data
+        for slot in fila_data
+    )
+
+def ingresar_auto_matriz(garage):
+    patente = input("Agrega el nro de patente: ")
+    tipo_vehiculo = funciones.tipo_slot()
+
+    # Verificar si la patente ya existe
+    posicion_existente = buscar_por_patente(garage, patente)
+    if posicion_existente != (-1, -1, -1):
+        print(f"Error: La patente {patente} ya está en el garage")
+        return False
+
+    # Buscar espacio libre
+    posicion = busqueda_espacio_libre(garage, tipo_vehiculo)
+
+    if posicion == (-1, -1, -1):
+        print("No hay espacios disponibles para este tipo de vehículo")
+        return False
+
+    piso, fila, columna = posicion
+
+    actualizar_slot(patente, tipo_vehiculo, piso, fila, columna, garage)
+    print(
+        f"Vehículo {patente} estacionado en Piso {piso}, Fila {fila}, Columna {columna}")
+    return True
 
 def generar_fecha_aleatoria():
     """Genera una fecha y hora aleatoria en formato 'YYYY-MM-DD HH:MM'"""
@@ -41,115 +96,18 @@ def actualizar_slot(patente, tipo_de_vehículo, piso, fila, columna, garage=GARA
     print(f"Slot actualizado: {slot}")
     return True 
 
-
-
-def busqueda_espacio_libre(tipo_vehiculo, garage=GARAGE):
-    for piso, piso_data in enumerate(garage):
-        for fila, fila_data in enumerate(piso_data):
-            for columna, slot in enumerate(fila_data):
-                if not slot[3] and (slot[2] == tipo_vehiculo or slot[2] == 4):
-                    return (piso, fila, columna)
-    return (-1, -1, -1)
-
-
-def buscar_por_patente(garage, patente_buscada):
-    for piso, piso_data in enumerate(garage):
-        for fila, fila_data in enumerate(piso_data):
-            for columna, slot in enumerate(fila_data):
-                if slot[1] == patente_buscada and slot[3]:
-                    return (piso, fila, columna)
-    return (-1, -1, -1)
-
-
-def contar_espacios_libres(garage):
-    return sum(
-        not slot[3]
-        for piso_data in garage
-        for fila_data in piso_data
-        for slot in fila_data
-    )
-
-
-def contar_por_tipo_vehiculo(garage, tipo_buscado):
-    return sum(
-        slot[6] == tipo_buscado and slot[3]
-        for piso_data in garage
-        for fila_data in piso_data
-        for slot in fila_data
-    )
-
-
-def ingresar_auto_matriz(garage):
-    patente = input("Agrega el nro de patente: ")
-    tipo_vehiculo = funciones.tipo_slot()
-
-    # Verificar si la patente ya existe
-    posicion_existente = buscar_por_patente(garage, patente)
-    if posicion_existente != (-1, -1, -1):
-        print(f"Error: La patente {patente} ya está en el garage")
-        return False
-
-    # Buscar espacio libre
-    posicion = busqueda_espacio_libre(garage, tipo_vehiculo)
-
-    if posicion == (-1, -1, -1):
-        print("No hay espacios disponibles para este tipo de vehículo")
-        return False
-
-    piso, fila, columna = posicion
-
-    actualizar_slot(patente, tipo_vehiculo, piso, fila, columna, garage)
-    print(
-        f"Vehículo {patente} estacionado en Piso {piso}, Fila {fila}, Columna {columna}")
-    return True
-
-
-def generar_fecha_aleatoria():
-    """Genera una fecha y hora aleatoria en formato 'YYYY-MM-DD HH:MM'"""
-    year = "2025"
-    month = str(random.randint(1, 12)).zfill(2)
-    day = str(random.randint(1, 28)).zfill(2)
-    hour = str(random.randint(0, 23)).zfill(2)
-    minute = str(random.randint(0, 59)).zfill(2)
-    return f"{year}-{month}-{day} {hour}:{minute}"
-
-
-def eliminar_fila_por_valor(valor, garage=GARAGE):
-    """Elimina la primera fila que contiene el valor dado"""
-    for i, fila in enumerate(garage):
-        if valor in fila:
-            del garage[i]
-            return True
-    return False
-
-# ? Actualizar el slot
-
-
-def actualizar_slot(patente, tipo_de_vehículo, piso, fila, columna, garage=GARAGE):
-    """Actualiza el slot con la nueva informacion"""
-    slot = garage[piso][fila][columna]
-    slot[1] = patente
-    slot[3] = False
-    slot[5] = generar_fecha_aleatoria()
-    slot[6] = tipo_de_vehículo
-    print(f"Slot actualizado: {slot}")
-    return True
-
 # TODO VALIDAR INGRESO DE PATENTE
-
 
 def ingresar_patente(patente):
     if chequear_existencia_patente(patente):
         print("Error: La patente ya existe en el sistema.")
         return None
     while True:
-        patente = input(
-            "Ingrese la patente (3 letras y 3 numeros, ej: ABC123): ").strip().upper()
+        patente = input("Ingrese la patente (3 letras y 3 numeros, ej: ABC123): ").strip().upper()
         if len(patente) == 6 and patente[:3].isalpha() and patente[3:].isdigit():
             return patente
         else:
             print("Error: Formato de patente invalido. Intente nuevamente.")
-
 
 def salida_tipo_vehiculo(tipo_slot):
     salida = ""
@@ -160,7 +118,6 @@ def salida_tipo_vehiculo(tipo_slot):
     elif tipo_slot == 3:
         salida = "Camioneta"
     return salida
-
 
 def busqueda_espacio_libre(garage, tipo_slot):
     for piso in range(len(garage)):
@@ -193,43 +150,37 @@ def chequear_existencia_patente(patente):
     info_patentes = acceder_a_info_de_patentes()
     for info in info_patentes:
         if patente in info:
-            return True
+                return True
     return False
 
 # ? Consultar si es mensual o diairio
-
-
 def es_subscripcion_mensual(patente):
     """Chequea si la subscripcion es mensual o diaria"""
     info_patentes = acceder_a_info_de_patentes()
     for info in info_patentes:
         if patente in info:
-            return info[3]
+            return info[3] 
 
 # ? Buscar espacio libre
-
-
-def chequear_espacio_libre(garage=GARAGE):
+def chequear_espacio_libre(garage = GARAGE):
     """Chequea si hay espacio libre en el estacionamiento"""
     for piso_idx, piso in enumerate(garage):
         if len(piso) < 12:
             fila = piso[-1][0] + 1
-            return (piso_idx, fila)  # Falta retornar algun dato mas??
+            return (piso_idx, fila) ##Falta retornar algun dato mas??
 
 
 # ? Mostrar mensaje de éxito o error
 # ? REGISTRO SALIDA DE AUTO
 # ? Ingresar patente a buscar
 def buscar_patente(patente):
-    info_patentes = acceder_a_info_de_patentes()
+    info_patentes= acceder_a_info_de_patentes()
     for info in info_patentes:
         if patente in info:
             return info
 # ? Buscar la patente en el garage
 # ? Si no se encuentra, mostrar mensaje de error
 # ? Si se encuentra, calcular el tiempo y costo
-
-
 def calcular_costo_de_estadia(patente, hora_salida):
     info_patente = buscar_patente(patente)
     costo = 0
@@ -238,16 +189,14 @@ def calcular_costo_de_estadia(patente, hora_salida):
     tipo_de_slot = info_patente[-1]
     if not es_subscripcion_mensual(patente):
         min_entrada = info_patente[-2].split(" ")[1].replace(":", "")
-        min_transcurridos = int(
-            hora_salida.replace(":", "")) - int(min_entrada)
+        min_transcurridos = int(hora_salida.replace(":", "")) - int(min_entrada)
         horas_transcurridas = min_transcurridos / 60
         print(f"Horas transcurridas: {horas_transcurridas}")
         costo = COSTOS[tipo_de_slot][0] * horas_transcurridas
     else:
-        # Debemos agregar la {ultima fecha de pago???
-        costo = COSTOS[tipo_de_slot][1]
+        costo = COSTOS[tipo_de_slot][1] ### Debemos agregar la {ultima fecha de pago??? 
     return costo
-
+    
 # ? Actualizar el slot
 # ? Mostrar mensaje de éxito con el costo
 
