@@ -8,6 +8,7 @@ def buscar_por_patente(garage, patente):
     return (-1, -1)
 
 
+
 def buscar_espacio_libre(garage, tipo_vehiculo):
     for i in range(len(garage)):
         piso = garage[i]
