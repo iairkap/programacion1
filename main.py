@@ -20,8 +20,8 @@ def mostrar_estadisticas_rapidas(garage):
 
 
 def busqueda_espacio_libre(garage, tipo_vehiculo):
-    # cambiar el enumerate por un bucle for con index
-    for piso_idx, piso in enumerate(garage):
+    for piso_idx in range(len(garage)):
+        piso = garage[piso_idx]
         for slot in piso:
             if not slot[3]:
                 if slot[2] == tipo_vehiculo or slot[2] == 4:
@@ -30,7 +30,8 @@ def busqueda_espacio_libre(garage, tipo_vehiculo):
 
 
 def buscar_por_patente(garage, patente_buscada):
-    for piso_idx, piso in enumerate(garage):
+    for piso_idx in range(len(garage)):
+        piso = garage[piso_idx]
         for slot in piso:
             if slot[1] == patente_buscada and slot[3]:
                 return (piso_idx, slot[0])  # Retorna piso y slot_id
@@ -130,8 +131,8 @@ def generar_fecha_aleatoria():
 
 def eliminar_fila_por_valor(valor, garage=GARAGE):
     """Elimina la primera fila que contiene el valor dado"""
-    for i, fila in enumerate(garage):
-        if valor in fila:
+    for i in range(len(garage)):
+        if valor in garage[i]:
             del garage[i]
             return True
     return False
