@@ -1,4 +1,3 @@
-
 from garage_util import (
     contar_espacios_libres,
     buscar_por_patente,
@@ -6,8 +5,11 @@ from garage_util import (
     contar_espacios_libres_por_tipo
 )
 from interaccion_usuario import pedir_piso, pedir_patente, pedir_tipo_vehiculo
+from main import ingresar_auto_matriz, contar_por_tipo_vehiculo, chequear_espacio_libre
+from mockdata import GARAGE, COSTOS
 
-from main import garage
+garage = GARAGE
+
 
 def mostrar_menu():
     print("\n--- MENÚ PRINCIPAL ---")
@@ -20,12 +22,12 @@ def mostrar_menu():
     print("7. Buscar vehículo por patente")
     print("8. Estadísticas rápidas")
     print("9. Salir")
-    
+
+
 def menu():
     while True:
         mostrar_menu()
         opcion = input("Seleccione una opción: ")
-#! agregar validacion aca para el ingreso de opciones, pedir por parametro el num max de opciones
 
         if opcion == "1":
             print("\n1. Por piso\n2. Por tipo de vehículo\n3. Totales\n4. Volver")
@@ -35,38 +37,42 @@ def menu():
                 libres = contar_espacios_libres([garage[piso]])
                 print(f"Espacios libres en el piso {piso}: {libres}")
             elif subop == "2":
+                print("\nTipos de vehículo:")
+                print("1. Moto\n2. Auto\n3. Camioneta\n4. Bicicleta")
                 tipo = pedir_tipo_vehiculo()
-                libres = contar_esapcios_libres_por_tipo(garage, tipo)
+                libres = contar_espacios_libres_por_tipo(garage, tipo)
                 print(f"Espacios libres para tipo {tipo}: {libres}")
             elif subop == "3":
                 libres = contar_espacios_libres(garage)
                 print(f"Espacios libres en todo el garage: {libres}")
-            elif subop == "4":
-                continue
 
         elif opcion == "2":
             print("\n1. Por tipo de vehículo\n2. Totales\n3. Volver")
             subop = input("Seleccione una de las opciones: ")
             if subop == "1":
+                print("\nTipos de vehículo:")
+                print("1. Moto\n2. Auto\n3. Camioneta\n4. Bicicleta")
                 tipo = pedir_tipo_vehiculo()
-                cantidad = contar_esapcios_libres_por_tipo(garage, tipo)
-                print(f"Cantidad de vehículos tipo {tipo}: {cantidad}")
+                cantidad = contar_por_tipo_vehiculo(garage, tipo)
+                tipos_nombres = {1: "Motos", 2: "Autos",
+                                 3: "Camionetas", 4: "Bicicletas"}
+                print(
+                    f"Cantidad de {tipos_nombres[tipo]} estacionadas: {cantidad}")
             elif subop == "2":
-                for tipo in range(1, 4):
-                    cantidad = contar_esapcios_libres_por_tipo(garage, tipo)
-                    print(f"Tipo {tipo}: {cantidad}")
-            elif subop == "3":
-                continue
+                print("\n--- Vehículos estacionados por tipo ---")
+                tipos = {1: "Motos", 2: "Autos",
+                         3: "Camionetas", 4: "Bicicletas"}
+                for tipo_num, tipo_nombre in tipos.items():
+                    cantidad = contar_por_tipo_vehiculo(garage, tipo_num)
+                    print(f"{tipo_nombre}: {cantidad}")
 
         elif opcion == "3":
             ingresar_auto_matriz(garage)
 
         elif opcion == "4":
-            patente = pedir_patente()
             print("Funcionalidad de salida de vehículo no implementada.")
 
         elif opcion == "5":
-            patente = pedir_patente()
             print("Funcionalidad de reubicación no implementada.")
 
         elif opcion == "6":
@@ -89,10 +95,6 @@ def menu():
 
         else:
             print("Opción inválida. Intente de nuevo.")
-            
-menu()
 
-#notas:
-# mostrar los tipos de veiculos en el menu
-# validar entradas de menu
-#hacer todo en un try para que no rompa
+
+menu()

@@ -135,3 +135,31 @@ Bloqueos / movimientos (si el modelo lo contempla)
 
 Aceptación
 • Para un mismo layout, el conteo de bloqueos es determinista y coherente con el mapa.
+
+# Representación del garage: lista de pisos (matrices)
+
+# Cada elemento es: [id, patente, tipo_slot, ocupado, reservado_mensual, hora_entrada, tipo_vehiculo_estacionado]
+
+# tipo_slot: 1=moto, 2=auto, 3=camioneta, 4=multi (acepta cualquiera)
+
+# ocupado: True/False
+
+# reservado_mensual: True/False
+
+# hora_entrada: timestamp o None si está vacío
+
+# tipo_vehiculo_estacionado: 1=moto, 2=auto, 3=camioneta, 4=bici, 0=vacío
+
+# Representación del garage: lista de pisos (matrices)
+
+# Cada elemento es: [id, patente, tipo_slot, ocupado, reservado_mensual, hora_entrada, tipo_vehiculo_estacionado]
+
+# tipo_slot: 1=moto, 2=auto, 3=camioneta, 4=multi (acepta cualquiera)
+
+# ocupado: True/False
+
+# reservado_mensual: True/False
+
+# hora_entrada: timestamp o None si está vacío
+
+# tipo_vehiculo_estacionado: 1=moto, 2=auto, 3=camioneta, 4=bici, 0=vacío
