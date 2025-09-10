@@ -6,12 +6,26 @@ from interaccion_usuario import pedir_patente
 #! TODO MODULARIZAR CODIGO -> MUCHA REPETICION DE FOR y de los bucles
 
 
+def mostrar_estadisticas_rapidas(garage):
+    print("\n--- ESTADÍSTICAS RÁPIDAS ---")
+    total_libres = contar_espacios_libres(garage)
+    total_estacionados = sum(contar_por_tipo_vehiculo(garage, tipo) for tipo in range(1, 5))
+    print(f"Total de espacios libres: {total_libres}")
+    print(f"Total de vehículos estacionados: {total_estacionados}")
+    tipos = {1: "Motos", 2: "Autos", 3: "Camionetas", 4: "Bicicletas"}
+    for tipo_num, tipo_nombre in tipos.items():
+        cantidad = contar_por_tipo_vehiculo(garage, tipo_num)
+        print(f"{tipo_nombre}: {cantidad}")
+
+
+
+
 def busqueda_espacio_libre(garage, tipo_vehiculo):
-    for piso_idx, piso in enumerate(garage):
+    for piso_idx, piso in enumerate(garage):#cambiar el enumerate por un bucle for con index 
         for slot in piso:
-            if not slot[3]:  # Si no está ocupado
-                if slot[2] == tipo_vehiculo or slot[2] == 4:  # Si el tipo de slot es adecuado
-                    return (piso_idx, slot[0])  # Retorna piso y slot_id
+            if not slot[3]:  
+                if slot[2] == tipo_vehiculo or slot[2] == 4: 
+                    return (piso_idx, slot[0])  
     return (-1, -1)
 
 
@@ -40,7 +54,38 @@ def obtener_slot_por_id(garage, slot_id):
     return None
 
 
-def ingresar_auto_matriz(garage):
+
+def registrar_salida_vehiculo(garage, patente):
+    """
+    devuelve True si se realizó la salida, False si no se encontró la patente.
+    """
+    for piso in garage:
+        for slot in piso:
+            if slot[3] == True and slot[1] == patente:
+                slot[1] = ""      # patente
+                slot[3] = False   # Marca como libre
+                slot[5] = ""      # Borra la fecha de ingreso
+                slot[6] = 0       # Borra el tipo de vehículo
+                return True
+    return False
+
+def modificar_vehiculo(garage, patente, nuevo_tipo=None, nueva_patente=None):
+    """
+    devuelve True si se modificó, False si no se encontró la patente.
+    """
+    for piso in garage:
+        for slot in piso:
+            if slot[3] == True and slot[1] == patente:
+                if nuevo_tipo is not None:
+                    slot[6] = nuevo_tipo
+                if nueva_patente is not None:
+                    slot[1] = nueva_patente
+                return True
+    return False
+
+
+
+def registrar_entrada_auto(garage):
     
     patente =pedir_patente()
 

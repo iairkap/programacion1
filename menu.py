@@ -3,9 +3,20 @@ from garage_util import (
     buscar_por_patente,
     buscar_espacio_libre,
     contar_espacios_libres_por_tipo
+
 )
-from interaccion_usuario import pedir_piso, pedir_patente, pedir_tipo_vehiculo
-from main import ingresar_auto_matriz, contar_por_tipo_vehiculo, chequear_espacio_libre
+from interaccion_usuario import(
+        pedir_piso,
+        pedir_patente,
+        pedir_tipo_vehiculo,
+        mostrar_estado_garage)
+from main import ( 
+        registrar_entrada_auto,
+        contar_por_tipo_vehiculo,
+        chequear_espacio_libre,
+        registrar_salida_vehiculo,
+        modificar_vehiculo,
+        mostrar_estadisticas_rapidas)
 from mockdata import GARAGE, COSTOS
 
 garage = GARAGE
@@ -17,7 +28,7 @@ def mostrar_menu():
     print("2. Consultar cantidad de vehículos estacionados")
     print("3. Ingresar un vehículo")
     print("4. Registrar salida de un vehículo")
-    print("5. Reubicar un vehículo")
+    print("5. Editar un vehículo")
     print("6. Mostrar estado del garage")
     print("7. Buscar vehículo por patente")
     print("8. Estadísticas rápidas")
@@ -67,16 +78,28 @@ def menu():
                     print(f"{tipo_nombre}: {cantidad}")
 
         elif opcion == "3":
-            ingresar_auto_matriz(garage)
+            registrar_entrada_auto(garage)
 
         elif opcion == "4":
-            print("Funcionalidad de salida de vehículo no implementada.")
+            patente = pedir_patente()
+            if registrar_salida_vehiculo(garage, patente):
+                print("Salida registrada correctamente.")
+            else:
+                print("Patente no encontrada.")
 
         elif opcion == "5":
-            print("Funcionalidad de reubicación no implementada.")
+            patente = pedir_patente()
+            nuevo_tipo = pedir_tipo_vehiculo()  
+            nueva_patente = input("Nueva patente (dejar vacío para no cambiar): ").strip().upper()
+            if nueva_patente == "":
+                nueva_patente = None
+            if modificar_vehiculo(garage, patente, nuevo_tipo, nueva_patente):
+                print("Vehículo modificado correctamente.")
+            else:
+                print("Patente no encontrada.")
 
         elif opcion == "6":
-            print("Funcionalidad de mostrar estado no implementada.")
+            mostrar_estado_garage(garage)
 
         elif opcion == "7":
             patente = pedir_patente()
@@ -87,7 +110,7 @@ def menu():
                 print("Vehículo no encontrado.")
 
         elif opcion == "8":
-            print("Funcionalidad de estadísticas no implementada.")
+            mostrar_estadisticas_rapidas(garage)
 
         elif opcion == "9":
             print("¡Hasta luego!")

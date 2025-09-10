@@ -2,6 +2,23 @@ def pedir_piso(garage):
     return pedir_num_natural(max =len(garage))
 
 
+
+
+
+        
+
+
+def mostrar_estado_garage(garage):
+    print("\n--- ESTADO DEL GARAGE ---")
+    imprimir_piso = lambda idx, piso: (
+        print(f"\nPiso {idx}:"),
+        [print(
+            f"  Slot {slot[0]}: {'Ocupado' if slot[3] else 'Libre'} | Patente: {slot[1] if slot[3] else '-'} | Tipo: {slot[6] if slot[3] else '-'}"
+        ) for slot in piso]
+    )
+    for idx in range(len(garage)):
+        imprimir_piso(idx, garage[idx])
+
 def pedir_patente():
     # estructura de patente 
     # NUEVA = AB123CD
