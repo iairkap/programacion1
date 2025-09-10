@@ -5,9 +5,7 @@ def pedir_piso(garage):
 
 
 
-        
-
-
+#!Funcion Lambda -> 
 def mostrar_estado_garage(garage):
     print("\n--- ESTADO DEL GARAGE ---")
     imprimir_piso = lambda idx, piso: (
@@ -45,6 +43,8 @@ def pedir_patente():
             print(e)
     
 
+
+
 def pedir_tipo_vehiculo():
     return pedir_num_natural(min = 1, max = 4)
 
@@ -61,3 +61,7 @@ def pedir_num_natural(max,min = 0):
             print("por favor ingresa un numero")
         except Exception as e : 
             print(e)
+            
+            
+            
+            
