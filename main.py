@@ -1,6 +1,7 @@
 import funciones
 from mockdata import GARAGE, COSTOS
 import random
+from interaccion_usuario import pedir_patente
 
 #! TODO MODULARIZAR CODIGO -> MUCHA REPETICION DE FOR y de los bucles
 
@@ -40,7 +41,9 @@ def obtener_slot_por_id(garage, slot_id):
 
 
 def ingresar_auto_matriz(garage):
-    patente = input("Agrega el nro de patente: ").strip().upper()
+    
+    patente =pedir_patente()
+
     tipo_vehiculo = funciones.tipo_slot()
 
     # Verificar si la patente ya existe
@@ -98,8 +101,7 @@ def actualizar_slot(patente, tipo_de_vehículo, piso, fila, columna, garage=GARA
 def ingresar_patente():
     """CORREGIDA - quité el parámetro que no se usaba"""
     while True:
-        patente = input(
-            "Ingrese la patente (3 letras y 3 numeros, ej: ABC123): ").strip().upper()
+        patente = pedir_patente()
         if chequear_existencia_patente(patente):
             print("Error: La patente ya existe en el sistema.")
             continue

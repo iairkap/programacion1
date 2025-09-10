@@ -6,9 +6,10 @@ def pedir_patente():
     # estructura de patente 
     # NUEVA = AB123CD
     # VIEJA = ABC123
+
     while True:
         try:
-            patente = input("ingrese la patente:")
+            patente = input("ingrese la patente:").strip().upper()
             digitos = len(patente)
             if digitos != 6 and digitos != 7:
                 print("las nuevas patentes tienen 7 digitos y las antiguas 6")
@@ -35,7 +36,7 @@ def pedir_tipo_vehiculo():
 def pedir_num_natural(max,min = 0):
     while True:
         try:
-            num = int(input("ingresa el numero"))
+            num = int(input("ingresa el numero: "))
             if num < min or num > max:
                 print(f"el nuero ingresado tiene que ser un num valido, entre {min} y {max}")
             else: return num
