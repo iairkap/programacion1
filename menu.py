@@ -5,7 +5,7 @@ from garage_util import (
     contar_espacios_libres_por_tipo
 )
 from interaccion_usuario import pedir_piso, pedir_patente, pedir_tipo_vehiculo
-from main import ingresar_auto_matriz, contar_por_tipo_vehiculo, chequear_espacio_libre
+from main import ingresar_auto_matriz, contar_por_tipo_vehiculo, chequear_espacio_libre, registrar_salida_vehiculo
 from mockdata import GARAGE, COSTOS
 
 garage = GARAGE
@@ -70,7 +70,7 @@ def menu():
             ingresar_auto_matriz(garage)
 
         elif opcion == "4":
-            print("Funcionalidad de salida de vehículo no implementada.")
+            registrar_salida_vehiculo(garage)
 
         elif opcion == "5":
             print("Funcionalidad de reubicación no implementada.")

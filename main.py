@@ -41,8 +41,8 @@ def obtener_slot_por_id(garage, slot_id):
 
 
 def ingresar_auto_matriz(garage):
-    
-    patente =pedir_patente()
+
+    patente = pedir_patente()
 
     tipo_vehiculo = funciones.tipo_slot()
 
@@ -94,7 +94,6 @@ def eliminar_fila_por_valor(valor, garage=GARAGE):
 
 
 def actualizar_slot(patente, tipo_de_vehículo, piso, fila, columna, garage=GARAGE):
-
     pass
 
 
@@ -109,19 +108,6 @@ def ingresar_patente():
             return patente
         else:
             print("Error: Formato de patente invalido. Intente nuevamente.")
-
-
-def salida_tipo_vehiculo(tipo_slot):
-    """Convierte tipo numérico a texto"""
-    if tipo_slot == 1:
-        return "Moto"
-    elif tipo_slot == 2:
-        return "Auto"
-    elif tipo_slot == 3:
-        return "Camioneta"
-    elif tipo_slot == 4:
-        return "Bicicleta"
-    return "Desconocido"
 
 
 def acceder_a_info_de_patentes():
@@ -185,6 +171,48 @@ def calcular_costo_de_estadia(patente, hora_salida):
         return COSTOS[tipo_de_slot][1]
 
     return 0
+
+
+def registrar_salida_vehiculo(garage):
+    patente = pedir_patente()
+    pos = buscar_por_patente(garage, patente)
+    if pos == (-1, -1):
+        print("Vehículo no encontrado.")
+        return False
+
+    hora_salida = input("Ingrese hora de salida (HH:MM): ").strip()
+    costo = calcular_costo_de_estadia(patente, hora_salida)
+
+    piso_idx, slot_id = pos
+    # Buscar el objeto slot por ID dentro del piso
+    for slot in garage[piso_idx]:
+        if slot[0] == slot_id:
+            # Mostrar costo antes de liberar
+            print(f"Costo de estadía para {patente}: ${costo}")
+            # Liberar
+            slot[1] = ""
+            slot[3] = False
+            slot[5] = None
+            slot[6] = 0
+            print(
+                f"Salida registrada. Piso {piso_idx}, Slot {slot_id} liberado.")
+            return True
+
+    print("Error interno liberando el slot.")
+    return False
+
+
+def salida_tipo_vehiculo(tipo_slot):
+    """Convierte tipo numérico a texto"""
+    if tipo_slot == 1:
+        return "Moto"
+    elif tipo_slot == 2:
+        return "Auto"
+    elif tipo_slot == 3:
+        return "Camioneta"
+    elif tipo_slot == 4:
+        return "Bicicleta"
+    return "Desconocido"
 
 
 # Configuración del edificio
