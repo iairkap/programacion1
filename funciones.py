@@ -20,3 +20,5 @@ def tipo_slot():
             else:
                 print(
                     "Error: Ingrese un numero (1-3) o el tipo de vehiculo (moto/auto/suv-camioneta)")
+                
+
