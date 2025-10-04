@@ -17,6 +17,13 @@ from main import (
     registrar_salida_vehiculo,
     modificar_vehiculo,
     mostrar_estadisticas_rapidas)
+
+from usuarios import(
+    creacion_usuario,
+    crear_archivo_users,
+    user_login
+)
+
 from mockdata import GARAGE, COSTOS
 
 garage = GARAGE
@@ -24,6 +31,7 @@ garage = GARAGE
 
 def mostrar_menu():
     print("\n--- MENÚ PRINCIPAL ---")
+    
     print("1. Consultar espacios libres")
     print("2. Consultar cantidad de vehículos estacionados")
     print("3. Ingresar un vehículo")
@@ -32,7 +40,9 @@ def mostrar_menu():
     print("6. Mostrar estado del garage")
     print("7. Buscar vehículo por patente")
     print("8. Estadísticas rápidas")
-    print("9. Salir")
+    print("9. Crear usuario")
+    print("10. Iniciar sesión")
+    print("11. Salir")
 
 
 def menu():
@@ -112,11 +122,29 @@ def menu():
 
         elif opcion == "8":
             mostrar_estadisticas_rapidas(garage)
-
+        
         elif opcion == "9":
+            crear_archivo_users()
+            usuario = creacion_usuario()
+
+            if usuario:
+                arch_users = open("files/users.csv", mode="a", encoding="utf-8")
+                arch_users.write(f"{usuario['nombre']},{usuario['apellido']},{usuario['email']},{usuario['password']}\n")
+                arch_users.close()
+                print("Usuario creado exitosamente:", usuario)
+            else:
+                print("No se pudo crear el usuario.")
+        elif opcion == "10":
+            user_login()
+            if user_login():
+                print("Login exitoso")
+            else:
+                print("Login fallido")
+        elif opcion == "11":
             print("¡Hasta luego!")
             break
-
+            
+        
         else:
             print("Opción inválida. Intente de nuevo.")
 
