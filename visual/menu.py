@@ -1,4 +1,4 @@
-from garage.garage_util import (
+from garag.garage_util import (
     contar_espacios_libres,
     buscar_por_patente,
     buscar_espacio_libre,
@@ -24,7 +24,7 @@ from users.usuarios import(
     user_login
 )
 
-from garage.mockdata import GARAGE, COSTOS
+from garag.mockdata import GARAGE, COSTOS
 
 garage = GARAGE
 

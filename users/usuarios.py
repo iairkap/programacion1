@@ -43,9 +43,33 @@ crear_archivo_users()
 
 usuario = creacion_usuario()
 
+def chequear_existencia_email(email):
+    """Chequea si el email existe en el sistema
+    retorna True si existe, else False"""
+    try:
+        arch_users = open("files/users.csv", mode="r", encoding="utf-8")
+        next(arch_users)  # Saltar la primera linea (headers)
+        
+        for line in arch_users:
+            nombre, apellido, user_email, user_password = line.strip().split(',')
+            if user_email == email:
+                arch_users.close()
+                return True
+        
+        arch_users.close()
+        return False
+    
+    except FileNotFoundError:
+        print("Error: El archivo de usuarios no existe.")
+        return False
+
 if usuario:
     arch_users = open("files/users.csv", mode="a", encoding="utf-8")
-    arch_users.write(f"{usuario['nombre']},{usuario['apellido']},{usuario['email']},{usuario['password']}\n")
+    #Hay que verificar si ya existe el email en el sistema
+    if chequear_existencia_email(usuario['email']):
+        print("Error: El email ya existe en el sistema.")
+    else:
+        arch_users.write(f"{usuario['nombre']},{usuario['apellido']},{usuario['email']},{usuario['password']}\n")
     arch_users.close()
     print("Usuario creado exitosamente:", usuario)
 else:
