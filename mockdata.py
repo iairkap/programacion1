@@ -1,8 +1,22 @@
 
-""" ["id", "patente", "tipo_slot", "ocupado", "reservado_mensual", "hora_entrada", "tipo_vehiculo_estacionado"] """
-
+{
+    "user": "iairkaplun",
+    "email": "", 
+    "garage_name": "Estacionamiento Uade",
+    "garage_id": "123456789",
+    "garage_address": "Av. Cordoba 1234, CABA",
+    "garage_floors": 4,
+    "slots_per_floor": 12, 
+    "tariffs": {
+        "moto": {"hourly": 2200, "daily": 50000},
+        "auto": {"hourly": 2400, "daily": 165000},
+        "camioneta": {"hourly": 3500, "daily": 200000},
+    }
+ 
+}
 
 GARAGE = [
+
     # PLANTA BAJA (piso 0) - 3x4 slots
     [
         """ {
