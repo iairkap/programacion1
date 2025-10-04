@@ -64,13 +64,29 @@ def es_subscripcion_mensual(patente):
             return info[3] 
 
 
+
+
+
+#!Funcion Lambda -> 
+def mostrar_estado_garage(garage):
+    print("\n--- ESTADO DEL GARAGE ---")
+    imprimir_piso = lambda idx, piso: (
+        print(f"\nPiso {idx}:"),
+        [print(
+            f"  Slot {slot[0]}: {'Ocupado' if slot[3] else 'Libre'} | Patente: {slot[1] if slot[3] else '-'} | Tipo: {slot[6] if slot[3] else '-'}"
+        ) for slot in piso]
+    )
+    for idx in range(len(garage)):
+        imprimir_piso(idx, garage[idx])
+
 def pedir_patente():
     # estructura de patente 
     # NUEVA = AB123CD
     # VIEJA = ABC123
+
     while True:
         try:
-            patente = input("ingrese la patente:")
+            patente = input("ingrese la patente:").strip().upper()
             digitos = len(patente)
             if digitos != 6 and digitos != 7:
                 print("las nuevas patentes tienen 7 digitos y las antiguas 6")
@@ -99,7 +115,7 @@ def pedir_tipo_vehiculo():
 def pedir_num_natural(max,min = 0):
     while True:
         try:
-            num = int(input("ingresa el numero"))
+            num = int(input("ingresa el numero: "))
             if num < min or num > max:
                 print(f"el nuero ingresado tiene que ser un num valido, entre {min} y {max}")
             else: return num
@@ -107,3 +123,7 @@ def pedir_num_natural(max,min = 0):
             print("por favor ingresa un numero")
         except Exception as e : 
             print(e)
+            
+            
+            
+            
