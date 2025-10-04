@@ -6,8 +6,8 @@
 # hora_entrada: timestamp o None si está vacío
 # tipo_vehiculo_estacionado: 1=moto, 2=auto, 3=camioneta, 4=bici, 0=vacío
 
-import funciones
-from mockdata import GARAGE, COSTOS
+import garage.slot_utils as slot_utils
+from garage.mockdata import GARAGE, COSTOS
 import random
 
 #! TODO MODULARIZAR CODIGO -> MUCHA REPETICION DE FOR y de los bucles
@@ -46,7 +46,7 @@ def contar_por_tipo_vehiculo(garage, tipo_buscado):
 
 def ingresar_auto_matriz(garage):
     patente = input("Agrega el nro de patente: ")
-    tipo_vehiculo = funciones.tipo_slot()
+    tipo_vehiculo = slot_utils.tipo_slot()
 
     # Verificar si la patente ya existe
     posicion_existente = buscar_por_patente(garage, patente)
@@ -86,15 +86,7 @@ def eliminar_fila_por_valor(valor, garage=GARAGE):
     return False
 
 # ? Actualizar el slot
-def actualizar_slot(patente, tipo_de_vehículo, piso, fila, columna, garage=GARAGE ):
-    """Actualiza el slot con la nueva informacion"""
-    slot = garage[piso][fila][columna]
-    slot[1] = patente
-    slot[3] = False
-    slot[5] = generar_fecha_aleatoria()
-    slot[6] = tipo_de_vehículo
-    print(f"Slot actualizado: {slot}")
-    return True 
+
 
 # TODO VALIDAR INGRESO DE PATENTE
 

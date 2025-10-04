@@ -1,90 +1,13 @@
-import funciones
-from mockdata import GARAGE, COSTOS
+import garage.slot_utils as slot_utils
+from garage.mockdata import GARAGE, COSTOS
 import random
-from interaccion_usuario import pedir_patente
+from users.interaccion_usuario import pedir_patente
+from garage.garage_util import * 
 
-#! TODO MODULARIZAR CODIGO -> MUCHA REPETICION DE FOR y de los bucles
+#! TODO MODULARIZAR CODIGO 
+## En main solo debemos tener la logica de iniciarlizar el programa y de ahí se pueden llamar a los otros modulos
 
 # FUNCIÓN PARA MOSTRAR ESTADÍSTICAS GENERALES DEL GARAGE
-
-
-def mostrar_estadisticas_rapidas(garage):
-    print("\n--- ESTADÍSTICAS RÁPIDAS ---")
-    # Cuenta todos los espacios libres en el garage
-    total_libres = contar_espacios_libres(garage)
-    # Suma todos los vehículos estacionados de todos los tipos (1-4)
-    total_estacionados = sum(contar_por_tipo_vehiculo(
-        garage, tipo) for tipo in range(1, 5))
-    print(f"Total de espacios libres: {total_libres}")
-    print(f"Total de vehículos estacionados: {total_estacionados}")
-    # Diccionario para convertir números de tipo a nombres legibles
-    tipos = {1: "Motos", 2: "Autos", 3: "Camionetas", 4: "Bicicletas"}
-    # Muestra la cantidad de cada tipo de vehículo estacionado
-    for tipo_num, tipo_nombre in tipos.items():
-        cantidad = contar_por_tipo_vehiculo(garage, tipo_num)
-        print(f"{tipo_nombre}: {cantidad}")
-
-# FUNCIÓN PRINCIPAL PARA BUSCAR UN ESPACIO LIBRE COMPATIBLE
-
-
-def busqueda_espacio_libre(garage, tipo_vehiculo):
-    # Recorre todos los pisos del garage
-    for piso_idx in range(len(garage)):
-        piso = garage[piso_idx]
-        # Recorre todos los slots del piso actual
-        for slot in piso:
-            # Verifica si el slot está libre (slot[3] = False)
-            if not slot[3]:
-                # Verifica si el tipo de slot es compatible (mismo tipo o tipo 4 = multi)
-                if slot[2] == tipo_vehiculo or slot[2] == 4:
-                    # Retorna la posición: (piso, slot_id)
-                    return (piso_idx, slot[0])
-    # Si no encuentra espacio, retorna (-1, -1)
-    return (-1, -1)
-
-# FUNCIÓN PARA BUSCAR UN VEHÍCULO POR SU PATENTE
-
-
-def buscar_por_patente(garage, patente_buscada):
-    # Recorre todos los pisos
-    for piso_idx in range(len(garage)):
-        piso = garage[piso_idx]
-        # Recorre todos los slots del piso
-        for slot in piso:
-            # Verifica si la patente coincide Y el slot está ocupado (slot[3] = True)
-            if slot[1] == patente_buscada and slot[3]:
-                return (piso_idx, slot[0])  # Retorna piso y slot_id
-    return (-1, -1)
-
-# FUNCIÓN PARA CONTAR TODOS LOS ESPACIOS LIBRES DEL GARAGE
-
-
-def contar_espacios_libres(garage):
-    # Usa comprensión de lista anidada para contar slots con slot[3] = False
-    return sum(not slot[3] for piso in garage for slot in piso)
-
-# FUNCIÓN PARA CONTAR VEHÍCULOS DE UN TIPO ESPECÍFICO
-
-
-def contar_por_tipo_vehiculo(garage, tipo_buscado):
-    # Cuenta slots donde slot[6] = tipo_buscado Y slot[3] = True (ocupado)
-    return sum(slot[6] == tipo_buscado and slot[3] for piso in garage for slot in piso)
-
-# FUNCIÓN AUXILIAR PARA OBTENER UN SLOT POR SU ID
-
-
-def obtener_slot_por_id(garage, slot_id):
-    """Obtiene slot por ID - NUEVA función auxiliar"""
-    # Busca en todos los pisos y slots
-    for piso in garage:
-        for slot in piso:
-            # Compara con slot[0] que es el ID del slot
-            if slot[0] == slot_id:
-                return slot
-    return None
-
-# FUNCIÓN PARA REGISTRAR SALIDA (VERSIÓN SIMPLE)
-
 
 def registrar_salida_vehiculo(garage, patente):
     """
@@ -128,7 +51,7 @@ def registrar_entrada_auto(garage):
     # Solicita la patente al usuario
     patente = pedir_patente()
     # Solicita el tipo de vehículo
-    tipo_vehiculo = funciones.tipo_slot()
+    tipo_vehiculo = slot_utils.tipo_slot()
 
     # VALIDACIÓN: Verificar si la patente ya existe en el sistema
     posicion_existente = buscar_por_patente(garage, patente)
@@ -184,15 +107,8 @@ def eliminar_fila_por_valor(valor, garage=GARAGE):
             return True
     return False
 
-# FUNCIÓN OBSOLETA (NO SE USA CON ESTRUCTURA 2D)
-
-
-def actualizar_slot(patente, tipo_de_vehículo, piso, fila, columna, garage=GARAGE):
-    pass
 
 # FUNCIÓN ALTERNATIVA PARA INGRESAR PATENTES CON VALIDACIÓN
-
-
 def ingresar_patente():
     """CORREGIDA - quité el parámetro que no se usaba"""
     while True:
