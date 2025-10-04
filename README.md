@@ -1,3 +1,70 @@
+# SlotMaster 🚗🅿️
+
+**Proyecto Final – Programación 1**
+
+---
+
+## 📌 Descripción del Proyecto
+
+**SlotMaster** es una simulación de un estacionamiento de varios pisos, diseñada para resolver los principales problemas de los usuarios y administradores de parkings:
+
+- Identificación rápida de espacios disponibles.
+- Registro ordenado de ingresos y egresos.
+- Cálculo automático y transparente de la estadía.
+- Diferenciación de espacios y tarifas según el tipo de vehículo (motos, autos y 4x4).
+
+El sistema se desarrolla con un enfoque académico, trabajando con **matrices y listas** para modelar pisos, slots y movimientos.
+
+---
+
+## 🎯 Objetivos
+
+- **Visualización de ocupación por piso:** Representar y mostrar claramente el estado de cada slot.
+- **Asignación y liberación de espacios:** Validar el tipo de vehículo y sugerir el lugar más adecuado.
+- **Cálculo automático de costos:** Registrar la hora de entrada/salida y liquidar la estadía según reglas configurables.
+- **Gestión por tipo de vehículo:** Soporte para motos, autos y 4x4 con reglas y tarifas diferenciadas.
+- **Egresos por piso:** Modelar salidas en cada nivel para mejorar circulación.
+
+---
+
+## 📊 Reportes y Resultados
+
+El programa genera información útil para usuarios y administradores:
+
+- **Estado instantáneo:** Slots libres/ocupados y mapa textual por piso.
+- **Métricas diarias:** Cantidad de ingresos/egresos y ocupación promedio.
+- **Distribución de uso:** Espacios libres vs espacios ocupados
+
+A futuro ->
+
+- **Historial de movimientos:** Registro cronológico de ingresos y salidas.
+- **Reportes relacionados con recaudacion y dinero:**
+
+## 🚀 Futuras Mejoras
+
+- Persistencia en archivos.
+- Exportación de reportes.
+- Algoritmos avanzados de asignación y circulación. (PILAS)
+
+---
+
+## 👩‍💻 Integrantes
+
+- Iair Kaplun
+- Juan Pablo Etchart
+- Emma Aprile
+- Klear Madera
+
+**Profesor/a:** Ing. Verónica Galat
+
+---
+
+## 🏁 Conclusión
+
+**SlotMaster** busca brindar una experiencia más eficiente y transparente en la gestión de estacionamientos, a la vez que constituye un ejercicio académico sólido en el manejo de estructuras de datos, interacción por menús y simulaciones realistas.
+
+---
+
 ## PARAMETROS POR OMISION
 
 Dentro del archivo interaccion_usuario -> pedir_tipo_de_vehciculo

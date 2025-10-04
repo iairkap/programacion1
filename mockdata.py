@@ -1,18 +1,30 @@
+
+""" ["id", "patente", "tipo_slot", "ocupado", "reservado_mensual", "hora_entrada", "tipo_vehiculo_estacionado"] """
+
+
 GARAGE = [
     # PLANTA BAJA (piso 0) - 3x4 slots
     [
-        [1, "", 1, False, False, None, 0],    
-        [2, "ABC123", 2, False, False, "2025-09-04 08:30", 2],
-        [3, "", 2, False, True, None, 0],    
-        [4, "DEF456", 3, True, False, "2025-09-04 09:15", 3],
-        [5, "GHI789", 1, True, False, "2025-09-04 07:45",1], 
-        [6, "", 4, False, False, None, 0],
-        [7, "", 2, False, False, None, 0], 
-        [8, "JKL012", 2, True, True, "2025-09-04 10:00", 2],
-        [9, "", 1, False, False, None, 0],   
-        [10, "MNO345", 4, True, False, "2025-09-04 11:20", 4],
-        [11, "", 3, False, False, None, 0],  
-        [12, "", 2, False, True, None, 0]
+        """ {
+            "id": 1, 
+            "patente": "", 
+            "tipo_slot": 1, 
+            "ocupado": False, 
+            "reservado_mensual": False, 
+            "hora_entrada": None,
+            "tipo_vehiculo_estacionado": 0
+            },    
+        {"id": 2, "patente": "ABC123", "tipo_slot": 2, "ocupado": False, "reservado_mensual": False, "hora_entrada": "2025-09-04 08:30", "tipo_vehiculo_estacionado": 2},
+        {"id": 3, "patente": "", "tipo_slot": 2, "ocupado": False, "reservado_mensual": True, "hora_entrada": None, "tipo_vehiculo_estacionado": 0},    
+        {"id": 4, "patente": "DEF456", "tipo_slot": 3, "ocupado": True, "reservado_mensual": False, "hora_entrada": "2025-09-04 09:15", "tipo_vehiculo_estacionado": 3},
+        {"id": 5, "patente": "GHI789", "tipo_slot": 1, "ocupado": True, "reservado_mensual": False, "hora_entrada": "2025-09-04 07:45", "tipo_vehiculo_estacionado": 1}, 
+        {"id": 6, "patente": "", "tipo_slot": 4, "ocupado": False, "reservado_mensual": False, "hora_entrada": None, "tipo_vehiculo_estacionado": 0},
+        {"id": 7, "patente": "", "tipo_slot": 2, "ocupado": False, "reservado_mensual": False, "hora_entrada": None, "tipo_vehiculo_estacionado": 0}, 
+        {"id": 8, "patente": "JKL012", "tipo_slot": 2, "ocupado": True, "reservado_mensual": True, "hora_entrada": "2025-09-04 10:00", "tipo_vehiculo_estacionado": 2},
+        {"id": 9, "patente": "", "tipo_slot": 1, "ocupado": False, "reservado_mensual": False, "hora_entrada": None, "tipo_vehiculo_estacionado": 0},   
+        {"id": 10, "patente": "MNO345", "tipo_slot": 4, "ocupado": True, "reservado_mensual": False, "hora_entrada": "2025-09-04 11:20", "tipo_vehiculo_estacionado": 4},
+        {"id": 11, "patente": "", "tipo_slot": 3, "ocupado": False, "reservado_mensual": False, "hora_entrada": None, "tipo_vehiculo_estacionado": 0},  
+        {"id": 12, "patente": "", "tipo_slot": 2, "ocupado": False, "reservado_mensual": True, "hora_entrada": None, "tipo_vehiculo_estacionado": 0} """
     ],
 
     # PISO 1 - 3x4 slots
