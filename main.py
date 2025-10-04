@@ -299,7 +299,7 @@ def calcular_costo_de_estadia(patente, hora_salida):
 
 # FUNCIÓN COMPLETA PARA REGISTRAR SALIDA CON CÁLCULO DE COSTO
 
-
+""" 
 def registrar_salida_vehiculo(garage):
     # Solicita patente al usuario
     patente = pedir_patente()
@@ -329,7 +329,7 @@ def registrar_salida_vehiculo(garage):
             return True
 
     print("Error interno liberando el slot.")
-    return False
+    return False """
 
 # FUNCIÓN AUXILIAR PARA CONVERTIR TIPOS NUMÉRICOS A TEXTO
 
