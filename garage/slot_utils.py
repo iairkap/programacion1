@@ -1,4 +1,6 @@
 import datetime
+from garage.mockdata import GARAGE, COSTOS
+
 
 def tipo_slot():
     while True:
