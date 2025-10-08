@@ -93,7 +93,7 @@ def obtener_siguiente_garage_id():
         return 1  # Primer garage
 
 def asociar_garage_a_usuario(user_email, garage_name, address, floors, slots_per_floor):
-    """Asocia un garage a un usuario escribiendo en users-garage.csv."""
+    """Asocia un garage a un usuario escribi endo en users-garage.csv."""
     try:
         garage_id = obtener_siguiente_garage_id()
         

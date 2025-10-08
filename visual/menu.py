@@ -35,10 +35,6 @@ from users.users_garage import (
 
 from garage.mockdata import GARAGE, COSTOS
 
-# Variables globales para el usuario y garage seleccionado
-usuario_actual = None
-garage_actual = None
-
 def mostrar_menu_inicial():
     """Menú de inicio de sesión y registro"""
     print("\n=== BIENVENIDO A SLOTMASTER ===")
@@ -46,15 +42,15 @@ def mostrar_menu_inicial():
     print("2. Registrarse")
     print("3. Salir")
 
-def mostrar_menu_garage():
+def mostrar_menu_garage(usuario):
     """Menú para seleccionar o crear garage"""
-    print(f"\n=== GESTIÓN DE GARAGES - {usuario_actual['nombre']} ===")
+    print(f"\n=== GESTIÓN DE GARAGES - {usuario['nombre']} ===")
     print("1. Seleccionar garage existente")
     print("2. Crear nuevo garage")
     print("3. Cerrar sesión")
 
-def mostrar_menu_principal():
-    """Menú principal del sistema (el actual)"""
+def mostrar_menu_principal(garage_actual):
+    """Menú principal del sistema"""
     print(f"\n=== MENÚ PRINCIPAL - {garage_actual['garage_name']} ===")
     print("1. Consultar espacios libres")
     print("2. Consultar cantidad de vehículos estacionados")
@@ -69,18 +65,16 @@ def mostrar_menu_principal():
     print("11. Salir")
 
 def menu_inicial():
-    """Gestiona el login y registro"""
-    global usuario_actual
-    
+    """Gestiona el login y registro - retorna el usuario o None"""
     while True:
         mostrar_menu_inicial()
         opcion = input("Seleccione una opción: ")
         
         if opcion == "1":
-            usuario_actual = user_login()
-            if usuario_actual:
-                print(f"¡Bienvenido {usuario_actual['nombre']}!")
-                return True
+            usuario = user_login()
+            if usuario:
+                print(f"¡Bienvenido {usuario['nombre']}!")
+                return usuario
             else:
                 print("Login fallido")
                 
@@ -92,12 +86,12 @@ def menu_inicial():
                 
         elif opcion == "3":
             print("¡Hasta luego!")
-            return False
+            return None
             
         else:
             print("Opción inválida")
 
-def crear_nuevo_garage():
+def crear_nuevo_garage(usuario):
     """Interfaz para crear un nuevo garage"""
     print("\n=== CREAR NUEVO GARAGE ===")
     nombre = input("Nombre del garage: ")
@@ -124,7 +118,7 @@ def crear_nuevo_garage():
             print("Ingrese un número válido")
     
     asociar_garage_a_usuario(
-        usuario_actual['email'], 
+        usuario['email'], 
         nombre, 
         direccion, 
         pisos, 
@@ -132,47 +126,45 @@ def crear_nuevo_garage():
     )
     return True
 
-def menu_garage():
-    """Gestiona la selección/creación de garages"""
-    global garage_actual
-    
+def menu_garage(usuario):
+    """Gestiona la selección/creación de garages - retorna el garage seleccionado o None"""
     crear_archivo_users_garage()
     
     while True:
-        mostrar_menu_garage()
+        mostrar_menu_garage(usuario)
         opcion = input("Seleccione una opción: ")
         
         if opcion == "1":
-            garages = buscar_garage_asociado(usuario_actual['email'])
+            garages = buscar_garage_asociado(usuario['email'])
             if garages:
-                garage_actual = seleccionar_solo_un_garage(garages)
-                if garage_actual:
-                    print(f"Garage '{garage_actual['garage_name']}' seleccionado")
-                    return True
+                garage_seleccionado = seleccionar_solo_un_garage(garages)
+                if garage_seleccionado:
+                    print(f"Garage '{garage_seleccionado['garage_name']}' seleccionado")
+                    return garage_seleccionado
             else:
                 print("No tiene garages asociados")
                 
         elif opcion == "2":
-            if crear_nuevo_garage():
+            if crear_nuevo_garage(usuario):
                 # Buscar el garage recién creado
-                garages = buscar_garage_asociado(usuario_actual['email'])
+                garages = buscar_garage_asociado(usuario['email'])
                 if garages:
-                    garage_actual = garages[-1]  # El último creado
-                    print(f"Garage '{garage_actual['garage_name']}' creado y seleccionado")
-                    return True
+                    garage_nuevo = garages[-1]  # El último creado
+                    print(f"Garage '{garage_nuevo['garage_name']}' creado y seleccionado")
+                    return garage_nuevo
                     
         elif opcion == "3":
-            return False
+            return None  # Cerrar sesión
             
         else:
             print("Opción inválida")
 
-def menu_principal():
-    """Menú principal del sistema (lógica actual)"""
+def menu_principal(garage_actual):
+    """Menú principal del sistema - retorna acción a realizar"""
     garage = GARAGE  # Usar el garage mock por ahora
     
     while True:
-        mostrar_menu_principal()
+        mostrar_menu_principal(garage_actual)
         opcion = input("Seleccione una opción: ")
 
         if opcion == "1":
@@ -260,19 +252,21 @@ def main():
     """Función principal que coordina todo el flujo"""
     while True:
         # 1. Login/Registro
-        if not menu_inicial():
+        usuario_actual = menu_inicial()
+        if not usuario_actual:
             break
             
         # 2. Selección/Creación de garage
         session_active = True
         while session_active:
-            if not menu_garage():
+            garage_actual = menu_garage(usuario_actual)
+            if not garage_actual:
                 session_active = False
                 continue
                 
             # 3. Menú principal
             while True:
-                resultado = menu_principal()
+                resultado = menu_principal(garage_actual)
                 
                 if resultado == "cambiar_garage":
                     break  # Volver al menú de garages
