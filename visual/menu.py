@@ -2,38 +2,24 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from garage.garage_util import (
-    contar_espacios_libres,
-    buscar_por_patente,
-    buscar_espacio_libre,
-    contar_espacios_libres_por_tipo
+from users.users_garage import crear_archivo_users_garage
+from visual.menu_handlers import (
+    handle_login, 
+    handle_registro, 
+    handle_seleccionar_garage, 
+    handle_crear_garage
 )
-from users.interaccion_usuario import (
-    pedir_piso,
-    pedir_patente,
-    pedir_tipo_vehiculo,
-    mostrar_estado_garage)
-from main import (
-    registrar_entrada_auto,
-    contar_por_tipo_vehiculo,
-    chequear_espacio_libre, 
-    registrar_salida_vehiculo,
-    modificar_vehiculo,
-    mostrar_estadisticas_rapidas)
-
-from users.usuarios import(
-    user_login,
-    registrar_nuevo_usuario
+from visual.menu_principal_handlers import (
+    handle_consultar_espacios_libres,
+    handle_consultar_vehiculos_estacionados,
+    handle_ingresar_vehiculo,
+    handle_registrar_salida,
+    handle_editar_vehiculo,
+    handle_mostrar_estado_garage,
+    handle_buscar_vehiculo,
+    handle_estadisticas_rapidas
 )
-
-from users.users_garage import (
-    buscar_garage_asociado,
-    seleccionar_solo_un_garage,
-    crear_archivo_users_garage,
-    asociar_garage_a_usuario
-)
-
-from garage.mockdata import GARAGE, COSTOS
+from garage.mockdata import GARAGE
 
 def mostrar_menu_inicial():
     """Menú de inicio de sesión y registro"""
@@ -66,216 +52,145 @@ def mostrar_menu_principal(garage_actual):
 
 def menu_inicial():
     """Gestiona el login y registro - retorna el usuario o None"""
-    while True:
+    continuar = True
+    usuario = None
+    
+    while continuar and not usuario:
         mostrar_menu_inicial()
         opcion = input("Seleccione una opción: ")
         
         if opcion == "1":
-            usuario = user_login()
+            usuario = handle_login()
             if usuario:
-                print(f"¡Bienvenido {usuario['nombre']}!")
-                return usuario
-            else:
-                print("Login fallido")
+                continuar = False
                 
         elif opcion == "2":
-            if registrar_nuevo_usuario():
-                print("Usuario registrado. Ahora puede iniciar sesión.")
-            else:
-                print("Error en el registro")
+            handle_registro()
                 
         elif opcion == "3":
             print("¡Hasta luego!")
-            return None
+            continuar = False
             
         else:
             print("Opción inválida")
-
-def crear_nuevo_garage(usuario):
-    """Interfaz para crear un nuevo garage"""
-    print("\n=== CREAR NUEVO GARAGE ===")
-    nombre = input("Nombre del garage: ")
-    direccion = input("Dirección: ")
     
-    while True:
-        try:
-            pisos = int(input("Cantidad de pisos: "))
-            if pisos > 0:
-                break
-            else:
-                print("Debe ser mayor a 0")
-        except ValueError:
-            print("Ingrese un número válido")
-    
-    while True:
-        try:
-            slots_por_piso = int(input("Slots por piso: "))
-            if slots_por_piso > 0:
-                break
-            else:
-                print("Debe ser mayor a 0")
-        except ValueError:
-            print("Ingrese un número válido")
-    
-    asociar_garage_a_usuario(
-        usuario['email'], 
-        nombre, 
-        direccion, 
-        pisos, 
-        slots_por_piso
-    )
-    return True
+    return usuario
 
 def menu_garage(usuario):
     """Gestiona la selección/creación de garages - retorna el garage seleccionado o None"""
     crear_archivo_users_garage()
     
-    while True:
+    continuar = True
+    garage_seleccionado = None
+    
+    while continuar and not garage_seleccionado:
         mostrar_menu_garage(usuario)
         opcion = input("Seleccione una opción: ")
         
         if opcion == "1":
-            garages = buscar_garage_asociado(usuario['email'])
-            if garages:
-                garage_seleccionado = seleccionar_solo_un_garage(garages)
-                if garage_seleccionado:
-                    print(f"Garage '{garage_seleccionado['garage_name']}' seleccionado")
-                    return garage_seleccionado
-            else:
-                print("No tiene garages asociados")
+            garage_seleccionado = handle_seleccionar_garage(usuario)
+            if garage_seleccionado:
+                continuar = False
                 
         elif opcion == "2":
-            if crear_nuevo_garage(usuario):
-                # Buscar el garage recién creado
-                garages = buscar_garage_asociado(usuario['email'])
-                if garages:
-                    garage_nuevo = garages[-1]  # El último creado
-                    print(f"Garage '{garage_nuevo['garage_name']}' creado y seleccionado")
-                    return garage_nuevo
+            garage_seleccionado = handle_crear_garage(usuario)
+            if garage_seleccionado:
+                continuar = False
                     
         elif opcion == "3":
-            return None  # Cerrar sesión
+            continuar = False  # Cerrar sesión
             
         else:
             print("Opción inválida")
+    
+    return garage_seleccionado
 
 def menu_principal(garage_actual):
     """Menú principal del sistema - retorna acción a realizar"""
     garage = GARAGE  # Usar el garage mock por ahora
     
-    while True:
+    continuar = True
+    accion = None
+    
+    while continuar and not accion:
         mostrar_menu_principal(garage_actual)
         opcion = input("Seleccione una opción: ")
 
         if opcion == "1":
-            print("\n1. Por piso\n2. Por tipo de vehículo\n3. Totales\n4. Volver")
-            subop = input("Seleccione una de las opciones: ")
-            if subop == "1":
-                piso = pedir_piso(garage)
-                libres = contar_espacios_libres([garage[piso]])
-                print(f"Espacios libres en el piso {piso}: {libres}")
-            elif subop == "2":
-                print("\nTipos de vehículo:")
-                print("1. Moto\n2. Auto\n3. Camioneta\n4. Bicicleta")
-                tipo = pedir_tipo_vehiculo()
-                libres = contar_espacios_libres_por_tipo(garage, tipo)
-                print(f"Espacios libres para tipo {tipo}: {libres}")
-            elif subop == "3":
-                libres = contar_espacios_libres(garage)
-                print(f"Espacios libres en todo el garage: {libres}")
+            handle_consultar_espacios_libres(garage)
 
         elif opcion == "2":
-            print("\n1. Por tipo de vehículo\n2. Totales\n3. Volver")
-            subop = input("Seleccione una de las opciones: ")
-            if subop == "1":
-                print("\nTipos de vehículo:")
-                print("1. Moto\n2. Auto\n3. Camioneta\n4. Bicicleta")
-                tipo = pedir_tipo_vehiculo()
-                cantidad = contar_por_tipo_vehiculo(garage, tipo)
-                tipos_nombres = {1: "Motos", 2: "Autos", 3: "Camionetas", 4: "Bicicletas"}
-                print(f"Cantidad de {tipos_nombres[tipo]} estacionadas: {cantidad}")
-            elif subop == "2":
-                print("\n--- Vehículos estacionados por tipo ---")
-                tipos = {1: "Motos", 2: "Autos", 3: "Camionetas", 4: "Bicicletas"}
-                for tipo_num, tipo_nombre in tipos.items():
-                    cantidad = contar_por_tipo_vehiculo(garage, tipo_num)
-                    print(f"{tipo_nombre}: {cantidad}")
+            handle_consultar_vehiculos_estacionados(garage)
 
         elif opcion == "3":
-            registrar_entrada_auto(garage)
+            handle_ingresar_vehiculo(garage)
 
         elif opcion == "4":
-            patente = pedir_patente()
-            if registrar_salida_vehiculo(garage, patente):
-                print("Salida registrada correctamente.")
-            else:
-                print("Patente no encontrada.")
+            handle_registrar_salida(garage)
 
         elif opcion == "5":
-            patente = pedir_patente()
-            nuevo_tipo = pedir_tipo_vehiculo()
-            nueva_patente = input("Nueva patente (dejar vacío para no cambiar): ").strip().upper()
-            if nueva_patente == "":
-                nueva_patente = None
-            if modificar_vehiculo(garage, patente, nuevo_tipo, nueva_patente):
-                print("Vehículo modificado correctamente.")
-            else:
-                print("Patente no encontrada.")
+            handle_editar_vehiculo(garage)
 
         elif opcion == "6":
-            mostrar_estado_garage(garage)
+            handle_mostrar_estado_garage(garage)
 
         elif opcion == "7":
-            patente = pedir_patente()
-            pos = buscar_por_patente(garage, patente)
-            if pos != (-1, -1):
-                print(f"Vehículo encontrado en Piso {pos[0]}, Slot {pos[1]}")
-            else:
-                print("Vehículo no encontrado.")
+            handle_buscar_vehiculo(garage)
 
         elif opcion == "8":
-            mostrar_estadisticas_rapidas(garage)
+            handle_estadisticas_rapidas(garage)
             
         elif opcion == "9":
-            return "cambiar_garage"
+            accion = "cambiar_garage"
+            continuar = False
             
         elif opcion == "10":
-            return "cerrar_sesion"
+            accion = "cerrar_sesion"
+            continuar = False
             
         elif opcion == "11":
-            return "salir"
+            accion = "salir"
+            continuar = False
             
         else:
             print("Opción inválida. Intente de nuevo.")
+    
+    return accion
 
 def main():
     """Función principal que coordina todo el flujo"""
-    while True:
+    programa_activo = True
+    
+    while programa_activo:
         # 1. Login/Registro
         usuario_actual = menu_inicial()
         if not usuario_actual:
-            break
+            programa_activo = False
+            continue
             
         # 2. Selección/Creación de garage
         session_active = True
-        while session_active:
+        while session_active and programa_activo:
             garage_actual = menu_garage(usuario_actual)
             if not garage_actual:
                 session_active = False
                 continue
                 
             # 3. Menú principal
-            while True:
+            menu_activo = True
+            while menu_activo and session_active:
                 resultado = menu_principal(garage_actual)
                 
                 if resultado == "cambiar_garage":
-                    break  # Volver al menú de garages
+                    menu_activo = False
                 elif resultado == "cerrar_sesion":
                     session_active = False
-                    break  # Volver al login
+                    menu_activo = False
                 elif resultado == "salir":
                     print("¡Hasta luego!")
-                    return
+                    programa_activo = False
+                    session_active = False
+                    menu_activo = False
 
 if __name__ == "__main__":
     main()

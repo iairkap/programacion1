@@ -1,3 +1,4 @@
 garage_id, user_email, garage_name, address, floors, slots_per_floor
 1,user@example.com,Estacionamiento Ejemplo,Direccion 1234 CABA,4,12
 2,user@example.com,UADE,Direccion 1234 CABA,4,123,prueba@gmail.com,UADE,Uade 123,5,10
+3,iairkap@gmail.com,SP Garage,Allenby 114,7,10

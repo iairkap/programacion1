@@ -4,7 +4,12 @@
 
 
 def buscar_garage_asociado(email):
-    """Busca el garage asociado a un usuario dado su email."""
+    """
+    Busca el garage asociado a un usuario dado su email.
+    Si me encuentra varios garages, se agregan a una lista que es retornada. 
+    En caso de no encontrar ninguno, retorna None.
+    
+    """
     print(email)
   
     if not email:
@@ -45,7 +50,7 @@ def buscar_garage_asociado(email):
 
 
 def seleccionar_solo_un_garage(garages):
-    "si el user tiene varios garages, le permite seleccionar uno"
+    "Se recibe como parametro una lista de garages, permitiendo al usuario seleccionar uno."
     if not garages:
         return None
     elif len(garages) == 1:
@@ -103,4 +108,12 @@ def asociar_garage_a_usuario(user_email, garage_name, address, floors, slots_per
             
     except Exception as e:
         print(f"Error al asociar el garage: {e}")
+        return garage_id
 
+
+
+def crear_nuevo_garage(garage_id): 
+    "Crear un nuevo garage en funcion al id"
+    "Preguntar tarifa de hora, tarifa mensual, cantidad de pisos y slots por piso"
+    
+    pass 
