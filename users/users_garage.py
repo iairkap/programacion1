@@ -104,4 +104,3 @@ def asociar_garage_a_usuario(user_email, garage_name, address, floors, slots_per
     except Exception as e:
         print(f"Error al asociar el garage: {e}")
 
-print(buscar_garage_asociado("user@example.com"))
