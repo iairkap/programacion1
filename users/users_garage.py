@@ -1,7 +1,12 @@
 #Archivo para crear garage, relacionarlos con usuarios y demas
 
 def buscar_garage_asociado(email):
-    """Busca el garage asociado a un usuario dado su email."""
+    """
+    Busca el garage asociado a un usuario dado su email.
+    Si me encuentra varios garages, se agregan a una lista que es retornada. 
+    En caso de no encontrar ninguno, retorna None.
+    
+    """
     print(email)
   
     if not email:
@@ -42,7 +47,7 @@ def buscar_garage_asociado(email):
 
 
 def seleccionar_solo_un_garage(garages):
-    "si el user tiene varios garages, le permite seleccionar uno"
+    "Se recibe como parametro una lista de garages, permitiendo al usuario seleccionar uno."
     if not garages:
         return None
     elif len(garages) == 1:
