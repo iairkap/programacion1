@@ -1,65 +1,64 @@
-import funciones
-from mockdata import GARAGE, COSTOS
+import garage.slot_utils as slot_utils
+from garage.mockdata import GARAGE, COSTOS
 import random
-from interaccion_usuario import pedir_patente
-import json
-import os
+from users.interaccion_usuario import pedir_patente
+from garage.garage_util import * 
 
-RUTA_JSON = "GARAGE_SLOTS_TEMPLATE.json"
+# -------------------------------------------------------
+# Lógica basada en diccionarios (sin I/O)
+# Requiere: from garage.mockdata import GARAGE, COSTOS
+# -------------------------------------------------------
 
 def leer_garage():
-    """Lee el archivo CSV y lo devuelve como lista de diccionarios."""
-    """Lee el archivo JSON y devuelve lista de diccionarios.
-
-    Si no existe el archivo JSON, lo crea a partir de la constante GARAGE importada
-    desde `mockdata` (si existe). Normaliza campos para mantener compatibilidad con
-    la lógica que esperaba strings como "True"/"False" en ciertos campos.
     """
-    def _normalize_slot(slot):
-        # Asegurar keys existan y sean strings similares al CSV previo
-        s = dict(slot)
-        # Campos booleanos representados como strings "True"/"False"
-        for key in ("ocupado", "reservado_mensual"):
-            if key in s:
-                val = s[key]
-                if isinstance(val, bool):
-                    s[key] = "True" if val else "False"
-                else:
-                    # normalizar valores vacíos/None
-                    s[key] = str(val) if val is not None else "False"
-            else:
-                s[key] = "False"
+    Convierte la estructura `GARAGE` (lista de pisos) a una lista plana de dicts.
+    Keys por slot: 'piso','id','patente','tipo_slot','ocupado',
+                   'reservado_mensual','hora_entrada','tipo_vehiculo_estacionado'
+    """
+    resultados = []
+    for piso_idx, piso in enumerate(GARAGE):
+        for slot in piso:
+            # asumimos slot como lista/tupla en la forma esperada [id, patente, tipo_slot, ocupado, reservado, hora, tipo_veh]
+            # Si slot fuera dict, se adapta también.
+            if type(slot) is dict:
+                s = dict(slot)
+                s["piso"] = str(s.get("piso", piso_idx))
+                s["id"] = str(s.get("id", "0"))
+                s["patente"] = "" if s.get("patente") is None else str(s.get("patente"))
+                s["tipo_slot"] = str(s.get("tipo_slot", "0"))
+                s["ocupado"] = "True" if s.get("ocupado") else "False"
+                s["reservado_mensual"] = "True" if s.get("reservado_mensual") else "False"
+                s["hora_entrada"] = "" if not s.get("hora_entrada") else str(s.get("hora_entrada"))
+                s["tipo_vehiculo_estacionado"] = str(s.get("tipo_vehiculo_estacionado", "0"))
+                resultados.append(s)
+                continue
 
-        # Campos numéricos a string (piso, id)
-        for key in ("piso", "id"):
-            if key in s:
-                s[key] = str(s[key])
-            else:
-                s[key] = "0"
+            # Si es lista/tupla:
+            if type(slot) in (list, tuple):
+                id_val = slot[0] if len(slot) > 0 else 0
+                patente_val = slot[1] if len(slot) > 1 else ""
+                tipo_slot_val = slot[2] if len(slot) > 2 else 0
+                ocupado_val = slot[3] if len(slot) > 3 else False
+                reservado_val = slot[4] if len(slot) > 4 else False
+                hora_val = slot[5] if len(slot) > 5 else None
+                tipo_veh_val = slot[6] if len(slot) > 6 else 0
 
-        # Otros campos que se usan como strings
-        for key in ("tipo_slot", "tipo_vehiculo_estacionado", "patente", "hora_entrada"):
-            s[key] = "" if s.get(key) is None else str(s.get(key))
+                resultados.append({
+                    "piso": str(piso_idx),
+                    "id": str(id_val),
+                    "patente": "" if patente_val is None else str(patente_val),
+                    "tipo_slot": str(tipo_slot_val),
+                    "ocupado": "True" if ocupado_val else "False",
+                    "reservado_mensual": "True" if reservado_val else "False",
+                    "hora_entrada": "" if not hora_val else str(hora_val),
+                    "tipo_vehiculo_estacionado": str(tipo_veh_val),
+                })
+                continue
 
-        return s
+            # Otros tipos: ignorar
+            continue
 
-    if not os.path.exists(RUTA_JSON):
-        # Crear archivo a partir de GARAGE si está disponible
-        try:
-            datos_iniciales = [ _normalize_slot(slot) for slot in GARAGE ]
-        except Exception:
-            datos_iniciales = []
-
-        with open(RUTA_JSON, "w", encoding="utf-8") as f:
-            json.dump(datos_iniciales, f, ensure_ascii=False, indent=2)
-
-    with open(RUTA_JSON, "r", encoding="utf-8") as f:
-        datos = json.load(f)
-
-    # Normalizar cada slot antes de devolver
-    return [_normalize_slot(slot) for slot in datos]
-
-
+    return resultados
 
 
 def generar_fecha_aleatoria():
@@ -72,95 +71,71 @@ def generar_fecha_aleatoria():
     return f"{year}-{month}-{day} {hour}:{minute}"
 
 
-#modificado a logica diccionario y csv
-def busqueda_espacio_libre(garage, tipo_vehiculo):
-    for slot in leer_garage():
-        if slot["ocupado"] == "False":
-            if slot.get("tipo_slot") == str(tipo_vehiculo) or slot.get("tipo_slot") == "4":
-                return (int(slot["piso"]), int(slot["id"]))
+def busqueda_espacio_libre(garage=None, tipo_vehiculo=None):
+    """
+    Retorna (piso, id) del primer slot libre compatible con tipo_vehiculo.
+    Si no hay, retorna (-1, -1).
+    """
+    datos = garage if garage is not None else leer_garage()
+    for slot in datos:
+        if slot.get("ocupado") == "False":
+            if tipo_vehiculo is None or slot.get("tipo_slot") == str(tipo_vehiculo) or slot.get("tipo_slot") == "4":
+                return (int(slot.get("piso", "0")), int(slot.get("id", "0")))
     return (-1, -1)
 
 
-#modificado a logica diccionario y csv
-
-def buscar_por_patente(garage, patente_buscada):
-    for slot in leer_garage():
-        if slot.get("patente") == patente_buscada and slot["ocupado"] == "True":
-            return (int(slot["piso"]), int(slot["id"]))
+def buscar_por_patente(garage=None, patente_buscada=None):
+    """
+    Devuelve (piso, id) si encuentra la patente ocupada; (-1,-1) sino.
+    """
+    datos = garage if garage is not None else leer_garage()
+    for slot in datos:
+        if slot.get("patente") == patente_buscada and slot.get("ocupado") == "True":
+            return (int(slot.get("piso", "0")), int(slot.get("id", "0")))
     return (-1, -1)
 
-#modificado a logica diccionario y csv
-def contar_espacios_libres(garage):
-    return sum(slot["ocupado"] == "False" for slot in leer_garage())
+
+def contar_espacios_libres(garage=None):
+    """Cuenta slots con 'ocupado' == 'False'."""
+    datos = garage if garage is not None else leer_garage()
+    return sum(1 for slot in datos if slot.get("ocupado") == "False")
 
 
-#modificado a logica diccionario y csv
-def contar_por_tipo_vehiculo(garage, tipo_buscado):
-    return sum(
-        slot["ocupado"] == "True" and slot.get("tipo_vehiculo_estacionado") == str(tipo_buscado)
-        for slot in leer_garage()
-    )
+def contar_por_tipo_vehiculo(garage=None, tipo_buscado=None):
+    """Cuenta vehículos estacionados de un tipo (tipo_vehiculo_estacionado)."""
+    datos = garage if garage is not None else leer_garage()
+    return sum(1 for slot in datos if slot.get("ocupado") == "True" and slot.get("tipo_vehiculo_estacionado") == str(tipo_buscado))
 
 
-#modificado a logica diccionario y csv
-
-def acceder_a_info_de_patentes():
-    """Devuelve todas las filas con vehículos estacionados (ocupados=True)"""
-    datos = []
-    for slot in leer_garage():
-        if slot["ocupado"] == "True":
-            datos.append(slot)
-    return datos
+def acceder_a_info_de_patentes(garage=None):
+    """Devuelve lista de dicts con slots ocupados."""
+    datos = garage if garage is not None else leer_garage()
+    return [slot for slot in datos if slot.get("ocupado") == "True"]
 
 
-#modificado a logica diccionario y csv
-def chequear_existencia_patente(patente):
-    """Chequea si la patente existe en el sistema (lógica CSV)"""
-    for slot in leer_garage():
-        if slot.get("patente") == patente and slot["ocupado"] == "True":
+def chequear_existencia_patente(patente, garage=None):
+    """Devuelve True si la patente existe y está ocupada."""
+    datos = garage if garage is not None else leer_garage()
+    for slot in datos:
+        if slot.get("patente") == patente and slot.get("ocupado") == "True":
             return True
     return False
 
 
-
-#modificado a logica diccionario y csv
-def es_subscripcion_mensual(patente):
-    """Chequea si la suscripción es mensual o diaria (lógica CSV)"""
-    for slot in leer_garage():
-        if slot.get("patente") == patente and slot["ocupado"] == "True":
+def es_subscripcion_mensual(patente, garage=None):
+    """Devuelve True si la patente corresponde a un reservado mensual (reservado_mensual == 'True')."""
+    datos = garage if garage is not None else leer_garage()
+    for slot in datos:
+        if slot.get("patente") == patente and slot.get("ocupado") == "True":
             return slot.get("reservado_mensual") == "True"
     return False
 
 
-
-#modificado a logica diccionario y csv
-def buscar_patente(patente):
-    """Busca información completa de una patente"""
-    for slot in leer_garage():
-        if slot.get("patente") == patente and slot["ocupado"] == "True":
+def buscar_patente(patente, garage=None):
+    """Devuelve el dict completo del slot si la patente está ocupada, o None."""
+    datos = garage if garage is not None else leer_garage()
+    for slot in datos:
+        if slot.get("patente") == patente and slot.get("ocupado") == "True":
             return slot
     return None
 
-
-
-#modificado a logica diccionario y csv
-def registrar_salida_vehiculo(garage, patente):
-    datos = leer_garage()
-    actualizado = False
-
-    for slot in datos:
-        if slot.get("patente") == patente and slot["ocupado"] == "True":
-            slot["patente"] = ""
-            slot["ocupado"] = "False"
-            slot["hora_entrada"] = ""
-            slot["tipo_vehiculo_estacionado"] = "0"
-            actualizado = True
-            break
-
-    if actualizado:
-        # Escribir JSON normalizado
-        with open(RUTA_JSON, "w", encoding="utf-8") as f:
-            json.dump(datos, f, ensure_ascii=False, indent=2)
-        return True
-
-    return False
