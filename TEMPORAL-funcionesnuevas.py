@@ -2,16 +2,62 @@ import funciones
 from mockdata import GARAGE, COSTOS
 import random
 from interaccion_usuario import pedir_patente
-import csv  # <---- agregalo también arriba de todo si no está
+import json
+import os
 
-RUTA_CSV = "GARAGE_SLOTS_TEMPLATE.csv"
+RUTA_JSON = "GARAGE_SLOTS_TEMPLATE.json"
 
 def leer_garage():
     """Lee el archivo CSV y lo devuelve como lista de diccionarios."""
-    with open(RUTA_CSV, mode="r", encoding="utf-8", newline="") as archivo_csv:
-        lector = csv.DictReader(archivo_csv)
-        garage = [dict(fila) for fila in lector]
-    return garage
+    """Lee el archivo JSON y devuelve lista de diccionarios.
+
+    Si no existe el archivo JSON, lo crea a partir de la constante GARAGE importada
+    desde `mockdata` (si existe). Normaliza campos para mantener compatibilidad con
+    la lógica que esperaba strings como "True"/"False" en ciertos campos.
+    """
+    def _normalize_slot(slot):
+        # Asegurar keys existan y sean strings similares al CSV previo
+        s = dict(slot)
+        # Campos booleanos representados como strings "True"/"False"
+        for key in ("ocupado", "reservado_mensual"):
+            if key in s:
+                val = s[key]
+                if isinstance(val, bool):
+                    s[key] = "True" if val else "False"
+                else:
+                    # normalizar valores vacíos/None
+                    s[key] = str(val) if val is not None else "False"
+            else:
+                s[key] = "False"
+
+        # Campos numéricos a string (piso, id)
+        for key in ("piso", "id"):
+            if key in s:
+                s[key] = str(s[key])
+            else:
+                s[key] = "0"
+
+        # Otros campos que se usan como strings
+        for key in ("tipo_slot", "tipo_vehiculo_estacionado", "patente", "hora_entrada"):
+            s[key] = "" if s.get(key) is None else str(s.get(key))
+
+        return s
+
+    if not os.path.exists(RUTA_JSON):
+        # Crear archivo a partir de GARAGE si está disponible
+        try:
+            datos_iniciales = [ _normalize_slot(slot) for slot in GARAGE ]
+        except Exception:
+            datos_iniciales = []
+
+        with open(RUTA_JSON, "w", encoding="utf-8") as f:
+            json.dump(datos_iniciales, f, ensure_ascii=False, indent=2)
+
+    with open(RUTA_JSON, "r", encoding="utf-8") as f:
+        datos = json.load(f)
+
+    # Normalizar cada slot antes de devolver
+    return [_normalize_slot(slot) for slot in datos]
 
 
 
@@ -30,7 +76,7 @@ def generar_fecha_aleatoria():
 def busqueda_espacio_libre(garage, tipo_vehiculo):
     for slot in leer_garage():
         if slot["ocupado"] == "False":
-            if slot["tipo_slot"] == str(tipo_vehiculo) or slot["tipo_slot"] == "4":
+            if slot.get("tipo_slot") == str(tipo_vehiculo) or slot.get("tipo_slot") == "4":
                 return (int(slot["piso"]), int(slot["id"]))
     return (-1, -1)
 
@@ -39,7 +85,7 @@ def busqueda_espacio_libre(garage, tipo_vehiculo):
 
 def buscar_por_patente(garage, patente_buscada):
     for slot in leer_garage():
-        if slot["patente"] == patente_buscada and slot["ocupado"] == "True":
+        if slot.get("patente") == patente_buscada and slot["ocupado"] == "True":
             return (int(slot["piso"]), int(slot["id"]))
     return (-1, -1)
 
@@ -51,7 +97,7 @@ def contar_espacios_libres(garage):
 #modificado a logica diccionario y csv
 def contar_por_tipo_vehiculo(garage, tipo_buscado):
     return sum(
-        slot["ocupado"] == "True" and slot["tipo_vehiculo_estacionado"] == str(tipo_buscado)
+        slot["ocupado"] == "True" and slot.get("tipo_vehiculo_estacionado") == str(tipo_buscado)
         for slot in leer_garage()
     )
 
@@ -71,7 +117,7 @@ def acceder_a_info_de_patentes():
 def chequear_existencia_patente(patente):
     """Chequea si la patente existe en el sistema (lógica CSV)"""
     for slot in leer_garage():
-        if slot["patente"] == patente and slot["ocupado"] == "True":
+        if slot.get("patente") == patente and slot["ocupado"] == "True":
             return True
     return False
 
@@ -81,8 +127,8 @@ def chequear_existencia_patente(patente):
 def es_subscripcion_mensual(patente):
     """Chequea si la suscripción es mensual o diaria (lógica CSV)"""
     for slot in leer_garage():
-        if slot["patente"] == patente and slot["ocupado"] == "True":
-            return slot["reservado_mensual"] == "True"
+        if slot.get("patente") == patente and slot["ocupado"] == "True":
+            return slot.get("reservado_mensual") == "True"
     return False
 
 
@@ -91,7 +137,7 @@ def es_subscripcion_mensual(patente):
 def buscar_patente(patente):
     """Busca información completa de una patente"""
     for slot in leer_garage():
-        if slot["patente"] == patente and slot["ocupado"] == "True":
+        if slot.get("patente") == patente and slot["ocupado"] == "True":
             return slot
     return None
 
@@ -103,7 +149,7 @@ def registrar_salida_vehiculo(garage, patente):
     actualizado = False
 
     for slot in datos:
-        if slot["patente"] == patente and slot["ocupado"] == "True":
+        if slot.get("patente") == patente and slot["ocupado"] == "True":
             slot["patente"] = ""
             slot["ocupado"] = "False"
             slot["hora_entrada"] = ""
@@ -112,12 +158,9 @@ def registrar_salida_vehiculo(garage, patente):
             break
 
     if actualizado:
-        archivo_csv = open(RUTA_CSV, "w", encoding="utf-8", newline="")
-        campos = list(datos[0].keys())
-        escritor = csv.DictWriter(archivo_csv, fieldnames=campos)
-        escritor.writeheader()
-        escritor.writerows(datos)
-        archivo_csv.close()
+        # Escribir JSON normalizado
+        with open(RUTA_JSON, "w", encoding="utf-8") as f:
+            json.dump(datos, f, ensure_ascii=False, indent=2)
         return True
 
     return False
