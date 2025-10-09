@@ -1,8 +1,5 @@
 #Archivo para crear garage, relacionarlos con usuarios y demas
 
-
-
-
 def buscar_garage_asociado(email):
     """Busca el garage asociado a un usuario dado su email."""
     print(email)
@@ -104,3 +101,92 @@ def asociar_garage_a_usuario(user_email, garage_name, address, floors, slots_per
     except Exception as e:
         print(f"Error al asociar el garage: {e}")
 
+def generate_garage_structure(floors, slots_per_floor):
+    """Genera la estructura inicial del garage."""
+    garage = []
+    slot_id = 0
+    for piso in range(floors):
+        piso_slots = []
+        for slot in range(slots_per_floor):
+            slot_id += 1
+      # Estructura del slot: [slot_id, piso, pos, tipo_slot, reservado_mensual, ocupado, patente, hora_entrada, tipo_vehiculo_estacionado]
+            piso_slots.append([slot_id, piso, slot, "", False, False, "", "", ""])
+        garage.append(piso_slots)
+    return garage
+
+def _escape_csv_field(value):
+    """Escapa un campo para CSV: dobla comillas y encierra en comillas si hay comas / saltos de línea."""
+    s = "" if value is None else str(value)
+    if any(c in s for c in ('"', ',', '\n', '\r')):
+        s = '"' + s.replace('"', '""') + '"'
+    return s
+
+def escribir_data_en_csv(file_path, data, headers=None):
+    """Escribe una lista de listas en file_path como CSV sin usar el módulo csv.
+    headers: lista opcional de nombres de columna."""
+    try:
+        with open(file_path, mode="w", encoding="utf-8") as f:
+            if headers:
+                f.write(",".join(_escape_csv_field(h) for h in headers) + "\n")
+            for row in data:
+                f.write(",".join(_escape_csv_field(cell) for cell in row) + "\n")
+    except Exception as e:
+        print(f"Error al escribir CSV {file_path}: {e}")
+        raise
+
+
+def crear_garage(garage_id, slots_per_floor, floors):
+    """Crea un garage nuevo basado en el ID proporcionado."""
+
+    ### Agregar check para el id ###
+    try:
+        estructura = generate_garage_structure(floors, slots_per_floor)
+        # Encabezados coherentes con la estructura de cada slot
+        headers = [
+            "slot_id",
+            "floor",
+            "pos",
+            "tipo_slot",
+            "reservado_mensual",
+            "ocupado",
+            "patente",
+            "hora_entrada",
+            "tipo_vehiculo_estacionado"
+        ]
+
+        rows = []
+        for piso_slots in estructura:
+            for slot in piso_slots:
+                rows.append(slot)
+        escribir_data_en_csv(f"files/garage-{garage_id}.csv", rows, headers=headers)
+        print(f"Garage {garage_id} creado con {floors} pisos y {slots_per_floor} slots por piso.")
+        return estructura
+    except Exception as e:
+        print(f"Error al crear el garage: {e}")
+        return None
+
+def actualizar_slot_por_tipo(estructura, slot_id, tipo_slot ):
+    """actualizar el tipo de slot en la estructura"""
+    for piso in estructura:
+        for slot in piso:
+            if slot[0] == slot_id:
+                slot[3] = tipo_slot
+                return True
+
+def actualizar_slots_por_tipo(estructura, garage_id, tipo_slot, cantidad):
+    """actualizar matriz y escribir en el archivo"""
+    #### A terminar ####
+    if cantidad <= 0:
+        print("Cantidad debe ser mayor que 0")
+        return False
+    try: 
+        for piso in estructura:
+            pass
+    except Exception as e:
+        print(f"Error al actualizar slots: {e}")
+        return False
+    
+def actualizar_slot_en_csv(estructura, garage_id, bulk= False):
+    """escribe la estructura actualizada en el archivo correspondiente"""
+    ### A terminar ###
+    pass

@@ -1,15 +1,16 @@
-from garage_util import (
+from garage.garage_util import (
     contar_espacios_libres,
     buscar_por_patente,
     buscar_espacio_libre,
     contar_espacios_libres_por_tipo
 
 )
-from interaccion_usuario import (
+from users.interaccion_usuario import (
     pedir_piso,
     pedir_patente,
     pedir_tipo_vehiculo,
     mostrar_estado_garage)
+
 from main import (
     registrar_entrada_auto,
     contar_por_tipo_vehiculo,
@@ -18,7 +19,7 @@ from main import (
     modificar_vehiculo,
     mostrar_estadisticas_rapidas)
 
-from usuarios import(
+from users.usuarios import(
     creacion_usuario,
     crear_archivo_users,
     user_login

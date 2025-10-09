@@ -1,9 +1,6 @@
 """ 
 Creacion de usuario 
 """
-
-
-
 def creacion_usuario():
     try:
         usuario = {}

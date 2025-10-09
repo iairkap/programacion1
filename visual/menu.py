@@ -124,6 +124,8 @@ def crear_nuevo_garage(usuario):
         pisos, 
         slots_por_piso
     )
+
+    ### Agregar ### 
     return True
 
 def menu_garage(usuario):
