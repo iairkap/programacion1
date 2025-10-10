@@ -114,8 +114,7 @@ def generate_garage_structure(floors, slots_per_floor):
         piso_slots = []
         for slot in range(slots_per_floor):
             slot_id += 1
-      # Estructura del slot: [slot_id, piso, pos, tipo_slot, reservado_mensual, ocupado, patente, hora_entrada, tipo_vehiculo_estacionado]
-            piso_slots.append([slot_id, piso, slot, "", False, False, "", "", ""])
+            piso_slots.append({"slot_id": slot_id,"piso": piso, "posicion": slot, "tipo_slot": "","reservado_mensual": False,"ocupado": False, "patente":"", "hora_entrada": "", "tipo_vehiculo":""})
         garage.append(piso_slots)
     return garage
 
@@ -142,27 +141,14 @@ def escribir_data_en_csv(file_path, data, headers=None):
 
 def crear_garage(garage_id, slots_per_floor, floors):
     """Crea un garage nuevo basado en el ID proporcionado."""
-
-    ### Agregar check para el id ###
     try:
         estructura = generate_garage_structure(floors, slots_per_floor)
         # Encabezados coherentes con la estructura de cada slot
-        headers = [
-            "slot_id",
-            "floor",
-            "pos",
-            "tipo_slot",
-            "reservado_mensual",
-            "ocupado",
-            "patente",
-            "hora_entrada",
-            "tipo_vehiculo_estacionado"
-        ]
-
+        headers = estructura[0][0].keys()
         rows = []
         for piso_slots in estructura:
             for slot in piso_slots:
-                rows.append(slot)
+                rows.append(slot.values())
         escribir_data_en_csv(f"files/garage-{garage_id}.csv", rows, headers=headers)
         print(f"Garage {garage_id} creado con {floors} pisos y {slots_per_floor} slots por piso.")
         return estructura
@@ -170,28 +156,76 @@ def crear_garage(garage_id, slots_per_floor, floors):
         print(f"Error al crear el garage: {e}")
         return None
 
-def actualizar_slot_por_tipo(estructura, slot_id, tipo_slot ):
-    """actualizar el tipo de slot en la estructura"""
-    for piso in estructura:
-        for slot in piso:
-            if slot[0] == slot_id:
-                slot[3] = tipo_slot
-                return True
-
-def actualizar_slots_por_tipo(estructura, garage_id, tipo_slot, cantidad):
-    """actualizar matriz y escribir en el archivo"""
-    #### A terminar ####
-    if cantidad <= 0:
-        print("Cantidad debe ser mayor que 0")
-        return False
+def actualizar_slot(garage_id, slot_id, nuevaData):
+    """actualizar un slot en particular
+    nuevaData es un diccionario con los campos a actualizar
+    """
     try: 
-        for piso in estructura:
-            pass
+        with open(f"files/garage-{garage_id}.csv", "r") as file:
+            lineas = file.readlines()
+        
+        encabezado = lineas[0].strip().split(",")
+        nuevas_lineas = [encabezado]
+        
+        for linea in lineas[1:]:
+            datos = linea.strip().split(",")
+            
+            id_actual = datos[0]
+            piso = datos[1]
+            posicion = datos[2]
+            tipo_slot = datos[3]
+            reservado_mensual = datos[4]
+            ocupado = datos[5]
+            patente = datos[6]
+            hora_entrada = datos[7]
+            tipo_vehiculo = datos[8]
+            
+            # Si coincide el id, actualizamos
+            if id_actual == str(slot_id):
+                tipo_slot = str(nuevaData.get("tipo_slot", tipo_slot))
+                reservado_mensual = str(nuevaData.get("reservado_mensual", reservado_mensual))
+                ocupado = str(nuevaData.get("ocupado", ocupado))
+                patente = str(nuevaData.get("patente", patente))
+                hora_entrada = str(nuevaData.get("hora_entrada", hora_entrada))
+                tipo_vehiculo = str(nuevaData.get("tipo_vehiculo", tipo_vehiculo))
+            
+            # Agregamos la fila (actualizada o no)
+            nuevas_lineas.append([id_actual, piso, posicion, tipo_slot, reservado_mensual, ocupado, patente, hora_entrada, tipo_vehiculo])
+
+        with open(f"files/garage-{garage_id}.csv", "w") as file:
+            # Reescribir encabezado
+            file.write(",".join(encabezado) + "\n")
+            # Reescribir filas
+            for fila in nuevas_lineas[1:]:
+                file.write(",".join(fila) + "\n")
+        
+        print(f"Slot con id {slot_id} actualizado correctamente ✅")
+    except FileNotFoundError:
+        print(f"Archivo garage-{garage_id}.csv no encontrado.")
     except Exception as e:
-        print(f"Error al actualizar slots: {e}")
-        return False
+        print(f"Error al actualizar el slot: {e}")
     
-def actualizar_slot_en_csv(estructura, garage_id, bulk= False):
-    """escribe la estructura actualizada en el archivo correspondiente"""
-    ### A terminar ###
-    pass
+def actualizar_slots(garage_id, nuevaData):
+    """actualizar varios slots a la vez
+    nuevaData es una lista de diccionarios con los campos a actualizar
+    i.e. [{"slot_id": 1, "ocupado": "True", "tipo_slot": 2}, {"slot_id": 2, "ocupado": "True"}]
+    """
+    try:
+        for slotInfo in nuevaData:
+            print(slotInfo)
+            slot_id = slotInfo.get("slot_id")
+            actualizar_slot(garage_id, slot_id, slotInfo)
+    except Exception as e:
+        print(f"Error al actualizar los slots: {e}")
+       
+def actualizar_garage(garage_id, data, bulk=False):
+    """Actualiza la información de un garage en csv."""
+    try: 
+        if bulk:
+            actualizar_slots(garage_id, data)
+            return True
+        else:
+            actualizar_slot(garage_id, data.get("slot_id"), data)
+        print(f"Garage con id {garage_id} actualizado correctamente ✅")
+    except Exception as e:
+        print(f"Error al actualizar el garage: {e}")
