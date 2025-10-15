@@ -5,7 +5,9 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from garage.garage_util import (
     contar_espacios_libres,
     buscar_por_patente,
-    contar_espacios_libres_por_tipo
+    contar_espacios_libres_por_tipo,
+    mostrar_estadisticas_rapidas
+
 )
 from users.interaccion_usuario import (
     pedir_piso,
@@ -18,7 +20,6 @@ from main import (
     contar_por_tipo_vehiculo,
     registrar_salida_vehiculo,
     modificar_vehiculo,
-    mostrar_estadisticas_rapidas
 )
 
 def handle_consultar_espacios_libres(garage):

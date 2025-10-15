@@ -5,6 +5,12 @@ Se lee los precios estipulados por el garage en el fine users-garage.csv -> se r
 """
 
 
+def escribir_precios(garage_id): 
+    ##
+    pass
+    
+
+
 def listado_de_precios(garage_id):
     try:
         with open("files/users-garage.csv", mode="r", encoding="utf-8") as archivo:

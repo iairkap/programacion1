@@ -3,6 +3,7 @@ from garage.mockdata import GARAGE, COSTOS
 import random
 from users.interaccion_usuario import pedir_patente
 import garage.garage_util as garage_util
+import auxiliares.date
 
 #funcion para leer garage 
 'logica diccionario, manejo de errores y doctring, '
@@ -87,6 +88,9 @@ def registrar_salida_vehiculo(garage=None, patente=None):
 
 
 
+
+
+
 # FUNCIÓN PARA MODIFICAR DATOS DE UN VEHÍCULO ESTACIONADO
 'doctring'
 def modificar_vehiculo(garage, patente, nuevo_tipo=None, nueva_patente=None):
@@ -108,7 +112,6 @@ def modificar_vehiculo(garage, patente, nuevo_tipo=None, nueva_patente=None):
 
 
 
-# FUNCIÓN PRINCIPAL PARA REGISTRAR ENTRADA DE VEHÍCULOS
 'menejo de errores'
 def buscar_por_patente(garage, patente):
     """
@@ -429,6 +432,31 @@ def salida_tipo_vehiculo(tipo_slot):
         return "Bicicleta"
     return "Desconocido"
 
+
+#funciones viejas -> Actualizar 
+
+
+
+# FUNCIÓN PRINCIPAL PARA REGISTRAR ENTRADA DE VEHÍCULOS
+def registrar_entrada_auto(garage):
+    # Solicita la patente al usuario
+    patente = pedir_patente()
+    # Solicita el tipo de vehículo
+    tipo_vehiculo = slot_utils.tipo_slot()
+
+    # VALIDACIÓN: Verificar si la patente ya existe en el sistema
+    posicion_existente = buscar_por_patente(garage, patente)
+    if posicion_existente != (-1, -1):
+        print(f"Error: La patente {patente} ya está en el garage")
+        return False
+
+    # BÚSQUEDA: Buscar un espacio libre compatible
+    posicion = busqueda_espacio_libre(garage, tipo_vehiculo)
+
+def contar_por_tipo_vehiculo(garage=None, tipo_buscado=None):
+    """Cuenta vehículos estacionados de un tipo (tipo_vehiculo_estacionado)."""
+    datos = garage if garage is not None else leer_garage()
+    return sum(1 for slot in datos if slot.get("ocupado") == "True" and slot.get("tipo_vehiculo_estacionado") == str(tipo_buscado))
 
 # CONFIGURACIÓN CONSTANTE DEL EDIFICIO
 pisos = 4

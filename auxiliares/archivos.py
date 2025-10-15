@@ -29,3 +29,4 @@ def escribir_csv(filename, data):
         for row in data:
             line = ','.join(map(str, row))  # Convierte cada elemento a string y une con comas
             file.write(line + '\n')  # Escribe la línea en el archivo seguida de un salto de línea
+            
