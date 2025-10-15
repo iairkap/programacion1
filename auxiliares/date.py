@@ -22,3 +22,5 @@ def  fecha_json_to_readable(fecha_json):
     struct_time = time.strptime(fecha_json, "%Y-%m-%d %H:%M:%S")
     return time.strftime("%d/%m/%Y %H:%M", struct_time)
 
+
+
