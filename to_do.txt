@@ -4,3 +4,9 @@ nice_to_have:
 carga de informacion a nivel archivo user friendly bulk. 
 
 
+
+Mejorar - especiados entre el menu 
+agregar colores con colorama en los errores para distinguir la terminal 
+
+
+
