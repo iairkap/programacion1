@@ -1,7 +1,7 @@
 import garage.slot_utils as slot_utils
 from garage.mockdata import GARAGE, COSTOS
 import random
-from users.interaccion_usuario import pedir_patente, pedir_tipo_vehiculo
+from users.interaccion_usuario import pedir_patente
 import garage.garage_util as garage_util
 
 #funcion para leer garage 
@@ -65,199 +65,25 @@ def leer_garage():
 #funcion para registrar salida de vehiculo en formato diccionario 
 'logica diccionario y manejo de errores'
 def registrar_salida_vehiculo(garage=None, patente=None):
-    """Registrar la salida de un vehículo con manejo robusto de errores.
-
-    Flujo:
-    - Busca la patente en la vista de diccionarios.
-    - Solicita y valida la hora de salida.
-    - Calcula costo de estadía localmente a partir de los datos del slot (no depende de otras
-      implementaciones inconsistentes).
-    - Actualiza la vista y sincroniza con `GARAGE`. Si la sincronización falla, intenta rollback
-      de la vista y retorna False.
-
-    Retorna True si la salida quedó registrada (vista y GARAGE sincronizados), False en caso de fallo.
+    """
+    Registra la salida de un vehículo del garage.
+    Busca en la lista de slots del garage el vehículo con la patente especificada y marca el slot como libre,
+    limpiando los datos asociados al vehículo estacionado. Si hay duplicados, solo limpia el primero encontrado
     """
     datos = garage if garage is not None else leer_garage()
+    actualizado = False
 
-    if patente is None:
-        patente = pedir_patente()
-
-    # Buscar el slot en la vista de diccionarios
-    found = None
     for slot in datos:
-        try:
-            if slot["patente"] == patente and slot["ocupado"] == "True":
-                found = slot
-                break
-        except Exception:
-            # slot malformado, ignora
-            continue
-
-    if not found:
-        print("Vehículo no encontrado.")
-        return False
-
-    # Guardamos estado previo para rollback en caso de error
-    prev_state = {
-        "patente": found.get("patente", ""),
-        "ocupado": found.get("ocupado", "False"),
-        "hora_entrada": found.get("hora_entrada", ""),
-        "tipo_vehiculo_estacionado": found.get("tipo_vehiculo_estacionado", "0"),
-    }
-
-    # Solicita hora de salida para calcular costo (validamos formato HH:MM o YYYY-MM-DD HH:MM)
-    def _parse_hora(h):
-        try:
-            h = h.strip()
-            if " " in h:
-                # formato 'YYYY-MM-DD HH:MM'
-                part = h.split(" ", 1)[1]
-            else:
-                part = h
-            hh, mm = part.split(":")
-            hh_i = int(hh)
-            mm_i = int(mm)
-            if not (0 <= hh_i <= 23 and 0 <= mm_i <= 59):
-                return None
-            return hh_i * 60 + mm_i
-        except Exception:
-            return None
-
-    # Pedimos la hora (hasta 3 intentos)
-    hora_salida_str = input("Ingrese hora de salida (HH:MM): ").strip()
-    salida_min = _parse_hora(hora_salida_str)
-    if salida_min is None:
-        print("Formato de hora inválido. Intentando usar el valor tal cual (fallback).")
-
-    # Calcular costo de forma local y defensiva
-    costo = 0
-    try:
-        tipo_slot_raw = found.get("tipo_vehiculo_estacionado", "0")
-        try:
-            tipo_idx = int(tipo_slot_raw)
-        except Exception:
-            tipo_idx = 0
-
-        # Si es suscripción mensual
-        try:
-            if es_subscripcion_mensual(patente):
-                costo = COSTOS[tipo_idx][1]
-            else:
-                hora_entrada_raw = found.get("hora_entrada", "")
-                entrada_min = None
-                if hora_entrada_raw:
-                    entrada_min = _parse_hora(hora_entrada_raw)
-
-                if entrada_min is None or salida_min is None:
-                    # Fallback a tarifa mínima por hora
-                    costo = COSTOS[tipo_idx][0]
-                else:
-                    minutos = salida_min - entrada_min
-                    if minutos < 0:
-                        # cruce de medianoche: sumamos 24h
-                        minutos += 24 * 60
-                    import math
-
-                    horas = math.ceil(max(1, minutos / 60))
-                    costo = COSTOS[tipo_idx][0] * horas
-        except Exception:
-            # cualquier problema con COSTOS o índices, tarifa mínima
-            try:
-                costo = COSTOS[int(found.get("tipo_vehiculo_estacionado", 0))][0]
-            except Exception:
-                costo = 0
-    except Exception as e:
-        print(f"Error calculando costo: {e}")
-        costo = 0
-
-    # Muestra el costo
-    print(f"Costo de estadía para {patente}: ${round(costo,2)}")
-
-    # Actualiza la vista de diccionarios (preparando para sincronizar)
-    found["patente"] = ""
-    found["ocupado"] = "False"
-    found["hora_entrada"] = ""
-    found["tipo_vehiculo_estacionado"] = "0"
-
-    # Intenta sincronizar con la estructura anidada GARAGE
-    try:
-        piso_idx = int(found.get("piso", 0))
-        slot_id = found.get("id")
-    except Exception:
-        piso_idx = None
-        slot_id = None
-
-    if piso_idx is None or slot_id is None:
-        # No podemos sincronizar, intentamos rollback y reportamos
-        print("No se pudo sincronizar con GARAGE (datos de ubicación incompletos). Restaurando vista.")
-        # rollback
-        found["patente"] = prev_state["patente"]
-        found["ocupado"] = prev_state["ocupado"]
-        found["hora_entrada"] = prev_state["hora_entrada"]
-        found["tipo_vehiculo_estacionado"] = prev_state["tipo_vehiculo_estacionado"]
-        return False
-
-    if piso_idx < 0 or piso_idx >= len(GARAGE):
-        print("Índice de piso fuera de rango. Restaurando vista.")
-        found["patente"] = prev_state["patente"]
-        found["ocupado"] = prev_state["ocupado"]
-        found["hora_entrada"] = prev_state["hora_entrada"]
-        found["tipo_vehiculo_estacionado"] = prev_state["tipo_vehiculo_estacionado"]
-        return False
-
-    target_index = None
-    for i, s in enumerate(GARAGE[piso_idx]):
-        try:
-            current_id = s[0]
-        except Exception:
-            continue
-        if str(current_id) == str(slot_id):
-            target_index = i
+        if slot.get("patente") == patente and slot.get("ocupado") == "True":
+            slot["patente"] = ""
+            slot["ocupado"] = "False"
+            slot["hora_entrada"] = ""
+            slot["tipo_vehiculo_estacionado"] = "0"
+            actualizado = True
+            # no hacemos break para limpiar duplicados si hubiese; si prefieres break, descomenta:
             break
 
-    if target_index is None:
-        print("No se encontró el slot en GARAGE. Restaurando vista.")
-        found["patente"] = prev_state["patente"]
-        found["ocupado"] = prev_state["ocupado"]
-        found["hora_entrada"] = prev_state["hora_entrada"]
-        found["tipo_vehiculo_estacionado"] = prev_state["tipo_vehiculo_estacionado"]
-        return False
-
-    # Modificamos el slot en GARAGE con manejo de excepciones y rollback si falla
-    try:
-        slot_ref = GARAGE[piso_idx][target_index]
-        if type(slot_ref) is tuple:
-            slot_ref = list(slot_ref)
-
-        if type(slot_ref) in (list, ): 
-            while len(slot_ref) < 7:
-                slot_ref.append(None)
-
-            prev_slot = list(slot_ref)
-
-            slot_ref[1] = ""        # Borra patente
-            slot_ref[3] = False      # Marca como libre
-            slot_ref[5] = None       # Borra fecha de entrada
-            slot_ref[6] = 0          # Borra tipo de vehículo
-
-            GARAGE[piso_idx][target_index] = slot_ref
-            print(f"Salida registrada. Piso {piso_idx}, Slot {slot_id} liberado.")
-            return True
-        else:
-            print("Tipo de slot en GARAGE no reconocido. Restaurando vista.")
-            # rollback vista
-            found["patente"] = prev_state["patente"]
-            found["ocupado"] = prev_state["ocupado"]
-            found["hora_entrada"] = prev_state["hora_entrada"]
-            found["tipo_vehiculo_estacionado"] = prev_state["tipo_vehiculo_estacionado"]
-            return False
-    except Exception as e:
-        print(f"Error sincronizando con GARAGE: {e}. Restaurando vista.")
-        found["patente"] = prev_state["patente"]
-        found["ocupado"] = prev_state["ocupado"]
-        found["hora_entrada"] = prev_state["hora_entrada"]
-        found["tipo_vehiculo_estacionado"] = prev_state["tipo_vehiculo_estacionado"]
-        return False
+    return actualizado  # True si modificó algún slot, False si no encontró
 
 
 
@@ -411,18 +237,27 @@ def busqueda_espacio_libre(garage=None, tipo_vehiculo=None):
 
 
 # FUNCIÓN PARA CONTAR ESPACIOS LIBRES
-'modificado a logica diccionario '
+'modificado a logica diccionario y doctring'
 def contar_espacios_libres(garage=None):
-    """Cuenta slots con 'ocupado' == 'False'."""
+    """
+    Cuenta la cantidad de espacios libres en el garage.
+    Cuenta slots con 'ocupado' == 'False'.
+    """
     datos = garage if garage is not None else leer_garage()
     return sum(1 for slot in datos if slot["ocupado"] == "False")
 
 
 
 # FUNCIÓN PARA CALCULAR EL COSTO DE ESTADÍA DE UN VEHÍCULO
-
+'manejo de errores'
 def calcular_costo_de_estadia(patente, hora_salida):
-    """Calcula costo de estadía"""
+    """
+    Calcula el costo de estadía de un vehículo en el garage según su patente y la hora de salida.
+    Si el vehículo no tiene suscripción mensual, calcula el costo en base a las horas transcurridas desde la hora de entrada
+    hasta la hora de salida, aplicando la tarifa por hora correspondiente al tipo de vehículo. Si ocurre un error en el cálculo,
+    se cobra la tarifa mínima por hora.
+    Si el vehículo tiene suscripción mensual, se cobra la tarifa fija mensual correspondiente al tipo de vehículo.
+    """
     # Obtiene la información completa del vehículo
     info_patente = buscar_por_patente(GARAGE, patente)
     if not info_patente:
@@ -457,8 +292,90 @@ def calcular_costo_de_estadia(patente, hora_salida):
 # FUNCIÓN COMPLETA PARA REGISTRAR SALIDA CON CÁLCULO DE COSTO
 
 #funcion para registrar salida de vehiculo en formato diccionario 
-'modificado a logica diccionario '
-# (La implementación robusta de `registrar_salida_vehiculo` se encuentra arriba.)
+'modificado a logica diccionario, manejo de errores y doctring'
+def registrar_salida_vehiculo(garage=None, patente=None):
+    """
+    Registra la salida de un vehículo del garage, actualizando tanto la vista de diccionarios como la estructura anidada GARAGE.
+    """
+    datos = garage if garage is not None else leer_garage()
+
+    if patente is None:
+        patente = pedir_patente()
+
+    # Buscar el slot en la vista de diccionarios
+    found = None
+    for slot in datos:
+        if slot.get("patente") == patente and slot.get("ocupado") == "True":
+            found = slot
+            break
+
+    if not found:
+        print("Vehículo no encontrado.")
+        return False
+
+    # Solicita hora de salida para calcular costo
+    hora_salida = input("Ingrese hora de salida (HH:MM): ").strip()
+    try:
+        costo = calcular_costo_de_estadia(patente, hora_salida)
+    except Exception:
+        costo = 0
+
+    # Muestra el costo
+    print(f"Costo de estadía para {patente}: ${costo}")
+
+    # Actualiza la vista de diccionarios
+    found["patente"] = ""
+    found["ocupado"] = "False"
+    found["hora_entrada"] = ""
+    found["tipo_vehiculo_estacionado"] = "0"
+
+    # Intenta sincronizar con la estructura anidada GARAGE
+    try:
+        piso_idx = int(found.get("piso", 0))
+        slot_id = found.get("id")
+    except Exception:
+        piso_idx = None
+        slot_id = None
+
+    if piso_idx is None or slot_id is None:
+        # No podemos sincronizar, pero la vista quedó actualizada
+        return True
+
+    if piso_idx < 0 or piso_idx >= len(GARAGE):
+        return True
+
+    target_index = None
+    for i, s in enumerate(GARAGE[piso_idx]):
+        try:
+            current_id = s[0]
+        except Exception:
+            continue
+        if str(current_id) == str(slot_id):
+            target_index = i
+            break
+
+    if target_index is None:
+        return True
+
+    slot_ref = GARAGE[piso_idx][target_index]
+    if type(slot_ref) is tuple:
+        slot_ref = list(slot_ref)
+
+    if type(slot_ref) in (list, ):
+        while len(slot_ref) < 7:
+            slot_ref.append(None)
+
+        slot_ref[1] = ""        # Borra patente
+        slot_ref[3] = False      # Marca como libre
+        slot_ref[5] = None       # Borra fecha de entrada
+        slot_ref[6] = 0          # Borra tipo de vehículo
+
+        GARAGE[piso_idx][target_index] = slot_ref
+
+        print(f"Salida registrada. Piso {piso_idx}, Slot {slot_id} liberado.")
+        return True
+
+    return True
 
 """ 
 def registrar_salida_vehiculo(garage):
@@ -494,10 +411,14 @@ def registrar_salida_vehiculo(garage):
 
 # FUNCIÓN AUXILIAR PARA CONVERTIR TIPOS NUMÉRICOS A TEXTO
 
-
+#funcion para convertir tipo numerico a texto
+'dosctring'
 def salida_tipo_vehiculo(tipo_slot):
-    """Convierte tipo numérico a texto"""
-    # Diccionario de conversión tipo número -> texto
+    """
+    Convierte un valor numérico que representa el tipo de vehículo en una cadena de texto descriptiva.
+    Si el tipo no es reconocido, retorna "Desconocido".
+    """ 
+# Diccionario de conversión tipo número -> texto
     if tipo_slot == 1:
         return "Moto"
     elif tipo_slot == 2:
@@ -514,105 +435,3 @@ pisos = 4
 filas_por_piso = 3
 columnas_por_piso = 4
 total_slots_por_piso = filas_por_piso * columnas_por_piso
-
-
-def registrar_entrada_auto(garage=None):
-    """Registrar la entrada de un vehículo con manejo robusto.
-
-    Flujo:
-    - Solicita/valida patente y tipo de vehículo.
-    - Busca espacio libre adecuado usando la vista de diccionarios.
-    - Reserva el slot en la vista y sincroniza con `GARAGE`.
-    - En caso de fallo en sincronización, realiza rollback de la vista.
-    """
-    datos = garage if garage is not None else leer_garage()
-
-    try:
-        patente = ingresar_patente()
-    except Exception:
-        print("Error obteniendo la patente.")
-        return False
-
-    # Pedimos tipo de vehículo (int) y normalizamos
-    try:
-        tipo = pedir_tipo_vehiculo()
-        tipo_str = str(tipo)
-    except Exception:
-        print("Tipo de vehículo inválido. Usando tipo por defecto 0.")
-        tipo_str = "0"
-
-    # Buscar espacio libre
-    piso_idx, slot_id = busqueda_espacio_libre(datos, tipo)
-    if piso_idx == -1:
-        print("No hay espacios disponibles para ese tipo de vehículo.")
-        return False
-
-    # Localizamos el slot en la vista y guardamos estado previo
-    target = None
-    for s in datos:
-        try:
-            if int(s.get("piso", -1)) == piso_idx and str(s.get("id")) == str(slot_id):
-                target = s
-                break
-        except Exception:
-            continue
-
-    if target is None:
-        print("Error localizando el slot en la vista. Abortando.")
-        return False
-
-    # Guardamos estado previo
-    prev_state = dict(target)
-
-    # Asignamos en la vista
-    target["patente"] = patente
-    target["ocupado"] = "True"
-    from datetime import datetime
-    target["hora_entrada"] = datetime.now().strftime("%Y-%m-%d %H:%M")
-    target["tipo_vehiculo_estacionado"] = tipo_str
-
-    # Sincronizar con GARAGE
-    try:
-        # búsqueda del slot en GARAGE
-        if piso_idx < 0 or piso_idx >= len(GARAGE):
-            raise IndexError("Piso fuera de rango")
-
-        found_index = None
-        for i, st in enumerate(GARAGE[piso_idx]):
-            try:
-                if str(st[0]) == str(slot_id):
-                    found_index = i
-                    break
-            except Exception:
-                continue
-
-        if found_index is None:
-            raise ValueError("Slot no encontrado en GARAGE")
-
-        slot_ref = GARAGE[piso_idx][found_index]
-        if type(slot_ref) is tuple:
-            slot_ref = list(slot_ref)
-
-        if type(slot_ref) in (list, ):
-            while len(slot_ref) < 7:
-                slot_ref.append(None)
-
-            slot_ref[1] = patente
-            slot_ref[3] = True
-            slot_ref[5] = target["hora_entrada"]
-            try:
-                slot_ref[6] = int(tipo_str)
-            except Exception:
-                slot_ref[6] = 0
-
-            GARAGE[piso_idx][found_index] = slot_ref
-            print(f"Entrada registrada. Piso {piso_idx}, Slot {slot_id} ocupado por {patente}.")
-            return True
-        else:
-            raise TypeError("Formato de slot en GARAGE inválido")
-    except Exception as e:
-        # rollback vista
-        print(f"Error sincronizando con GARAGE: {e}. Revirtiendo cambios en vista.")
-        target.clear()
-        target.update(prev_state)
-        return False
