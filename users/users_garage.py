@@ -1,3 +1,4 @@
+from auxiliares.consola import clear_screen
 #Archivo para crear garage, relacionarlos con usuarios y demas
 
 def buscar_garage_asociado(email):
@@ -39,6 +40,8 @@ def buscar_garage_asociado(email):
             return garages
         else:
             print("No se encontró un garage asociado a este usuario.")
+            input("Presione cualquier tecla para continuar...")
+            clear_screen()
             return None
             
     except FileNotFoundError:
@@ -77,7 +80,8 @@ def crear_archivo_users_garage():
             arch.write("garage_id,user_email,garage_name,address,floors,slots_per_floor\n")
             print("Archivo users-garage.csv creado exitosamente.")
     except FileExistsError:
-        print("El archivo users-garage.csv ya existe.")
+        # El archivo ya existe, no hacer nada
+        pass
     return
 
 def obtener_siguiente_garage_id():
@@ -141,20 +145,37 @@ def escribir_data_en_csv(file_path, data, headers=None):
 
 
 def crear_garage(usuario, slots_per_floor =5 , floors= 2):
-    #Preguntar nombre, direccion, el garage_id se va a obtener de asociar_garage_a_usuario
-
     try:
-        nombre = input("Nombre del garage: desde la funcion nueva")
-        direccion = input("Dirección: ")
-        garage_id = asociar_garage_a_usuario(
-            usuario['email'],
-            nombre,
-            direccion,
-            floors,
-            slots_per_floor
-        )
-    except Exception as e:
-        print(f"Error al crear el garage: {e}")
+        # Validar nombre no vacío
+        while True:
+            nombre = input("Nombre del garage: ").strip()
+            if nombre:
+                break
+            print("El nombre no puede estar vacío. Intente de nuevo.")
+        
+        # Validar dirección no vacía
+        while True:
+            direccion = input("Dirección: ").strip()
+            if direccion:
+                break
+            print("La dirección no puede estar vacía. Intente de nuevo.")
+        
+    except KeyboardInterrupt:
+        print("\nCreación de garage cancelada por el usuario.")
+        input("Presione cualquier tecla para continuar...")
+        clear_screen()
+        return None
+
+    # Asociar garage al usuario y obtener garage_id
+    garage_id = asociar_garage_a_usuario(
+        usuario['email'],
+        nombre,
+        direccion,
+        floors,
+        slots_per_floor
+    )
+    if not garage_id:
+        print("No se pudo asociar el garage.")
         return None
 
     """Crea un garage nuevo basado en el ID proporcionado."""
