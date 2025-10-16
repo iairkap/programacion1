@@ -434,9 +434,6 @@ def salida_tipo_vehiculo(tipo_slot):
 
 
 #funciones viejas -> Actualizar 
-
-
-
 # FUNCIÓN PRINCIPAL PARA REGISTRAR ENTRADA DE VEHÍCULOS
 def registrar_entrada_auto(garage):
     # Solicita la patente al usuario

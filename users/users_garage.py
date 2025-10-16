@@ -102,6 +102,7 @@ def asociar_garage_a_usuario(user_email, garage_name, address, floors, slots_per
         with open("files/users-garage.csv", mode="a", encoding="utf-8") as arch:
             arch.write(f"{garage_id},{user_email},{garage_name},{address},{floors},{slots_per_floor}\n")
             print(f"Garage '{garage_name}' asociado al usuario '{user_email}' exitosamente.")
+            return garage_id
             
     except Exception as e:
         print(f"Error al asociar el garage: {e}")
@@ -139,7 +140,23 @@ def escribir_data_en_csv(file_path, data, headers=None):
         raise
 
 
-def crear_garage(garage_id, slots_per_floor, floors):
+def crear_garage(usuario, slots_per_floor =5 , floors= 2):
+    #Preguntar nombre, direccion, el garage_id se va a obtener de asociar_garage_a_usuario
+
+    try:
+        nombre = input("Nombre del garage: desde la funcion nueva")
+        direccion = input("Dirección: ")
+        garage_id = asociar_garage_a_usuario(
+            usuario['email'],
+            nombre,
+            direccion,
+            floors,
+            slots_per_floor
+        )
+    except Exception as e:
+        print(f"Error al crear el garage: {e}")
+        return None
+
     """Crea un garage nuevo basado en el ID proporcionado."""
     try:
         estructura = generate_garage_structure(floors, slots_per_floor)

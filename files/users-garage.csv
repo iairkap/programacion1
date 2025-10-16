@@ -1,3 +1,4 @@
 garage_id, user_email, garage_name, address, floors, slots_per_floor
 1,juan@etchart.com,UADE,lima 123,5,7
 2,john@doe.com,UADE,Lima 123,5,5
+3,john@doe.com,Lima 123,lima 123,2,5
