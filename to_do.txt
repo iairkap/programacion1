@@ -9,4 +9,8 @@ Mejorar - especiados entre el menu
 agregar colores con colorama en los errores para distinguir la terminal 
 
 
+to do juampi : 
+    
+    -permitir setear el tipo de slot al crear garage nuevo por las dudas, especificar cuantos quiere de cada 
 
+    

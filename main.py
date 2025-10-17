@@ -1,61 +1,77 @@
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import garage.slot_utils as slot_utils
 from garage.mockdata import GARAGE, COSTOS
 import random
 from users.interaccion_usuario import pedir_patente
 import garage.garage_util as garage_util
 import auxiliares.date
+from users import users_garage
+from cache.json import leer_estado_garage, guardar_estado_garage
 
-#funcion para leer garage 
-'logica diccionario, manejo de errores y doctring, '
-def leer_garage():
+
+## aca agregarle la lectura del json para saber cual es el garage actual 
+def leer_garage_normalizado():
     """
-    Recorre la estructura global GARAGE y retorna una lista de diccionarios normalizados
-    representando cada slot de estacionamiento.
-    Cada slot puede estar representado como un diccionario o como una lista/tupla.
+    Lee el garage y retorna una lista de diccionarios normalizados.
+    Cada slot esta representado como un diccionario 
     """
-    resultados = []
-    for piso_idx, piso in enumerate(GARAGE):
-        for slot in piso:
-            # asumimos slot como lista/tupla en la forma esperada [id, patente, tipo_slot, ocupado, reservado, hora, tipo_veh]
-            if type(slot) is dict:
-                s = dict(slot)
-                s["piso"] = str(s["piso"]) if "piso" in s else str(piso_idx)
-                s["id"] = str(s["id"]) if "id" in s else "0"
-                s["patente"] = "" if ("patente" not in s or s["patente"] is None) else str(s["patente"])
-                s["tipo_slot"] = str(s["tipo_slot"]) if "tipo_slot" in s else "0"
-                s["ocupado"] = "True" if ("ocupado" in s and s["ocupado"]) else "False"
-                s["reservado_mensual"] = "True" if ("reservado_mensual" in s and s["reservado_mensual"]) else "False"
-                s["hora_entrada"] = "" if ("hora_entrada" not in s or not s["hora_entrada"]) else str(s["hora_entrada"])
-                s["tipo_vehiculo_estacionado"] = str(s["tipo_vehiculo_estacionado"]) if "tipo_vehiculo_estacionado" in s else "0"
-                resultados.append(s)
-                continue
+    garage_id = leer_estado_garage()['garage_id']
+    return users_garage.get_garage_data(garage_id)
 
-            # Si es lista/tupla:
-            if type(slot) in (list, tuple):
-                id_val = slot[0] if len(slot) > 0 else 0
-                patente_val = slot[1] if len(slot) > 1 else ""
-                tipo_slot_val = slot[2] if len(slot) > 2 else 0
-                ocupado_val = slot[3] if len(slot) > 3 else False
-                reservado_val = slot[4] if len(slot) > 4 else False
-                hora_val = slot[5] if len(slot) > 5 else None
-                tipo_veh_val = slot[6] if len(slot) > 6 else 0
 
-                resultados.append({
-                    "piso": str(piso_idx),
-                    "id": str(id_val),
-                    "patente": "" if patente_val is None else str(patente_val),
-                    "tipo_slot": str(tipo_slot_val),
-                    "ocupado": "True" if ocupado_val else "False",
-                    "reservado_mensual": "True" if reservado_val else "False",
-                    "hora_entrada": "" if not hora_val else str(hora_val),
-                    "tipo_vehiculo_estacionado": str(tipo_veh_val),
-                })
-                continue
+# def leer_garage():
+#     """
+#     Recorre la estructura global GARAGE y retorna una lista de diccionarios normalizados
+#     representando cada slot de estacionamiento.
+#     Cada slot puede estar representado como un diccionario o como una lista/tupla.
+#     """
+#     garage = users_garage.get_garage(1)  # leer desde CSV
+#     resultados = []
+#     for piso_idx, piso in enumerate(GARAGE):
+#         for slot in piso:
+#             # asumimos slot como lista/tupla en la forma esperada [id, patente, tipo_slot, ocupado, reservado, hora, tipo_veh]
+#             if type(slot) is dict:
+#                 s = dict(slot)
+#                 s["piso"] = str(s["piso"]) if "piso" in s else str(piso_idx)
+#                 s["id"] = str(s["id"]) if "id" in s else "0"
+#                 s["patente"] = "" if ("patente" not in s or s["patente"] is None) else str(s["patente"])
+#                 s["tipo_slot"] = str(s["tipo_slot"]) if "tipo_slot" in s else "0"
+#                 s["ocupado"] = "True" if ("ocupado" in s and s["ocupado"]) else "False"
+#                 s["reservado_mensual"] = "True" if ("reservado_mensual" in s and s["reservado_mensual"]) else "False"
+#                 s["hora_entrada"] = "" if ("hora_entrada" not in s or not s["hora_entrada"]) else str(s["hora_entrada"])
+#                 s["tipo_vehiculo_estacionado"] = str(s["tipo_vehiculo_estacionado"]) if "tipo_vehiculo_estacionado" in s else "0"
+#                 resultados.append(s)
+#                 continue
+
+#             # Si es lista/tupla:
+#             if type(slot) in (list, tuple):
+#                 id_val = slot[0] if len(slot) > 0 else 0
+#                 patente_val = slot[1] if len(slot) > 1 else ""
+#                 tipo_slot_val = slot[2] if len(slot) > 2 else 0
+#                 ocupado_val = slot[3] if len(slot) > 3 else False
+#                 reservado_val = slot[4] if len(slot) > 4 else False
+#                 hora_val = slot[5] if len(slot) > 5 else None
+#                 tipo_veh_val = slot[6] if len(slot) > 6 else 0
+
+#                 resultados.append({
+#                     "piso": str(piso_idx),
+#                     "id": str(id_val),
+#                     "patente": "" if patente_val is None else str(patente_val),
+#                     "tipo_slot": str(tipo_slot_val),
+#                     "ocupado": "True" if ocupado_val else "False",
+#                     "reservado_mensual": "True" if reservado_val else "False",
+#                     "hora_entrada": "" if not hora_val else str(hora_val),
+#                     "tipo_vehiculo_estacionado": str(tipo_veh_val),
+#                 })
+#                 continue
 
             
-            continue
+#             continue
 
-    return resultados
+#     return resultados
 
 
 #! TODO MODULARIZAR CODIGO
@@ -71,7 +87,7 @@ def registrar_salida_vehiculo(garage=None, patente=None):
     Busca en la lista de slots del garage el vehículo con la patente especificada y marca el slot como libre,
     limpiando los datos asociados al vehículo estacionado. Si hay duplicados, solo limpia el primero encontrado
     """
-    datos = garage if garage is not None else leer_garage()
+    datos = garage
     actualizado = False
 
     for slot in datos:
@@ -101,26 +117,23 @@ def modificar_vehiculo(garage, patente, nuevo_tipo=None, nueva_patente=None):
     # Busca el vehículo por patente
     for piso in garage:
         for slot in piso:
-            if slot[3] == True and slot[1] == patente:
+            if slot["ocupado"] == True and slot["patente"] == patente:
                 # Modifica solo los campos que no son None
                 if nuevo_tipo is not None:
-                    slot[6] = nuevo_tipo        # Cambia tipo de vehículo
+                    slot["tipo_vehiculo_estacionado"] = nuevo_tipo        # Cambia tipo de vehículo
                 if nueva_patente is not None:
-                    slot[1] = nueva_patente     # Cambia patente
+                    slot["patente"] = nueva_patente     # Cambia patente
                 return True
     return False
 
-
-
-'menejo de errores'
-def buscar_por_patente(garage, patente):
-    """
+'manejo de errores'
+def buscar_por_patente(garage, patente = None):
+    """ 
     Busca la patente en la estructura de garage.
     Si encuentra, retorna (piso_idx, slot_id), si no, retorna (-1, -1).
     """
     for idx_piso, piso in enumerate(garage):
         for slot in piso:
-            # Si slot es dict (tiene método 'get')
             try:
                 patente_slot = slot["patente"]
                 ocupado_slot = slot["ocupado"]
@@ -129,10 +142,9 @@ def buscar_por_patente(garage, patente):
                     id_val = int(slot["id"]) if "id" in slot else 0
                     return (piso_val, id_val)
             except Exception:
-                # Si no es dict, intentamos como lista/tupla
                 try:
-                    if len(slot) > 1 and slot[1] == patente and len(slot) > 3 and slot[3]:
-                        return (idx_piso, slot[0])
+                    if len(slot) > 1 and slot["patente"] == patente and len(slot) > 3 and slot["ocupado"] == True:
+                        return (idx_piso, slot["id"])
                 except Exception:
                     continue
     return (-1, -1)
@@ -154,7 +166,7 @@ def generar_fecha_aleatoria():
 
 # FUNCIÓN PARA ELIMINAR UNA FILA COMPLETA DEL GARAGE
 'agregue manejo de errores'
-def eliminar_fila_por_valor(valor, garage=GARAGE):
+def eliminar_fila_por_valor(valor, garage):
     """Elimina la primera fila que contiene el valor dado, con manejo de errores."""
     try:
         for i in range(len(garage)):
@@ -190,18 +202,18 @@ def ingresar_patente():
 
 #funcion para acceder a info de patentes en formato diccionario
 'modificado a logica diccionario '
-def acceder_a_info_de_patentes(garage=None):
+def acceder_a_info_de_patentes(garage):
     """Devuelve lista de dicts con slots ocupados."""
-    datos = garage if garage is not None else leer_garage()
+    datos = garage
     return [slot for slot in datos if slot.get("ocupado") == "True"]
 
 
 
 # FUNCIÓN PARA VERIFICAR SI UNA PATENTE EXISTE
 'modificado a logica diccionario '
-def chequear_existencia_patente(patente, garage=None):
+def chequear_existencia_patente(patente, garage ):
     """Devuelve True si la patente existe y está ocupada."""
-    datos = garage if garage is not None else leer_garage()
+    datos = garage
     for slot in datos:
         if slot["patente"] == patente and slot["ocupado"] == "True":
             return True
@@ -210,12 +222,12 @@ def chequear_existencia_patente(patente, garage=None):
 
 # FUNCIÓN PARA VERIFICAR SI UN VEHÍCULO TIENE SUSCRIPCIÓN MENSUAL
 'modificado a logica diccionario '
-def es_subscripcion_mensual(patente, garage=None):
+def es_subscripcion_mensual(patente, garage):
     """Chequea si la subscripcion es mensual usando la vista de diccionarios.
 
     Retorna True si el slot tiene `reservado_mensual` == "True" o es True.
     """
-    datos = garage if garage is not None else leer_garage()
+    datos = garage
     for slot in datos:
         if slot["patente"] == patente and slot["ocupado"] == "True":
             val = slot["reservado_mensual"]
@@ -227,16 +239,16 @@ def es_subscripcion_mensual(patente, garage=None):
 
 # FUNCIÓN SIMPLE PARA VERIFICAR SI HAY ESPACIOS LIBRES
 'modifcado a logica diccionario '
-def busqueda_espacio_libre(garage=None, tipo_vehiculo=None):
-    datos = garage if garage is not None else leer_garage()
-    for slot in datos:
-        if slot["ocupado"] == "False":
-            if tipo_vehiculo is None or slot["tipo_slot"] == str(tipo_vehiculo) or slot["tipo_slot"] == "4":
-                piso_val = int(slot["piso"]) if "piso" in slot else 0
-                id_val = int(slot["id"]) if "id" in slot else 0
-                return (piso_val, id_val)
+def busqueda_espacio_libre(garage, tipo_vehiculo=None):
+    for piso in garage: 
+        for slot in piso:
+            if slot["ocupado"] == False:
+                if tipo_vehiculo is None or slot["tipo_slot"] == str(tipo_vehiculo) or slot["tipo_slot"] == tipo_vehiculo:
+                    piso_val = int(slot["piso"]) if "piso" in slot else 0
+                    id_val = int(slot["id"]) if "id" in slot else 0
+                    return (piso_val, id_val)
+                    
     return (-1, -1)
-
 
 
 # FUNCIÓN PARA CONTAR ESPACIOS LIBRES
@@ -246,12 +258,12 @@ def contar_espacios_libres(garage=None):
     Cuenta la cantidad de espacios libres en el garage.
     Cuenta slots con 'ocupado' == 'False'.
     """
-    datos = garage if garage is not None else leer_garage()
+    datos = leer_garage_normalizado()
     return sum(1 for slot in datos if slot["ocupado"] == "False")
 
 
 
-# FUNCIÓN PARA CALCULAR EL COSTO DE ESTADÍA DE UN VEHÍCULO
+# FUNCIÓN PARA CALCULAR EL COSTO DE ESTADÍA DE UN VEHÍCULO ||||||| MODIFICAR PORQUE GARAGE YA NO 
 'manejo de errores'
 def calcular_costo_de_estadia(patente, hora_salida):
     """
@@ -300,7 +312,7 @@ def registrar_salida_vehiculo(garage=None, patente=None):
     """
     Registra la salida de un vehículo del garage, actualizando tanto la vista de diccionarios como la estructura anidada GARAGE.
     """
-    datos = garage if garage is not None else leer_garage()
+    datos = leer_garage_normalizado()
 
     if patente is None:
         patente = pedir_patente()
@@ -449,10 +461,15 @@ def registrar_entrada_auto(garage):
 
     # BÚSQUEDA: Buscar un espacio libre compatible
     posicion = busqueda_espacio_libre(garage, tipo_vehiculo)
-
+    if posicion == (-1, -1):
+        print("Error: No hay espacio libre disponible para este tipo de vehículo.")
+        return False
+    else:   
+        print("Espacio disponible en Piso", posicion[0], "Slot ID", posicion[1])
+    
 def contar_por_tipo_vehiculo(garage=None, tipo_buscado=None):
     """Cuenta vehículos estacionados de un tipo (tipo_vehiculo_estacionado)."""
-    datos = garage if garage is not None else leer_garage()
+    datos = leer_garage_normalizado()
     return sum(1 for slot in datos if slot.get("ocupado") == "True" and slot.get("tipo_vehiculo_estacionado") == str(tipo_buscado))
 
 # CONFIGURACIÓN CONSTANTE DEL EDIFICIO

@@ -76,7 +76,7 @@ def busqueda_espacio_libre(garage=None, tipo_vehiculo=None):
     Retorna (piso, id) del primer slot libre compatible con tipo_vehiculo.
     Si no hay, retorna (-1, -1).
     """
-    datos = garage if garage is not None else leer_garage()
+    datos = leer_garage_normalizado()
     for slot in datos:
         if slot.get("ocupado") == "False":
             if tipo_vehiculo is None or slot.get("tipo_slot") == str(tipo_vehiculo) or slot.get("tipo_slot") == "4":
@@ -88,7 +88,7 @@ def buscar_por_patente(garage=None, patente_buscada=None):
     """
     Devuelve (piso, id) si encuentra la patente ocupada; (-1,-1) sino.
     """
-    datos = garage if garage is not None else leer_garage()
+    datos = leer_garage_normalizado()
     for slot in datos:
         if slot.get("patente") == patente_buscada and slot.get("ocupado") == "True":
             return (int(slot.get("piso", "0")), int(slot.get("id", "0")))
@@ -97,25 +97,25 @@ def buscar_por_patente(garage=None, patente_buscada=None):
 
 def contar_espacios_libres(garage=None):
     """Cuenta slots con 'ocupado' == 'False'."""
-    datos = garage if garage is not None else leer_garage()
+    datos = leer_garage_normalizado()
     return sum(1 for slot in datos if slot.get("ocupado") == "False")
 
 
 def contar_por_tipo_vehiculo(garage=None, tipo_buscado=None):
     """Cuenta vehículos estacionados de un tipo (tipo_vehiculo_estacionado)."""
-    datos = garage if garage is not None else leer_garage()
+    datos = leer_garage_normalizado()
     return sum(1 for slot in datos if slot.get("ocupado") == "True" and slot.get("tipo_vehiculo_estacionado") == str(tipo_buscado))
 
 
 def acceder_a_info_de_patentes(garage=None):
     """Devuelve lista de dicts con slots ocupados."""
-    datos = garage if garage is not None else leer_garage()
+    datos = leer_garage_normalizado()
     return [slot for slot in datos if slot.get("ocupado") == "True"]
 
 
 def chequear_existencia_patente(patente, garage=None):
     """Devuelve True si la patente existe y está ocupada."""
-    datos = garage if garage is not None else leer_garage()
+    datos = leer_garage_normalizado()
     for slot in datos:
         if slot.get("patente") == patente and slot.get("ocupado") == "True":
             return True
@@ -124,7 +124,7 @@ def chequear_existencia_patente(patente, garage=None):
 
 def es_subscripcion_mensual(patente, garage=None):
     """Devuelve True si la patente corresponde a un reservado mensual (reservado_mensual == 'True')."""
-    datos = garage if garage is not None else leer_garage()
+    datos = leer_garage_normalizado()
     for slot in datos:
         if slot.get("patente") == patente and slot.get("ocupado") == "True":
             return slot.get("reservado_mensual") == "True"
@@ -133,7 +133,7 @@ def es_subscripcion_mensual(patente, garage=None):
 
 def buscar_patente(patente, garage=None):
     """Devuelve el dict completo del slot si la patente está ocupada, o None."""
-    datos = garage if garage is not None else leer_garage()
+    datos = leer_garage_normalizado()
     for slot in datos:
         if slot.get("patente") == patente and slot.get("ocupado") == "True":
             return slot

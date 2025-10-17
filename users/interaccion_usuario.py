@@ -73,7 +73,7 @@ def mostrar_estado_garage(garage):
     imprimir_piso = lambda idx, piso: (
         print(f"\nPiso {idx}:"),
         [print(
-            f"  Slot {slot[0]}: {'Ocupado' if slot[3] else 'Libre'} | Patente: {slot[1] if slot[3] else '-'} | Tipo: {slot[6] if slot[3] else '-'}"
+            f"  Slot {slot['id']}: {'Ocupado' if slot['ocupado'] else 'Libre'} | Patente: {slot['patente'] if slot['ocupado'] else '-'} | Tipo: {slot['tipo_vehiculo_estacionado'] if slot['ocupado'] else '-'}"
         ) for slot in piso]
     )
     for idx in range(len(garage)):

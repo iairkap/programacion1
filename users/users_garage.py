@@ -1,4 +1,5 @@
 from auxiliares.consola import clear_screen
+from cache.json import guardar_estado_garage, leer_estado_garage
 #Archivo para crear garage, relacionarlos con usuarios y demas
 
 def buscar_garage_asociado(email):
@@ -57,12 +58,18 @@ def seleccionar_solo_un_garage(garages):
         return garages[0]
     else:
         print("Seleccione un garage:\n")
+        print("0. Salir.")
         for i, garage in enumerate(garages):
             print(f"{i + 1}. {garage['garage_name']} - {garage['address']}")
         seleccion = input("Ingrese el número del garage deseado: ")
+        
         try:
             seleccion = int(seleccion)
+            if seleccion == 0:
+                print("Operación cancelada.")
+                return None
             if 1 <= seleccion <= len(garages):
+                
                 return garages[seleccion - 1]
             else:
                 print("Selección inválida.")
@@ -112,7 +119,7 @@ def asociar_garage_a_usuario(user_email, garage_name, address, floors, slots_per
         print(f"Error al asociar el garage: {e}")
 
 def generate_garage_structure(floors, slots_per_floor):
-    """Genera la estructura inicial del garage."""
+    """Genera la estructura inicial del garage. """
     garage = []
     slot_id = 0
     for piso in range(floors):
@@ -189,15 +196,17 @@ def crear_garage(usuario, slots_per_floor =5 , floors= 2):
                 rows.append(slot.values())
         escribir_data_en_csv(f"files/garage-{garage_id}.csv", rows, headers=headers)
         print(f"Garage {garage_id} creado con {floors} pisos y {slots_per_floor} slots por piso.")
-        return estructura
+        return garage_id
     except Exception as e:
         print(f"Error al crear el garage: {e}")
         return None
 
-def actualizar_slot(garage_id, slot_id, nuevaData):
+def actualizar_slot( slot_id, nuevaData):
     """actualizar un slot en particular
     nuevaData es un diccionario con los campos a actualizar
     """
+    garage_id = leer_estado_garage()['garage_id']
+    
     try: 
         with open(f"files/garage-{garage_id}.csv", "r") as file:
             lineas = file.readlines()
@@ -208,18 +217,21 @@ def actualizar_slot(garage_id, slot_id, nuevaData):
         for linea in lineas[1:]:
             datos = linea.strip().split(",")
             
-            id_actual = datos[0]
-            piso = datos[1]
-            posicion = datos[2]
-            tipo_slot = datos[3]
-            reservado_mensual = datos[4]
-            ocupado = datos[5]
-            patente = datos[6]
-            hora_entrada = datos[7]
-            tipo_vehiculo = datos[8]
-            
+            id_actual = datos[0]#muevo esto para optimizar tareas si no coincide el id
+
             # Si coincide el id, actualizamos
             if id_actual == str(slot_id):
+                piso = datos[1]
+                posicion = datos[2]
+                tipo_slot = datos[3]
+                reservado_mensual = datos[4]
+                ocupado = datos[5]
+                patente = datos[6]
+                hora_entrada = datos[7]
+                tipo_vehiculo = datos[8]
+            
+                
+                
                 tipo_slot = str(nuevaData.get("tipo_slot", tipo_slot))
                 reservado_mensual = str(nuevaData.get("reservado_mensual", reservado_mensual))
                 ocupado = str(nuevaData.get("ocupado", ocupado))
@@ -242,7 +254,47 @@ def actualizar_slot(garage_id, slot_id, nuevaData):
         print(f"Archivo garage-{garage_id}.csv no encontrado.")
     except Exception as e:
         print(f"Error al actualizar el slot: {e}")
+
     
+def get_garage_data(garage_id: int ) -> list:
+    garage = []
+    try:
+        with open(f"files/garage-{garage_id}.csv", "r") as file:
+            lineas = file.readlines()
+
+        encabezado = lineas[0].strip().split(",")
+
+        for linea in lineas[1:]:
+            datos = linea.strip().split(",")
+            piso_csv = int(datos[1]) if len(datos) > 1 and datos[1].isdigit() else 0
+
+            #agrego pisos vacios si es necesario
+            while len(garage) <= piso_csv:
+                garage.append([])
+
+            slot = {
+                "id": int(datos[0]) if len(datos) > 0 and datos[0].isdigit() else 0,
+                "posicion": int(datos[2]) if len(datos) > 2 and datos[2].isdigit() else 0,
+                "tipo_slot": int(datos[3]) if len(datos) > 3 and datos[3].isdigit() else 0,
+                "reservado_mensual": datos[4].lower() == "true" if len(datos) > 4 else False,
+                "ocupado": datos[5].lower() == "true" if len(datos) > 5 else False,
+                "patente": datos[6] if len(datos) > 6 else "",
+                "hora_entrada": datos[7] if len(datos) > 7 and datos[7].strip() else None,
+                "tipo_vehiculo_estacionado": int(datos[8]) if len(datos) > 8 and datos[8].isdigit() else 0,
+            }
+
+            garage[piso_csv].append(slot)  # Agrego slot al piso correspondiente
+
+        return garage
+
+    except FileNotFoundError:
+        print(f"Archivo garage-{garage_id}.csv no encontrado.")
+    except Exception as e:
+        print(f"Error al obtener datos del garage: {e}")
+    return []  # devuelvo lista vacia en caso de error
+
+
+
 def actualizar_slots(garage_id, nuevaData):
     """actualizar varios slots a la vez
     nuevaData es una lista de diccionarios con los campos a actualizar
