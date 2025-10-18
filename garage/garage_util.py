@@ -12,14 +12,13 @@ def buscar_espacio_libre(garage, tipo_vehiculo):
     for i in range(len(garage)):
         piso = garage[i]
         for slot in piso:
-            if slot["ocupado"] == False and (tipo_vehiculo == slot["tipo_slot"] or slot["tipo_slot"] == 4):
+            if slot["ocupado"] == False and (tipo_vehiculo == slot["tipo_slot"] or slot["tipo_slot"] == tipo_vehiculo):
                 return (i, slot["id"])
     return (-1, -1)
 
 
 def contar_espacios_libres(garage):
     cont = 0
-    print("el garage es     ", garage)
     for piso in garage:
         for slot in piso:
             if slot["ocupado"] == False:
@@ -31,7 +30,7 @@ def contar_espacios_libres_por_tipo(garage, tipo_vehiculo):
     cont = 0
     for piso in garage:
         for slot in piso:
-            if slot["ocupado"] == False and (tipo_vehiculo == slot["tipo_slot"] or slot["tipo_slot"] == 4):
+            if slot["ocupado"] == False and (tipo_vehiculo == slot["tipo_slot"] or slot["tipo_slot"] == tipo_vehiculo):
                 cont += 1
     return cont
 

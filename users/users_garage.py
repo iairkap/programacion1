@@ -201,11 +201,10 @@ def crear_garage(usuario, slots_per_floor =5 , floors= 2):
         print(f"Error al crear el garage: {e}")
         return None
 
-def actualizar_slot( slot_id, nuevaData):
+def actualizar_slot( garage_id, slot_id, nuevaData):
     """actualizar un slot en particular
     nuevaData es un diccionario con los campos a actualizar
     """
-    garage_id = leer_estado_garage()['garage_id']
     
     try: 
         with open(f"files/garage-{garage_id}.csv", "r") as file:
@@ -217,20 +216,13 @@ def actualizar_slot( slot_id, nuevaData):
         for linea in lineas[1:]:
             datos = linea.strip().split(",")
             
-            id_actual = datos[0]#muevo esto para optimizar tareas si no coincide el id
 
+            id_actual,piso, posicion, tipo_slot, reservado_mensual, ocupado, patente, hora_entrada, tipo_vehiculo = datos[0:]
+            
             # Si coincide el id, actualizamos
             if id_actual == str(slot_id):
-                piso = datos[1]
-                posicion = datos[2]
-                tipo_slot = datos[3]
-                reservado_mensual = datos[4]
-                ocupado = datos[5]
-                patente = datos[6]
-                hora_entrada = datos[7]
-                tipo_vehiculo = datos[8]
-            
-                
+                piso = datos[1] # esto no se actualiza, es fijo 
+                posicion = datos[2] # esto no se actualiza, es fijo 
                 
                 tipo_slot = str(nuevaData.get("tipo_slot", tipo_slot))
                 reservado_mensual = str(nuevaData.get("reservado_mensual", reservado_mensual))
@@ -309,13 +301,17 @@ def actualizar_slots(garage_id, nuevaData):
         print(f"Error al actualizar los slots: {e}")
        
 def actualizar_garage(garage_id, data, bulk=False):
-    """Actualiza la información de un garage en csv."""
+    """Actualiza la información de un garage en csv.
+        si bulk es True, data es una lista de diccionarios con la info de varios slots
+        si bulk es False, data es un diccionario con la info de un solo slot
+    """
+    print( data.get("slot_id","no slot id") )
     try: 
         if bulk:
             actualizar_slots(garage_id, data)
-            return True
         else:
-            actualizar_slot(garage_id, data.get("slot_id"), data)
+            actualizar_slot(garage_id, data.get("slot_id"), data) 
         print(f"Garage con id {garage_id} actualizado correctamente ✅")
+        return True
     except Exception as e:
         print(f"Error al actualizar el garage: {e}")

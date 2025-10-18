@@ -7,8 +7,13 @@ from garage.mockdata import GARAGE, COSTOS
 import random
 from users.interaccion_usuario import pedir_patente
 import garage.garage_util as garage_util
-import auxiliares.date
+from auxiliares.date import get_current_time_json
 from users import users_garage
+
+from users.users_garage import (    
+                crear_archivo_users_garage, 
+                get_garage_data,
+                actualizar_garage)
 from cache.json import leer_estado_garage, guardar_estado_garage
 
 
@@ -319,10 +324,11 @@ def registrar_salida_vehiculo(garage=None, patente=None):
 
     # Buscar el slot en la vista de diccionarios
     found = None
-    for slot in datos:
-        if slot.get("patente") == patente and slot.get("ocupado") == "True":
-            found = slot
-            break
+    for piso in datos:
+        for slot in piso:
+            if slot.get("patente") == patente and slot.get("ocupado") == "True":
+                found = slot
+                break
 
     if not found:
         print("Vehículo no encontrado.")
@@ -460,12 +466,35 @@ def registrar_entrada_auto(garage):
         return False
 
     # BÚSQUEDA: Buscar un espacio libre compatible
-    posicion = busqueda_espacio_libre(garage, tipo_vehiculo)
-    if posicion == (-1, -1):
+    piso, slot_id  = busqueda_espacio_libre(garage, tipo_vehiculo)
+    if (piso, slot_id) == (-1, -1):
         print("Error: No hay espacio libre disponible para este tipo de vehículo.")
         return False
-    else:   
-        print("Espacio disponible en Piso", posicion[0], "Slot ID", posicion[1])
+    else:
+
+        new_slot = {
+            "slot_id": slot_id,
+            "piso": piso,#no hace es necesario pero lo dejo para mantener la estructura
+            "ocupado": "True",
+            "hora_entrada": get_current_time_json(),
+            "tipo_slot": tipo_vehiculo,
+            "patente": patente
+            
+        }
+        # ACTUALIZACIÓN: Registrar el vehículo en el slot encontrado
+        if actualizar_garage(garage_id=leer_estado_garage()['garage_id'], data=new_slot, bulk=False):
+            print(f"Vehículo {patente} registrado en el garage.")
+        else: 
+            print("Error actualizando el garage.")        
+        return True
+
+def obtener_id_por_posicion(garage, piso_idx, slot_idx):
+    """Obtiene el ID del slot dado su piso y posición en el piso."""
+    try:
+        slot = garage[piso_idx][slot_idx]
+        return int(slot["id"])
+    except Exception:
+        return None
     
 def contar_por_tipo_vehiculo(garage=None, tipo_buscado=None):
     """Cuenta vehículos estacionados de un tipo (tipo_vehiculo_estacionado)."""

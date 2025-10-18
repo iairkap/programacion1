@@ -11,6 +11,6 @@ agregar colores con colorama en los errores para distinguir la terminal
 
 to do juampi : 
     
-    -permitir setear el tipo de slot al crear garage nuevo por las dudas, especificar cuantos quiere de cada 
-
-    
+    -permitir setear el tipo de slot al crear garage nuevo por las dudas, especificar cuantos quiere de cada -- crear un archivo de configuracion para eso ameno para el usuario, que tengamos una bandera para ver si ya se configuracion
+    - mejorar la validacion del logeo( dice que el mail ya esta pero en realidad ya esta el nombre de usuario y el apellido no el mail, que sea solo por mail)
+    - si se borra el archivo en medio de la ejecucion, que no tire error raro, que lo cree de nuevo, guardar las caracteristicas del garage en un archivo de configuracion aparte
