@@ -1,5 +1,13 @@
 def pedir_piso(garage):
-    return pedir_num_natural(max =len(garage))
+    while True:
+        try:
+            piso = pedir_num_natural(mensaje_personalizado="Ingrese el piso que desea consultar: ",max =len(garage)-1)
+            if piso < 0 or piso < len(garage):
+                print("El piso ingresado no es válido. Intente nuevamente.")
+            else:
+                return piso            
+        except Exception as e:
+            print(e)
 
 def acceder_a_info_de_patentes(GARAGE):
     """Accede a los datos guardados de las patentes
@@ -45,17 +53,6 @@ def calcular_costo_de_estadia(patente, hora_salida):
     return costo
     
 
-
-#creo que esta la hice jp
-# def chequear_espacio_libre(garage = GARAGE):
-#     """Chequea si hay espacio libre en el estacionamiento"""
-#     for piso_idx, piso in enumerate(garage):
-#         if len(piso) < 12:
-#             fila = piso[-1][0] + 1
-#             return (piso_idx, fila) ##Falta retornar algun dato mas??
-
-
-
 def es_subscripcion_mensual(patente):
     """Chequea si la subscripcion es mensual o diaria"""
     info_patentes = acceder_a_info_de_patentes()
@@ -73,7 +70,7 @@ def mostrar_estado_garage(garage):
     imprimir_piso = lambda idx, piso: (
         print(f"\nPiso {idx}:"),
         [print(
-            f"  Slot {slot[0]}: {'Ocupado' if slot[3] else 'Libre'} | Patente: {slot[1] if slot[3] else '-'} | Tipo: {slot[6] if slot[3] else '-'}"
+            f"  Slot {slot['id']}: {'Ocupado' if slot['ocupado'] else 'Libre'} | Patente: {slot['patente'] if slot['ocupado'] else '-'} | Tipo: {slot['tipo_vehiculo_estacionado'] if slot['ocupado'] else '-'}"
         ) for slot in piso]
     )
     for idx in range(len(garage)):
@@ -112,10 +109,10 @@ def pedir_tipo_vehiculo():
 
 
     
-def pedir_num_natural(max,min = 0):
+def pedir_num_natural(max,mensaje_personalizado = "ingresa el numero: ",min = 0):
     while True:
         try:
-            num = int(input("ingresa el numero: "))
+            num = int(input(mensaje_personalizado))
             if num < min or num > max:
                 print(f"el nuero ingresado tiene que ser un num valido, entre {min} y {max}")
             else: return num

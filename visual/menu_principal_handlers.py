@@ -29,6 +29,7 @@ def handle_consultar_espacios_libres(garage):
     
     if subop == "1":
         piso = pedir_piso(garage)
+        
         libres = contar_espacios_libres([garage[piso]])
         print(f"Espacios libres en el piso {piso}: {libres}")
     elif subop == "2":

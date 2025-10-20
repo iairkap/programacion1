@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from users.users_garage import crear_archivo_users_garage
+from users.users_garage import crear_archivo_users_garage, get_garage_data
 from visual.menu_handlers import (
     handle_login, 
     handle_registro, 
@@ -19,7 +19,8 @@ from visual.menu_principal_handlers import (
     handle_buscar_vehiculo,
     handle_estadisticas_rapidas
 )
-from garage.mockdata import GARAGE
+
+from cache.json import leer_estado_garage, guardar_estado_garage
 
 def mostrar_menu_inicial():
     """Menú de inicio de sesión y registro"""
@@ -81,7 +82,7 @@ def menu_garage(usuario):
     crear_archivo_users_garage()
     
     continuar = True
-    garage_seleccionado = None
+    garage_seleccionado = None #users-garage actual
     
     while continuar and not garage_seleccionado:
         mostrar_menu_garage(usuario)
@@ -107,39 +108,44 @@ def menu_garage(usuario):
 
 def menu_principal(garage_actual):
     """Menú principal del sistema - retorna acción a realizar"""
-    garage = GARAGE  # Usar el garage mock por ahora
+    #SUBO MI GARAGE ACTUAL AL JSON PARA QUE SEA ACCESIBLE DESDE CUALQUIER PARTE DEL PROYECTO
+    guardar_estado_garage(garage_actual)    
+    
     
     continuar = True
     accion = None
     
     while continuar and not accion:
         mostrar_menu_principal(garage_actual)
+        
+        
+        garage_data = get_garage_data(garage_actual['garage_id'])
         opcion = input("Seleccione una opción: ")
 
         if opcion == "1":
-            handle_consultar_espacios_libres(garage)
+            handle_consultar_espacios_libres(garage_data)
 
         elif opcion == "2":
-            handle_consultar_vehiculos_estacionados(garage)
+            handle_consultar_vehiculos_estacionados(garage_data)
 
         elif opcion == "3":
-            handle_ingresar_vehiculo(garage)
+            handle_ingresar_vehiculo(garage_data)
 
         elif opcion == "4":
-            handle_registrar_salida(garage)
+            handle_registrar_salida(garage_data)
 
         elif opcion == "5":
-            handle_editar_vehiculo(garage)
+            handle_editar_vehiculo(garage_data)
 
         elif opcion == "6":
-            handle_mostrar_estado_garage(garage)
+            handle_mostrar_estado_garage(garage_data)
 
         elif opcion == "7":
-            handle_buscar_vehiculo(garage)
+            handle_buscar_vehiculo(garage_data)
 
         elif opcion == "8":
-            handle_estadisticas_rapidas(garage)
-            
+            handle_estadisticas_rapidas(garage_data)
+
         elif opcion == "9":
             accion = "cambiar_garage"
             continuar = False
@@ -157,6 +163,8 @@ def menu_principal(garage_actual):
     
     return accion
 
+
+
 def main():
     """Función principal que coordina todo el flujo"""
     programa_activo = True
@@ -172,10 +180,13 @@ def main():
         session_active = True
         while session_active and programa_activo:
             garage_actual = menu_garage(usuario_actual)
+            guardar_estado_garage(garage_actual)#guardo el garage actual en el json para acceder desde todo el proyecto
+            
             if not garage_actual:
                 session_active = False
                 continue
-                
+ 
+            
             # 3. Menú principal
             menu_activo = True
             while menu_activo and session_active:

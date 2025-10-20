@@ -1,5 +1,5 @@
 import datetime
-from garage.mockdata import GARAGE, COSTOS
+from garage.mockdata import  COSTOS
 
 
 def tipo_slot():
@@ -31,18 +31,20 @@ def obtener_slot_por_id(garage, slot_id):
     # Busca en todos los pisos y slots
     for piso in garage:
         for slot in piso:
-            # Compara con slot[0] que es el ID del slot
-            if slot[0] == slot_id:
+            # Compara con slot["id"] que es el ID del slot
+            if slot["id"] == slot_id:
                 return slot
     return None
 
 
-def actualizar_slot(patente, tipo_de_vehículo, piso, fila, columna, garage=GARAGE ):
-    """Actualiza el slot con la nueva informacion"""
-    slot = garage[piso][fila][columna]
-    slot[1] = patente
-    slot[3] = False
-    slot[5] = datetime.datetime.now()
-    slot[6] = tipo_de_vehículo
-    print(f"Slot actualizado: {slot}")
-    return True 
+
+# ## actualizar esto 
+# def actualizar_slot(patente, tipo_de_vehículo, piso, fila, columna, garage ):
+#     """Actualiza el slot con la nueva informacion"""
+#     slot = garage[piso][fila][columna]
+#     slot["patente"] = patente
+#     slot["ocupado"] = False
+#     slot["hora_entrada"] = datetime.datetime.now()
+#     slot["tipo_vehiculo_estacionado"] = tipo_de_vehículo
+#     print(f"Slot actualizado: {slot}")
+#     return True 

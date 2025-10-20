@@ -2,3 +2,7 @@ garage_id, user_email, garage_name, address, floors, slots_per_floor
 1,juan@etchart.com,UADE,lima 123,5,7
 2,john@doe.com,UADE,Lima 123,5,5
 3,john@doe.com,Lima 123,lima 123,2,5
+4,iairkap@gmail.com,,,2,5
+5,iair@kaplun.com,Uade,limas123,2,5
+6,iair@kaplun.com,Fafa,Fofo,2,5
+7,a@a.com,test,teste123,2,5
