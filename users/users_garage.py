@@ -1,6 +1,8 @@
 from auxiliares.consola import clear_screen
 from cache.json import guardar_estado_garage, leer_estado_garage
 #Archivo para crear garage, relacionarlos con usuarios y demas
+import os
+from constantes.tipos_vehiculos import enum_tipo_vehiculo
 
 def buscar_garage_asociado(email):
     """
@@ -113,8 +115,7 @@ def asociar_garage_a_usuario(user_email, garage_name, address, floors, slots_per
         with open("files/users-garage.csv", mode="a", encoding="utf-8") as arch:
             arch.write(f"{garage_id},{user_email},{garage_name},{address},{floors},{slots_per_floor}\n")
             print(f"Garage '{garage_name}' asociado al usuario '{user_email}' exitosamente.")
-            return garage_id
-            
+            return garage_id        
     except Exception as e:
         print(f"Error al asociar el garage: {e}")
 
@@ -151,6 +152,7 @@ def escribir_data_en_csv(file_path, data, headers=None):
         raise
 
 
+<<<<<<< HEAD
 def crear_garage(usuario, slots_per_floor =5 , floors= 2):
     try:
         # Validar nombre no vacío
@@ -187,6 +189,22 @@ def crear_garage(usuario, slots_per_floor =5 , floors= 2):
 
     """Crea un garage nuevo basado en el ID proporcionado."""
     try:
+=======
+def crear_garage(usuario):
+    """Crea un garage nuevo basado en el ID proporcionado."""
+    try:
+        nombre = input("Ingrese nombre del garage*: ")
+        direccion = input("Ingrese dirección*: ")
+        floors = int(input("Ingrese cantidad de pisos: "))
+        slots_per_floor = int(input("Ingrese cantidad de slots por piso: "))
+        garage_id = asociar_garage_a_usuario(
+            usuario['email'],
+            nombre,
+            direccion,
+            floors if floors else 2,
+            slots_per_floor if slots_per_floor else 10
+        )
+>>>>>>> origin/main_klearv2
         estructura = generate_garage_structure(floors, slots_per_floor)
         # Encabezados coherentes con la estructura de cada slot
         headers = estructura[0][0].keys()
@@ -199,7 +217,60 @@ def crear_garage(usuario, slots_per_floor =5 , floors= 2):
         return garage_id
     except Exception as e:
         print(f"Error al crear el garage: {e}")
-        return None
+        return 
+    
+def leer_garage_desde_csv(garage_id):
+    """
+    Lee la estructura del garage desde su archivo CSV y devuelve
+    una lista de diccionarios con el formato estandarizado.
+    """
+    ruta = f"files/garage-{garage_id}.csv"
+    try:
+        with open(ruta, mode="r", encoding="utf-8") as arch:
+            next(arch)  # Saltar header
+            garage = []
+
+            for line in arch:
+                parts = line.strip().split(",")
+                if len(parts) < 9:
+                    continue  # Evitar líneas incompletas
+
+                slot = {
+                    "id": int(parts[0]),
+                    "patente": parts[6].strip(),
+                    "tipo_slot": int(parts[3]) if parts[3].isdigit() else parts[3],
+                    "ocupado": parts[5].lower() == "true",
+                    "reservado_mensual": parts[4].lower() == "true",
+                    "hora_entrada": parts[7].strip() if parts[7].strip() != "" else None,
+                    "tipo_vehiculo_estacionado": int(parts[8]) if parts[8].isdigit() else 0
+                }
+
+                garage.append(slot)
+
+            return garage
+    except FileNotFoundError:
+        print(f"⚠️ Archivo 'garage-{garage_id}.csv' no encontrado.")
+        return []
+    except Exception as e:
+        print(f"❌ Error al leer el garage: {e}")
+        return []
+    
+def crear_data_para_actualizar_slot(slot_id, tipo_slot=None, reservado_mensual=None, ocupado=None, patente=None, hora_entrada=None, tipo_vehiculo=None):
+    """Crea un diccionario con los datos a actualizar para un slot."""
+    data = {"slot_id": slot_id}
+    if tipo_slot is not None:
+        data["tipo_slot"] = tipo_slot
+    if reservado_mensual is not None:
+        data["reservado_mensual"] = reservado_mensual
+    if ocupado is not None:
+        data["ocupado"] = ocupado
+    if patente is not None:
+        data["patente"] = patente
+    if hora_entrada is not None:
+        data["hora_entrada"] = hora_entrada
+    if tipo_vehiculo is not None:
+        data["tipo_vehiculo"] = tipo_vehiculo
+    return data
 
 def actualizar_slot( garage_id, slot_id, nuevaData):
     """actualizar un slot en particular
@@ -247,6 +318,80 @@ def actualizar_slot( garage_id, slot_id, nuevaData):
     except Exception as e:
         print(f"Error al actualizar el slot: {e}")
 
+<<<<<<< HEAD
+=======
+def generar_csv_slots():
+    """
+    Crea un archivo CSV si no existe en la ruta
+    ~/Documents/data/config_slots.csv para que el usuario edite
+    los tipos de slot y sus cantidades. Si ya existe, no lo modifica.
+    """
+    try:
+        ruta_base = os.path.expanduser('~')
+        ruta_data = os.path.join(ruta_base, "Documents", "data")
+        os.makedirs(ruta_data, exist_ok=True)
+        ruta_csv = os.path.join(ruta_data, "config_slots.csv")
+
+        if not os.path.exists(ruta_csv):
+            with open(ruta_csv, "w", encoding='utf-8') as file:
+                file.write("tipo_de_slot,cantidad\n")
+                file.write("auto,0\n")
+                file.write("moto,0\n")
+                file.write("camioneta,0\n")
+            print(f"✅ Archivo de configuración CREADO en: {os.path.abspath(ruta_csv)}")
+        
+        else:
+            print(f"ℹ️ El archivo de configuración YA EXISTE en: {os.path.abspath(ruta_csv)}")
+
+        print("Editá este archivo para indicar las cantidades de cada tipo de slot.")
+        print("Una vez editado, guardalo y ejecuta la actualización de tipos de slots nuevamente.")
+        return ruta_csv
+    except Exception as e:
+        print(f"❌ Ocurrió un error al intentar gestionar el archivo CSV: {e}")
+        print("Asegurate de que tu usuario tenga permisos para escribir en la carpeta 'Documents'.")
+
+def leer_config_slots(ruta_csv=None):
+    """
+    Lee el archivo config_slots.csv y devuelve un diccionario
+    con tipo_de_slot -> cantidad.
+    """
+    if os.path.exists(ruta_csv):
+        config = {}
+        with open(ruta_csv, "r", encoding="utf-8") as f:
+            lineas = f.read().strip().split("\n")
+
+        for linea in lineas[1:]:
+            if not linea.strip():
+                continue
+            partes = linea.split(",")
+            if len(partes) != 2:
+                continue
+
+            tipo = partes[0].strip()
+            cantidad_str = partes[1].strip()
+
+            if cantidad_str.isdigit():
+                config[tipo] = int(cantidad_str)
+        return config
+
+def crear_data_para_actualizar_tipo_slots(ruta_csv):
+    """Crea una lista de diccionarios con los datos a actualizar para varios slots.
+    """
+    try:
+        config = leer_config_slots(ruta_csv)
+        slots = []
+        slot_id = 0
+        for tipo, cantidad in config.items():
+            for _ in range(cantidad):
+                tipo_slot = enum_tipo_vehiculo()[tipo.lower()]
+                slot_id += 1
+                slot_data= {"slot_id": slot_id,"tipo_slot": tipo_slot}
+                slots.append(slot_data)
+        return slots
+    except Exception as e:
+        print(f"Error al actualizar slots: {e}")
+        return []
+>>>>>>> origin/main_klearv2
     
 def get_garage_data(garage_id: int ) -> list:
     garage = []
@@ -300,6 +445,7 @@ def actualizar_slots(garage_id, nuevaData):
     except Exception as e:
         print(f"Error al actualizar los slots: {e}")
        
+<<<<<<< HEAD
 def actualizar_garage(garage_id, data, bulk=False):
     """Actualiza la información de un garage en csv.
         si bulk es True, data es una lista de diccionarios con la info de varios slots
@@ -315,3 +461,16 @@ def actualizar_garage(garage_id, data, bulk=False):
         return True
     except Exception as e:
         print(f"Error al actualizar el garage: {e}")
+=======
+# def actualizar_garage(garage_id, data, bulk=False):
+#     """Actualiza la información de un garage en csv."""
+#     try: 
+#         if bulk:
+#             actualizar_slots(garage_id, data)
+#             return True
+#         else:
+#             actualizar_slot(garage_id, data.get("slot_id"), data)
+#         print(f"Garage con id {garage_id} actualizado correctamente ✅")
+#     except Exception as e:
+#         print(f"Error al actualizar el garage: {e}")
+>>>>>>> origin/main_klearv2
