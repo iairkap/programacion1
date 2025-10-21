@@ -16,6 +16,8 @@ from users.users_garage import (
                 actualizar_garage)
 from cache.json import leer_estado_garage, guardar_estado_garage
 
+from garage.precios import (configurar_precios, es_subscripcion_mensual,
+                            buscar_por_patente, calcular_costo_de_estadia)
 
 ## aca agregarle la lectura del json para saber cual es el garage actual 
 def leer_garage_normalizado():

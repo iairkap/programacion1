@@ -2,11 +2,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-<<<<<<< HEAD
-from users.users_garage import crear_archivo_users_garage, get_garage_data
-=======
 from users.users_garage import crear_archivo_users_garage, leer_garage_desde_csv
->>>>>>> origin/main_klearv2
 from visual.menu_handlers import (
     handle_login, 
     handle_registro, 
@@ -114,63 +110,6 @@ def menu_garage(usuario):
     
     return garage_seleccionado
 
-<<<<<<< HEAD
-def menu_principal(garage_actual):
-    """Menú principal del sistema - retorna acción a realizar"""
-    #SUBO MI GARAGE ACTUAL AL JSON PARA QUE SEA ACCESIBLE DESDE CUALQUIER PARTE DEL PROYECTO
-    guardar_estado_garage(garage_actual)    
-    
-    
-    continuar = True
-    accion = None
-    
-    while continuar and not accion:
-        mostrar_menu_principal(garage_actual)
-        
-        
-        garage_data = get_garage_data(garage_actual['garage_id'])
-        opcion = input("Seleccione una opción: ")
-
-        if opcion == "1":
-            handle_consultar_espacios_libres(garage_data)
-
-        elif opcion == "2":
-            handle_consultar_vehiculos_estacionados(garage_data)
-
-        elif opcion == "3":
-            handle_ingresar_vehiculo(garage_data)
-
-        elif opcion == "4":
-            handle_registrar_salida(garage_data)
-
-        elif opcion == "5":
-            handle_editar_vehiculo(garage_data)
-
-        elif opcion == "6":
-            handle_mostrar_estado_garage(garage_data)
-
-        elif opcion == "7":
-            handle_buscar_vehiculo(garage_data)
-
-        elif opcion == "8":
-            handle_estadisticas_rapidas(garage_data)
-
-        elif opcion == "9":
-            accion = "cambiar_garage"
-            continuar = False
-            
-        elif opcion == "10":
-            accion = "cerrar_sesion"
-            continuar = False
-            
-        elif opcion == "11":
-            accion = "salir"
-            continuar = False
-            
-        else:
-            print("Opción inválida. Intente de nuevo.")
-    
-=======
 def menu_principal(garage_actual, garageName):
     """Menú principal del sistema - retorna acción a realizar""" 
     continuar = True
@@ -215,7 +154,6 @@ def menu_principal(garage_actual, garageName):
                 print("Opción inválida. Intente de nuevo.")
     except Exception as e:
         print(f"Ocurrió un error: {e}")
->>>>>>> origin/main_klearv2
     return accion
 
 
@@ -234,16 +172,9 @@ def main():
         # 2. Selección/Creación de garage
         session_active = True
         while session_active and programa_activo:
-<<<<<<< HEAD
-            garage_actual = menu_garage(usuario_actual)
-            guardar_estado_garage(garage_actual)#guardo el garage actual en el json para acceder desde todo el proyecto
-            
-            if not garage_actual:
-=======
             garage_actual_obj = menu_garage(usuario_actual)
             garage_from_csv = leer_garage_desde_csv(garage_actual_obj['garage_id'])
             if not garage_actual_obj:
->>>>>>> origin/main_klearv2
                 session_active = False
                 continue
  
