@@ -23,6 +23,7 @@ from visual.menu_principal_handlers import (
 )
 
 from cache.json import leer_estado_garage, guardar_estado_garage
+from colorama import Fore, Style
 
 def mostrar_menu_inicial():
     """Menú de inicio de sesión y registro"""
@@ -77,7 +78,7 @@ def menu_inicial():
             continuar = False
             
         else:
-            print("Opción inválida")
+            print(Fore.RED + "Opción inválida" + Style.RESET_ALL)
     
     return usuario
 
@@ -106,7 +107,7 @@ def menu_garage(usuario):
             continuar = False  # Cerrar sesión
             
         else:
-            print("Opción inválida")
+            print(Fore.RED + "Opción inválida" + Style.RESET_ALL)
     
     return garage_seleccionado
 
@@ -151,9 +152,9 @@ def menu_principal(garage_actual, garageName):
                 accion = acciones_especiales[opcion]
                 continuar = False
             else:
-                print("Opción inválida. Intente de nuevo.")
+                print(Fore.RED + "Opción inválida. Intente de nuevo." + Style.RESET_ALL)
     except Exception as e:
-        print(f"Ocurrió un error: {e}")
+        print(Fore.RED + f"Ocurrió un error: {e}" + Style.RESET_ALL)
     return accion
 
 

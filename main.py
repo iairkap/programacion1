@@ -16,6 +16,8 @@ from users.users_garage import (
                 actualizar_garage)
 from cache.json import leer_estado_garage, guardar_estado_garage
 
+from colorama import Fore, Style
+
 from garage.precios import (configurar_precios, es_subscripcion_mensual,
                             buscar_por_patente, calcular_costo_de_estadia)
 
@@ -172,17 +174,19 @@ def generar_fecha_aleatoria():
 
 
 # FUNCIÓN PARA ELIMINAR UNA FILA COMPLETA DEL GARAGE
-'agregue manejo de errores'
+'agregue manejo de errores ' 
 def eliminar_fila_por_valor(valor, garage):
     """Elimina la primera fila que contiene el valor dado, con manejo de errores."""
     try:
         for i in range(len(garage)):
             if valor in garage[i]:
                 del garage[i]
+                print(Fore.GREEN + f"Fila eliminada correctamente (valor: {valor})." + Style.RESET_ALL)
                 return True
     except Exception as e:
-        print(f"Error eliminando fila: {e}")
+        print(Fore.RED + f"Error eliminando fila: {e}" + Style.RESET_ALL)
         return False
+    print(Fore.YELLOW + "No se encontró ninguna fila con el valor especificado." + Style.RESET_ALL)
     return False
 
 
@@ -190,19 +194,20 @@ def eliminar_fila_por_valor(valor, garage):
 # FUNCIÓN ALTERNATIVA PARA INGRESAR PATENTES CON VALIDACIÓN
 'manejo de errores'
 def ingresar_patente():
-    """Solicita y valida una patente, con manejo de errores."""
+    """Solicita y valida una patente, con manejo de errores y colorama."""
     while True:
         try:
             patente = pedir_patente()
             if chequear_existencia_patente(patente):
-                print("Error: La patente ya existe en el sistema.")
+                print(Fore.RED + "Error: La patente ya existe en el sistema." + Style.RESET_ALL)
                 continue
             if len(patente) == 6 and patente[:3].isalpha() and patente[3:].isdigit():
+                print(Fore.GREEN + "Patente válida ingresada." + Style.RESET_ALL)
                 return patente
             else:
-                print("Error: Formato de patente inválido. Intente nuevamente.")
+                print(Fore.YELLOW + "Error: Formato de patente inválido. Intente nuevamente." + Style.RESET_ALL)
         except Exception as e:
-            print(f"Error procesando la patente: {e}. Intente nuevamente.")
+            print(Fore.RED + f"Error procesando la patente: {e}. Intente nuevamente." + Style.RESET_ALL)
 
 # FUNCIÓN PARA OBTENER INFORMACIÓN DE TODOS LOS VEHÍCULOS ESTACIONADOS
 
@@ -333,7 +338,7 @@ def registrar_salida_vehiculo(garage=None, patente=None):
                 break
 
     if not found:
-        print("Vehículo no encontrado.")
+        print(Fore.RED + "Vehículo no encontrado." + Style.RESET_ALL)
         return False
 
     # Solicita hora de salida para calcular costo
@@ -464,30 +469,28 @@ def registrar_entrada_auto(garage):
     # VALIDACIÓN: Verificar si la patente ya existe en el sistema
     posicion_existente = buscar_por_patente(garage, patente)
     if posicion_existente != (-1, -1):
-        print(f"Error: La patente {patente} ya está en el garage")
+        print(Fore.RED + f"Error: La patente {patente} ya está en el garage" + Style.RESET_ALL)
         return False
 
     # BÚSQUEDA: Buscar un espacio libre compatible
     piso, slot_id  = busqueda_espacio_libre(garage, tipo_vehiculo)
     if (piso, slot_id) == (-1, -1):
-        print("Error: No hay espacio libre disponible para este tipo de vehículo.")
+        print(Fore.RED + "Error: No hay espacio libre disponible para este tipo de vehículo." + Style.RESET_ALL)
         return False
     else:
-
         new_slot = {
             "slot_id": slot_id,
-            "piso": piso,#no hace es necesario pero lo dejo para mantener la estructura
+            "piso": piso, #no hace es necesario pero lo dejo para mantener la estructura
             "ocupado": "True",
             "hora_entrada": get_current_time_json(),
             "tipo_slot": tipo_vehiculo,
             "patente": patente
-            
         }
         # ACTUALIZACIÓN: Registrar el vehículo en el slot encontrado
         if actualizar_garage(garage_id=leer_estado_garage()['garage_id'], data=new_slot, bulk=False):
-            print(f"Vehículo {patente} registrado en el garage.")
+            print(Fore.GREEN + f"Vehículo {patente} registrado en el garage." + Style.RESET_ALL)
         else: 
-            print("Error actualizando el garage.")        
+            print(Fore.RED + "Error actualizando el garage." + Style.RESET_ALL)
         return True
 
 def obtener_id_por_posicion(garage, piso_idx, slot_idx):

@@ -10,8 +10,12 @@ Funciones principales:
 
 """
 
-from datetime import datetime
 
+from datetime import datetime
+from colorama import init, Fore, Style
+
+# Inicializar colorama (solo una vez)
+init(autoreset=True)
 
 # CONFIGURACIÓN DE TARIFAS
 
@@ -63,19 +67,20 @@ def calcular_costo_de_estadia(patente, hora_salida=None, garage=None):
     - Si ocurre error → cobra tarifa mínima por hora.
     """
     if garage is None:
-        raise ValueError("Se requiere una lista de slots (garage) para calcular el costo.")
+           print(Fore.RED + "⚠️ Error: Se requiere una lista de slots (garage) para calcular el costo.")
+           raise ValueError("Se requiere una lista de slots (garage) para calcular el costo.")
 
     precios = configurar_precios()
     slot = buscar_por_patente(garage, patente)
 
     if not slot:
-        print(f"No se encontró la patente {patente}")
-        return 0
+           print(Fore.YELLOW + f"No se encontró la patente {patente}")
+           return 0
 
     tipo = slot.get("tipo_vehiculo_estacionado", "").lower()
     if tipo not in precios:
-        print(f"Tipo de vehículo desconocido para {patente}")
-        return 0
+           print(Fore.YELLOW + f"Tipo de vehículo desconocido para {patente}")
+           return 0
 
     # Verificar suscripción mensual
     if es_subscripcion_mensual(patente, garage):
@@ -84,8 +89,8 @@ def calcular_costo_de_estadia(patente, hora_salida=None, garage=None):
     # Cálculo por hora
     hora_entrada = slot.get("hora_entrada")
     if not hora_entrada:
-        print(f"El vehículo {patente} no tiene hora de entrada registrada.")
-        return precios[tipo]["por_hora"]
+           print(Fore.YELLOW + f"El vehículo {patente} no tiene hora de entrada registrada.")
+           return precios[tipo]["por_hora"]
 
     if not hora_salida:
         hora_salida = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -98,5 +103,6 @@ def calcular_costo_de_estadia(patente, hora_salida=None, garage=None):
         costo = precios[tipo]["por_hora"] * horas
         return round(costo, 2)
     except Exception as e:
-        print(f"Error al calcular costo para {patente}: {e}")
+            print(Fore.RED + f"⚠️ Error al calcular costo para {patente}: {e}")
         return precios[tipo]["por_hora"]
+
