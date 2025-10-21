@@ -1,6 +1,6 @@
-def enum_tipo_vehiculo(type_id):
+def enum_tipo_vehiculo():
     return {
-        1: "Moto",
-        2: "Auto",
-        3: "Camioneta",
+        "moto": 1 ,
+        "auto": 2,
+        "camioneta": 3,
     }
