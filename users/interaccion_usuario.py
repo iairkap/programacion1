@@ -1,3 +1,6 @@
+from colorama import Fore, Style
+
+
 def pedir_piso(garage):
     while True:
         try:
@@ -80,13 +83,12 @@ def pedir_patente():
     # estructura de patente 
     # NUEVA = AB123CD
     # VIEJA = ABC123
-
     while True:
         try:
-            patente = input("ingrese la patente:").strip().upper()
+            patente = input(Fore.YELLOW + "\nIngrese la patente:" + Style.RESET_ALL).strip().upper()
             digitos = len(patente)
             if digitos != 6 and digitos != 7:
-                print("las nuevas patentes tienen 7 digitos y las antiguas 6")
+                print(Fore.RED + "\nLas nuevas patentes tienen 7 digitos y las antiguas 6\n" + Style.RESET_ALL)
             elif digitos == 6 :
                 if patente[:3].isalpha() and patente[3:].isdigit():
                     return patente
@@ -94,9 +96,9 @@ def pedir_patente():
                 if patente[:2].isalpha() and patente[2:5].isdigit() and patente[5:].isalpha():
                     return patente
             else: 
-                print("la patente no tiene le formato correcto ej: AB123CD o ABC123")
+                print(Fore.RED + "La patente no tiene el formato correcto ej: AB123CD o ABC123" + Style.RESET_ALL)
                 
-            print("volve a intentarlo")
+            print("Volve a intentarlo")
 
         except Exception as e:
             print(e)

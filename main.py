@@ -20,6 +20,7 @@ from colorama import Fore, Style
 
 from garage.precios import (configurar_precios, es_subscripcion_mensual,
                             buscar_por_patente, calcular_costo_de_estadia)
+import datetime
 
 ## aca agregarle la lectura del json para saber cual es el garage actual 
 def leer_garage_normalizado():
@@ -477,12 +478,14 @@ def registrar_entrada_auto(garage):
     if (piso, slot_id) == (-1, -1):
         print(Fore.RED + "Error: No hay espacio libre disponible para este tipo de vehículo." + Style.RESET_ALL)
         return False
+    #!TODO NO SE REGISTRA NADA EN GARAGE
+    
     else:
         new_slot = {
             "slot_id": slot_id,
             "piso": piso, #no hace es necesario pero lo dejo para mantener la estructura
-            "ocupado": "True",
-            "hora_entrada": get_current_time_json(),
+            "ocupado": True,
+            "hora_entrada": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
             "tipo_slot": tipo_vehiculo,
             "patente": patente
         }
