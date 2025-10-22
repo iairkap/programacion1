@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from users.users_garage import crear_archivo_users_garage, leer_garage_desde_csv
+from users.users_garage import crear_archivo_users_garage, leer_garage_desde_csv, get_garage_data
 from visual.menu_handlers import (
     handle_login, 
     handle_registro, 
@@ -111,8 +111,12 @@ def menu_garage(usuario):
     
     return garage_seleccionado
 
-def menu_principal(garage_actual, garageName):
-    """Menú principal del sistema - retorna acción a realizar""" 
+def menu_principal(garage_actual):
+    """Menú principal del sistema - retorna acción a realizar"""
+    #SUBO MI GARAGE ACTUAL AL JSON PARA QUE SEA ACCESIBLE DESDE CUALQUIER PARTE DEL PROYECTO
+    guardar_estado_garage(garage_actual)    
+    
+    
     continuar = True
     accion = None
 
@@ -139,13 +143,14 @@ def menu_principal(garage_actual, garageName):
     }
     try: 
         while continuar and not accion:
-            mostrar_menu_principal(garageName)
+            mostrar_menu_principal(garage_actual)
+            garage_data = get_garage_data(garage_actual['garage_id'])
             opcion = input("Seleccione una opción: ")
 
             if opcion.isdigit():
                 indice = int(opcion) - 1  # la lista empieza en 0 y el menú en 1
                 if 0 <= indice < len(handlers):
-                    handlers[indice](garage_actual)
+                    handlers[indice](garage_actual, garage_data)
                     continue
 
             if opcion in acciones_especiales:
@@ -173,17 +178,17 @@ def main():
         # 2. Selección/Creación de garage
         session_active = True
         while session_active and programa_activo:
-            garage_actual_obj = menu_garage(usuario_actual)
-            garage_from_csv = leer_garage_desde_csv(garage_actual_obj['garage_id'])
-            if not garage_actual_obj:
+            garage_actual = menu_garage(usuario_actual)
+            guardar_estado_garage(garage_actual)#guardo el garage actual en el json para acceder desde todo el proyecto
+            
+            if not garage_actual:
                 session_active = False
                 continue
- 
-            
+
             # 3. Menú principal
             menu_activo = True
             while menu_activo and session_active:
-                resultado = menu_principal(garage_actual_obj, garage_actual_obj['garage_name'])
+                resultado = menu_principal(garage_actual)
                 
                 if resultado == "cambiar_garage":
                     menu_activo = False

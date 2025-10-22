@@ -2,9 +2,6 @@ nombre,apellido,email,password
 iair,kaplun,iairkap@gmail.com,abc123
 juan,etchart,juan@etchart.com,abc123
 john,doe,john@doe.com,abc123
-<<<<<<< HEAD
 iair,kaplun,iair@kaplun.com,abc123
 aa,aa,a@a.com,aa
-=======
 klear,madera,kmadera@gmail.com,123abc
->>>>>>> origin/main_klearv2
