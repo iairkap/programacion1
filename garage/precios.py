@@ -9,13 +9,15 @@ Funciones principales:
 
 
 """
-
-
+# Importar datetime para manejar fechas y horas
 from datetime import datetime
+
+# Importar colorama para mensajes coloreados
 from colorama import init, Fore, Style
 
 # Inicializar colorama (solo una vez)
 init(autoreset=True)
+
 
 # CONFIGURACIÓN DE TARIFAS
 
@@ -67,7 +69,7 @@ def calcular_costo_de_estadia(patente, hora_salida=None, garage=None):
     - Si ocurre error → cobra tarifa mínima por hora.
     """
     if garage is None:
-           print(Fore.RED + "⚠️ Error: Se requiere una lista de slots (garage) para calcular el costo.")
+           print(Fore.RED + " Error: Se requiere una lista de slots (garage) para calcular el costo.")
            raise ValueError("Se requiere una lista de slots (garage) para calcular el costo.")
 
     precios = configurar_precios()
@@ -103,6 +105,6 @@ def calcular_costo_de_estadia(patente, hora_salida=None, garage=None):
         costo = precios[tipo]["por_hora"] * horas
         return round(costo, 2)
     except Exception as e:
-            print(Fore.RED + f"⚠️ Error al calcular costo para {patente}: {e}")
+        print(Fore.RED + f" Error al calcular costo para {patente}: {e}")
         return precios[tipo]["por_hora"]
 

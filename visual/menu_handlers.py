@@ -58,31 +58,8 @@ def handle_registro():
 def crear_nuevo_garage(usuario):
     """Interfaz para crear un nuevo garage"""
     print("\n=== CREAR NUEVO GARAGE ===")
-<<<<<<< HEAD
-    
-    #logica para preguntarle cuantos pisos y slots por piso
-    while True:
-        try:
-            slots_per_floor = int(input("Ingrese la cantidad de slots por piso (mínimo 5): "))
-            floors = int(input("Ingrese la cantidad de pisos (mínimo 1): "))
-            if slots_per_floor >= 5 and floors >= 1:
-                break
-            else:
-                print("Por favor, ingrese valores válidos.")
-        except ValueError:
-            print("Entrada inválida. Intente nuevamente.")
-
-    garage_id = crear_garage(usuario, slots_per_floor=slots_per_floor, floors=floors)
-
-    input("Presione cualquier tecla para continuar...")
-    clear_screen()
-    
-    
-    return garage_id
-=======
     garage = crear_garage(usuario)
     return garage
->>>>>>> origin/main_klearv2
 
 def handle_seleccionar_garage(usuario):
     """Maneja la selección de garage existente"""
@@ -111,11 +88,6 @@ def handle_crear_garage(usuario):
             print(f"Garage '{garage_nuevo['garage_name']}' creado y seleccionado")
             
             return garage_nuevo
-<<<<<<< HEAD
-        input("Presione Enter para continuar...")
-        clear_screen()
-    return None
-=======
     return None
 
 def handle_actualizar_tipo_slots(garage):
@@ -196,4 +168,3 @@ def handle_actualizar_slots(garage):
 #     else:
 #         print("No tiene garages asociados")
 #     return None
->>>>>>> origin/main_klearv2
