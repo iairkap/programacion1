@@ -66,13 +66,16 @@ def crear_nuevo_garage(usuario):
         try:
             nombre = input("Nombre del garage: ").strip()
             if not nombre:
+                print(Fore.RED + "El nombre no puede estar vacío. Intente de nuevo." + Style.RESET_ALL)
                 break
-                print("El nombre no puede estar vacío. Intente de nuevo.")
             direccion = input("Dirección: ").strip()
             if not direccion:
+                print(Fore.RED + "La dirección no puede estar vacía. Intente de nuevo." + Style.RESET_ALL)
                 break
-                print("La dirección no puede estar vacía. Intente de nuevo.")
             slots_per_floor = int(input("Ingrese la cantidad de slots por piso (mínimo 5): "))
+            while slots_per_floor < 5:
+                print(Fore.RED + "La cantidad mínima de slots por piso es 5. Intente de nuevo." + Style.RESET_ALL)
+                slots_per_floor = int(input(Fore.LIGHTYELLOW_EX + "Ingrese la cantidad de slots por piso (mínimo 5): " + Style.RESET_ALL))
             floors = int(input("Ingrese la cantidad de pisos (mínimo 1): "))
             if slots_per_floor >= 5 and floors >= 1:
                 break
@@ -85,7 +88,13 @@ def crear_nuevo_garage(usuario):
             clear_screen()
             return None
     garage_id = crear_garage(usuario,nombre, direccion, slots_per_floor=slots_per_floor, floors=floors)
-
+    
+    print(Fore.GREEN + f"\nGarage '{nombre}' creado con éxito." + Style.RESET_ALL)
+    bulk = input(Fore.LIGHTYELLOW_EX + f"Desea configurar los slots ahora? Presione s para sí o cualquier otra tecla para continuar" + Style.RESET_ALL)
+    
+    if bulk == 's':
+        print("Ejecutar la funcion de actualizar tipo de slots")
+        
     input("Presione cualquier tecla para continuar...")
     clear_screen()
     return garage_id

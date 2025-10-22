@@ -69,7 +69,7 @@ def es_subscripcion_mensual(patente):
 
 #!Funcion Lambda -> 
 def mostrar_estado_garage(garage):
-    print("\n--- ESTADO DEL GARAGE ---")
+    print(Fore.GREEN + "\n--- ESTADO DEL GARAGE ---" + Style.RESET_ALL)
     imprimir_piso = lambda idx, piso: (
         print(f"\nPiso {idx}:"),
         [print(
@@ -78,6 +78,7 @@ def mostrar_estado_garage(garage):
     )
     for idx in range(len(garage)):
         imprimir_piso(idx, garage[idx])
+    input(Fore.YELLOW + '\nPresione cualquier tecla para continuar...' + Style.RESET_ALL) 
 
 def pedir_patente():
     # estructura de patente 
