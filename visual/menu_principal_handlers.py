@@ -123,4 +123,4 @@ def handle_buscar_vehiculo(garage, garage_data):
 
 def handle_estadisticas_rapidas(garage, garage_data= None):
     """Maneja las estadísticas rápidas"""
-    mostrar_estadisticas_rapidas(garage)
+    mostrar_estadisticas_rapidas(garage_data)

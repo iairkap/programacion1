@@ -1,3 +1,6 @@
+from colorama import Fore, Style
+from auxiliares.consola import clear_screen
+
 
 def buscar_por_patente(garage, patente):
     for i in range(len(garage)):
@@ -40,17 +43,20 @@ def contar_por_tipo_vehiculo(garage, tipo_buscado):
 
 
 def mostrar_estadisticas_rapidas(garage):
-    print("\n--- ESTADÍSTICAS RÁPIDAS ---")
+    print(Fore.GREEN + "\n--- ESTADÍSTICAS RÁPIDAS ---" + Style.RESET_ALL)
     # Cuenta todos los espacios libres en el garage
     total_libres = contar_espacios_libres(garage)
     # Suma todos los vehículos estacionados de todos los tipos (1-4)
     total_estacionados = sum(contar_por_tipo_vehiculo(
         garage, tipo) for tipo in range(1, 5))
-    print(f"Total de espacios libres: {total_libres}")
-    print(f"Total de vehículos estacionados: {total_estacionados}")
+    print(Fore.GREEN + f"Total de espacios libres: {total_libres}" + Style.RESET_ALL)
+    print(Fore.GREEN + f"Total de vehículos estacionados: {total_estacionados}" + Style.RESET_ALL)
     # Diccionario para convertir números de tipo a nombres legibles
     tipos = {1: "Motos", 2: "Autos", 3: "Camionetas", 4: "Bicicletas"}
     # Muestra la cantidad de cada tipo de vehículo estacionado
     for tipo_num, tipo_nombre in tipos.items():
         cantidad = contar_por_tipo_vehiculo(garage, tipo_num)
-        print(f"{tipo_nombre}: {cantidad}")
+        print(Fore.GREEN + f"{tipo_nombre}: {cantidad}" + Style.RESET_ALL)
+    
+    input(Fore.YELLOW + '\nPresione cualquier tecla para continuar...' + Style.RESET_ALL)
+    clear_screen()
