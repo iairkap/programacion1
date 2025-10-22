@@ -7,7 +7,7 @@ from garage.mockdata import GARAGE, COSTOS
 import random
 from users.interaccion_usuario import pedir_patente
 import garage.garage_util as garage_util
-from auxiliares.date import get_current_time_json
+#from auxiliares.date import get_current_time_json
 from users import users_garage
 
 from users.users_garage import (    

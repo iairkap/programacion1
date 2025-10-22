@@ -109,15 +109,15 @@ def pedir_tipo_vehiculo():
 
 
     
-def pedir_num_natural(max,mensaje_personalizado = "ingresa el numero: ",min = 0):
+def pedir_num_natural(max,mensaje_personalizado = "\nIngresa el numero: ",min = 0):
     while True:
         try:
             num = int(input(mensaje_personalizado))
             if num < min or num > max:
-                print(f"el nuero ingresado tiene que ser un num valido, entre {min} y {max}")
+                print(f"\nEl numero ingresado tiene que ser un numero valido, entre {min} y {max}")
             else: return num
         except ValueError:
-            print("por favor ingresa un numero")
+            print("\nPor favor ingresa un numero")
         except Exception as e : 
             print(e)
             

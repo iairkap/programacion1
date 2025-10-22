@@ -11,7 +11,7 @@ def guardar_estado_garage(garage: list, filename: str = "cache.json") -> None:
     try:
         with open(filename, "w", encoding="utf-8") as f:
             json.dump(garage, f, indent=4, ensure_ascii=False)
-        print(f"Estado del garage guardado en {filename}")
+        #print(f"Estado del garage guardado en {filename}")
     except Exception as e:
         print(f"No se pudo guardar el estado del garage: {e}")
 

@@ -21,45 +21,68 @@ from main import (
     registrar_salida_vehiculo,
     modificar_vehiculo,
 )
+from colorama import Back, Fore, Style
+from auxiliares.consola import clear_screen
+from constantes.tipos_vehiculos import enum_tipo_vehiculo
+
 
 def handle_consultar_espacios_libres(garage, garage_data):
     """Maneja la consulta de espacios libres"""
     print("\n1. Por piso\n2. Por tipo de vehículo\n3. Totales\n4. Volver")
-    subop = input("Seleccione una de las opciones: ")
+    subop = input(Fore.YELLOW + "\nSeleccione una de las opciones: " + Style.RESET_ALL)
     
     if subop == "1":
         piso = pedir_piso(garage_data) 
         
         libres = contar_espacios_libres([garage_data[piso]])
-        print(f"Espacios libres en el piso {piso}: {libres}")
+        print(Fore.GREEN + f"\nEspacios libres en el piso {piso}: {libres}" + Style.RESET_ALL)
+        input('\nPresione cualquier tecla para continuar...')
+        clear_screen()
     elif subop == "2":
         print("\nTipos de vehículo:")
         print("1. Moto\n2. Auto\n3. Camioneta\n4. Bicicleta")
         tipo = pedir_tipo_vehiculo()
         libres = contar_espacios_libres_por_tipo(garage_data, tipo)
-        print(f"Espacios libres para tipo {tipo}: {libres}")
+        #Formatear tipo a texto
+        
+        tipos = enum_tipo_vehiculo()
+        
+        tipo_texto = [k for k, v in tipos.items() if v == tipo]
+        print(Fore.GREEN + f"\nEspacios libres para tipo {tipo_texto[0] if tipo_texto else tipo}: {libres}" + Style.RESET_ALL)
+        input('\nPresione cualquier tecla para continuar...')
+        clear_screen()
+        
     elif subop == "3":
         libres = contar_espacios_libres(garage_data)
-        print(f"Espacios libres en todo el garage: {libres}")
+        print(Fore.GREEN   + f"\nEspacios libres en todo el garage: {libres}" + Style.RESET_ALL)
+        input('\nPresione cualquier tecla para continuar...')
+        clear_screen()
 
 def handle_consultar_vehiculos_estacionados(garage, garage_data):
     """Maneja la consulta de vehículos estacionados"""
     print("\n1. Por tipo de vehículo\n2. Totales\n3. Volver")
-    subop = input("Seleccione una de las opciones: ")
+    subop = input(Fore.YELLOW+ "\nSeleccione una de las opciones: " + Style.RESET_ALL)
     
     if subop == "1":
         print("\nTipos de vehículo:")
         print("1. Moto\n2. Auto\n3. Camioneta\n4. Bicicleta")
         tipo = pedir_tipo_vehiculo()
         cantidad = contar_por_tipo_vehiculo(garage_data, tipo)
-        tipos_nombres = {1: "Motos", 2: "Autos", 3: "Camionetas", 4: "Bicicletas"}
-        print(f"Cantidad de {tipos_nombres[tipo]} estacionadas: {cantidad}")
+        tipos = enum_tipo_vehiculo()
+        tipo_texto = [k for k, v in tipos.items() if v == tipo]
+        print(Fore.GREEN + f"Cantidad de {tipo_texto[0] if tipo_texto else tipo} estacionadas: {cantidad}" + Style.RESET_ALL)
+    
     elif subop == "2":
-        print("\n--- Vehículos estacionados por tipo ---")
-        tipos = {1: "Motos", 2: "Autos", 3: "Camionetas", 4: "Bicicletas"}
-        for tipo_num, tipo_nombre in tipos.items():
+        print(Fore.GREEN + "\n--- Vehículos estacionados por tipo ---\n" + Style.RESET_ALL)
+        tipos = enum_tipo_vehiculo()
+        
+        # tipos: {"moto": 1, "auto": 2, ...}
+        for tipo_nombre, tipo_num in tipos.items():
             cantidad = contar_por_tipo_vehiculo(garage_data, tipo_num)
-            print(f"{tipo_nombre}: {cantidad}")
+            print(Fore.GREEN + f"{tipo_nombre.capitalize()}: {cantidad}" + Style.RESET_ALL)
+    input('\nPresione cualquier tecla para continuar...')
+    clear_screen()
+
 
 def handle_ingresar_vehiculo(garage, garage_data):
     """Maneja el ingreso de vehículos"""

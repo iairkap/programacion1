@@ -19,6 +19,8 @@ from users.users_garage import (
 )
 
 from auxiliares.consola import clear_screen
+from colorama import Fore, Style
+
 
 
 
@@ -29,13 +31,13 @@ def handle_login():
     """Maneja el login del usuario"""
     usuario = user_login()
     if usuario:
-        print(f"¡Bienvenido {usuario['nombre']}!")
-        input("Presione Enter para continuar...")
+        print(Fore.GREEN + f"\n\n¡Bienvenido {usuario['nombre']}!" + Style.RESET_ALL)
+        input(Fore.LIGHTYELLOW_EX + "\nPresione Enter para continuar..." + Style.RESET_ALL)
         clear_screen()
         return usuario
     else:
         print("Login fallido")
-        input("Presione Enter para continuar...")
+        input(Fore.LIGHTYELLOW_EX + "Presione cualquier tecla para continuar..." + Style.RESET_ALL)
         clear_screen()
         return None
 
@@ -43,12 +45,12 @@ def handle_registro():
     """Maneja el registro de nuevo usuario"""
     if registrar_nuevo_usuario():
         print("Usuario registrado. Ahora puede iniciar sesión.")
-        input("Presione Enter para continuar...")
+        input(Fore.LIGHTYELLOW_EX + "Presione cualquier tecla para continuar..." + Style.RESET_ALL)
         clear_screen()
         return True
     else:
         print("Error en el registro")
-        input("Presione Enter para continuar...")
+        input(Fore.LIGHTYELLOW_EX + "Presione cualquier tecla para continuar..." + Style.RESET_ALL)
         clear_screen()
         
         return False
@@ -94,13 +96,12 @@ def handle_seleccionar_garage(usuario):
     if garages:
         garage_seleccionado = seleccionar_solo_un_garage(garages)
         if garage_seleccionado:
-            print(f"Garage '{garage_seleccionado['garage_name']}' seleccionado")
-            
-
+            print(Fore.GREEN + f"Garage '{garage_seleccionado['garage_name']}' seleccionado" + Style.RESET_ALL)
+            clear_screen()
             return garage_seleccionado
     else:
-        print("No tiene garages asociados")
-    input("Presione Enter para continuar...")
+        print(Fore.RED + "No tiene garages asociados" + Style.RESET_ALL)
+    input(Fore.LIGHTYELLOW_EX + "Presione cualquier tecla para continuar..." + Style.RESET_ALL)
     clear_screen()
     return None
 
@@ -115,7 +116,7 @@ def handle_crear_garage(usuario):
             print(f"Garage '{garage_nuevo['garage_name']}' creado y seleccionado")
             
             return garage_nuevo
-        input("Presione Enter para continuar...")
+        input(Fore.LIGHTYELLOW_EX + "Presione cualquier tecla para continuar..." + Style.RESET_ALL)
         clear_screen()
     return None
 

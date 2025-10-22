@@ -3,6 +3,8 @@ from cache.json import guardar_estado_garage, leer_estado_garage
 #Archivo para crear garage, relacionarlos con usuarios y demas
 import os
 from constantes.tipos_vehiculos import enum_tipo_vehiculo
+from colorama import Fore, Style
+
 
 def buscar_garage_asociado(email):
     """
@@ -59,8 +61,8 @@ def seleccionar_solo_un_garage(garages):
     elif len(garages) == 1:
         return garages[0]
     else:
-        print("Seleccione un garage:\n")
-        print("0. Salir.")
+        print("\nSeleccione un garage:\n")
+        print(Fore.RED + "0. Salir." + Style.RESET_ALL)
         for i, garage in enumerate(garages):
             print(f"{i + 1}. {garage['garage_name']} - {garage['address']}")
         seleccion = input("Ingrese el número del garage deseado: ")
@@ -74,10 +76,10 @@ def seleccionar_solo_un_garage(garages):
                 
                 return garages[seleccion - 1]
             else:
-                print("Selección inválida.")
+                print(Fore.RED + "Selección inválida." + Style.RESET_ALL)
                 return None
         except ValueError:
-            print("Entrada no válida.")
+            print(Fore.RED + "Entrada no válida." + Style.RESET_ALL)
             return None
         
         

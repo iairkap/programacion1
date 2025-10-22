@@ -27,22 +27,24 @@ from colorama import Fore, Style
 
 def mostrar_menu_inicial():
     """Menú de inicio de sesión y registro"""
-    print("\n=== BIENVENIDO A SLOTMASTER ===")
-    print("1. Iniciar sesión")
+    print(Fore.GREEN + "\n=== BIENVENIDO A SLOTMASTER ===" + Style.RESET_ALL)
+    print("\n1. Iniciar sesión")
     print("2. Registrarse")
-    print("3. Salir")
+    print("3. Salir\n")
 
 def mostrar_menu_garage(usuario):
     """Menú para seleccionar o crear garage"""
-    print(f"\n=== GESTIÓN DE GARAGES - {usuario['nombre']} ===")
-    print("1. Seleccionar garage existente")
+    print(Fore.GREEN+f"\n=== GESTIÓN DE GARAGES - {usuario['nombre']} ===" + Style.RESET_ALL)
+    print("\n1. Seleccionar garage existente")
     print("2. Crear nuevo garage")
-    print("3. Cerrar sesión")
+    print("3. Cerrar sesión\n")
+    
+
 
 def mostrar_menu_principal(garage_name):
     """Menú principal del sistema"""
-    print(f"\n=== MENÚ PRINCIPAL - {garage_name} ===")
-    print("1. Consultar espacios libres")
+    print(Fore.GREEN + f"\n=== MENÚ PRINCIPAL - {garage_name['garage_name'].upper()} ===" + Style.RESET_ALL)
+    print("\n1. Consultar espacios libres")
     print("2. Consultar cantidad de vehículos estacionados")
     print("3. Ingresar un vehículo")
     print("4. Registrar salida de un vehículo")
@@ -52,9 +54,9 @@ def mostrar_menu_principal(garage_name):
     print("8. Estadísticas rápidas")
     print("9. Actualizar tipo de slot")
     print("10. Actualizar info de slots")
-    print("c. Cambiar garage")
+    print("\nc. Cambiar garage")
     print("x. Cerrar sesión")
-    print("z. Salir")
+    print("z. Salir\n")
 
 def menu_inicial():
     """Gestiona el login y registro - retorna el usuario o None"""
@@ -63,7 +65,7 @@ def menu_inicial():
     
     while continuar and not usuario:
         mostrar_menu_inicial()
-        opcion = input("Seleccione una opción: ")
+        opcion = input("Seleccione una opción: \n")
         
         if opcion == "1":
             usuario = handle_login()
@@ -91,7 +93,7 @@ def menu_garage(usuario):
     
     while continuar and not garage_seleccionado:
         mostrar_menu_garage(usuario)
-        opcion = input("Seleccione una opción: ")
+        opcion = input("Seleccione una opción: \n")
         
         if opcion == "1":
             garage_seleccionado = handle_seleccionar_garage(usuario)
@@ -145,7 +147,7 @@ def menu_principal(garage_actual):
         while continuar and not accion:
             mostrar_menu_principal(garage_actual)
             garage_data = get_garage_data(garage_actual['garage_id'])
-            opcion = input("Seleccione una opción: ")
+            opcion = input("Seleccione una opción: \n")
 
             if opcion.isdigit():
                 indice = int(opcion) - 1  # la lista empieza en 0 y el menú en 1
