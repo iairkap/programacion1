@@ -270,7 +270,7 @@ def actualizar_slot( garage_id, slot_id, nuevaData):
             for fila in nuevas_lineas[1:]:
                 file.write(",".join(fila) + "\n")
         
-        print(f"Slot con id {slot_id} actualizado correctamente ✅")
+        #print(f"Slot con id {slot_id} actualizado correctamente ✅")
     except FileNotFoundError:
         print(f"Archivo garage-{garage_id}.csv no encontrado.")
     except Exception as e:
@@ -345,7 +345,7 @@ def crear_data_para_actualizar_tipo_slots(ruta_csv):
                 slots.append(slot_data)
         return slots
     except Exception as e:
-        print(f"Error al actualizar slots: {e}")
+        print(Fore.RED + f"\nError al actualizar slots: {e}\n" + Style.RESET_ALL)
         return []
     
 def get_garage_data(garage_id: int ) -> list:
@@ -394,20 +394,24 @@ def actualizar_slots(garage_id, nuevaData):
     """
     try:
         for slotInfo in nuevaData:
-            print(slotInfo)
+            #print(slotInfo)
             slot_id = slotInfo.get("slot_id")
             actualizar_slot(garage_id, slot_id, slotInfo)
     except Exception as e:
         print(f"Error al actualizar los slots: {e}")
        
-# def actualizar_garage(garage_id, data, bulk=False):
-#     """Actualiza la información de un garage en csv."""
-#     try: 
-#         if bulk:
-#             actualizar_slots(garage_id, data)
-#             return True
-#         else:
-#             actualizar_slot(garage_id, data.get("slot_id"), data)
-#         print(f"Garage con id {garage_id} actualizado correctamente ✅")
-#     except Exception as e:
-#         print(f"Error al actualizar el garage: {e}")
+def actualizar_garage(garage_id, data, bulk=False):
+     """Actualiza la información de un garage en csv."""
+     try: 
+         if bulk:
+             actualizar_slots(garage_id, data)
+             print(f"Garage con id {garage_id} actualizado correctamente ✅")
+
+             return True
+         else:
+             actualizar_slot(garage_id, data.get("slot_id"), data)
+         print(f"Garage con id {garage_id} actualizado correctamente ✅")
+         return True
+     except Exception as e:
+         print(f"Error al actualizar el garage: {e}")
+        

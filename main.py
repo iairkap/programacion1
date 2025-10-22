@@ -12,8 +12,8 @@ from users import users_garage
 
 from users.users_garage import (    
                 crear_archivo_users_garage, 
-                get_garage_data,)
-                #actualizar_garage)
+                get_garage_data,
+                actualizar_garage)
 from cache.json import leer_estado_garage, guardar_estado_garage
 
 from colorama import Fore, Style
@@ -21,7 +21,7 @@ from colorama import Fore, Style
 from garage.precios import (configurar_precios, es_subscripcion_mensual,
                             buscar_por_patente, calcular_costo_de_estadia)
 import datetime
-
+from auxiliares.consola import clear_screen
 ## aca agregarle la lectura del json para saber cual es el garage actual 
 def leer_garage_normalizado():
     """
@@ -478,7 +478,6 @@ def registrar_entrada_auto(garage):
     if (piso, slot_id) == (-1, -1):
         print(Fore.RED + "Error: No hay espacio libre disponible para este tipo de vehículo." + Style.RESET_ALL)
         return False
-    #!TODO NO SE REGISTRA NADA EN GARAGE
     
     else:
         new_slot = {
@@ -490,11 +489,13 @@ def registrar_entrada_auto(garage):
             "patente": patente
         }
         # ACTUALIZACIÓN: Registrar el vehículo en el slot encontrado
-        # if actualizar_garage(garage_id=leer_estado_garage()['garage_id'], data=new_slot, bulk=False):
-        #     print(Fore.GREEN + f"Vehículo {patente} registrado en el garage." + Style.RESET_ALL)
-        # else: 
-        #     print(Fore.RED + "Error actualizando el garage." + Style.RESET_ALL)
-        # return True
+        if actualizar_garage(garage_id=leer_estado_garage()['garage_id'], data=new_slot, bulk=False):
+           print(Fore.GREEN + f"Vehículo {patente} registrado en el garage." + Style.RESET_ALL)
+        else:
+           print(Fore.RED + "Error actualizando el garage." + Style.RESET_ALL)
+        input(Fore.YELLOW + '\nPresione cualquier tecla para continuar...' + Style.RESET_ALL)
+        clear_screen()
+        return True 
 
 def obtener_id_por_posicion(garage, piso_idx, slot_idx):
     """Obtiene el ID del slot dado su piso y posición en el piso."""
