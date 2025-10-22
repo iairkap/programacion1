@@ -104,5 +104,5 @@ def calcular_costo_de_estadia(patente, hora_salida=None, garage=None):
         return round(costo, 2)
     except Exception as e:
             print(Fore.RED + f"⚠️ Error al calcular costo para {patente}: {e}")
-        return precios[tipo]["por_hora"]
+            return precios[tipo]["por_hora"]
 
