@@ -62,24 +62,31 @@ def crear_nuevo_garage(usuario):
     #logica para preguntarle cuantos pisos y slots por piso
     while True:
         try:
+            nombre = input("Nombre del garage: ").strip()
+            if not nombre:
+                break
+                print("El nombre no puede estar vacío. Intente de nuevo.")
+            direccion = input("Dirección: ").strip()
+            if not direccion:
+                break
+                print("La dirección no puede estar vacía. Intente de nuevo.")
             slots_per_floor = int(input("Ingrese la cantidad de slots por piso (mínimo 5): "))
             floors = int(input("Ingrese la cantidad de pisos (mínimo 1): "))
             if slots_per_floor >= 5 and floors >= 1:
                 break
             else:
                 print("Por favor, ingrese valores válidos.")
-        except ValueError:
-            print("Entrada inválida. Intente nuevamente.")
 
-    garage_id = crear_garage(usuario, slots_per_floor=slots_per_floor, floors=floors)
+        except KeyboardInterrupt:
+            print("\nCreación de garage cancelada por el usuario.")
+            input("Presione cualquier tecla para continuar...")
+            clear_screen()
+            return None
+    garage_id = crear_garage(usuario,nombre, direccion, slots_per_floor=slots_per_floor, floors=floors)
 
     input("Presione cualquier tecla para continuar...")
     clear_screen()
-    
-    
     return garage_id
-    garage = crear_garage(usuario)
-    return garage
 
 def handle_seleccionar_garage(usuario):
     """Maneja la selección de garage existente"""
@@ -112,7 +119,7 @@ def handle_crear_garage(usuario):
         clear_screen()
     return None
 
-def handle_actualizar_tipo_slots(garage):
+def handle_actualizar_tipo_slots(garage, garage_data= None):
     """Maneja la actualización del tipo de slots en el garage"""
     print("\n=== ACTUALIZAR TIPO DE SLOTS ===")
     garage_id = garage['garage_id']
@@ -136,7 +143,7 @@ def handle_actualizar_tipo_slots(garage):
     else:
         print("Actualización de un solo slot")
         slot_id = int(input("Ingrese el ID del slot a actualizar: "))
-        tipo_slot = int(input("Ingrese el nuevo tipo de slot para actualizar: "))
+        tipo_slot = input("Ingrese el nuevo tipo de slot para actualizar: ")
         try:
             print(f"Actualizando tipo de slot para el garage '{garage['garage_name']}'...")
             data.append(crear_data_para_actualizar_slot( slot_id=slot_id, tipo_slot=tipo_slot))
@@ -146,7 +153,7 @@ def handle_actualizar_tipo_slots(garage):
             print(f"Error al actualizar el garage: {e}")
     return garage
 
-def handle_actualizar_slots(garage):
+def handle_actualizar_slots(garage, garage_data = None):
     """Maneja la actualización de información de slots en el garage"""
     print("\n=== ACTUALIZAR INFORMACIÓN DE SLOTS ===")
     # Aquí se implementaría la lógica para actualizar los slots
@@ -160,10 +167,10 @@ def handle_actualizar_slots(garage):
             if slot_id.lower() == 'q':
                 break
             ocupado = input("¿El slot está ocupado? (s/n): ").lower() == 's'
-            reservado_mensual = input("¿El slot es reservado mensual? (s/n/deje vacío para no cambiar): ").lower()
+            reservado_mensual = input("¿El slot es reservado mensual? (s/n): ").lower() == 's'
             patente = input("Ingrese la patente del vehículo: ")   
             hora_entrada= input("Ingrese la hora de entrada (hs:min): ")## Actualizar con datetime.today() si se puede
-            tipo_vehiculo= input("Ingrese el tipo de vehículo (deje vacío para no cambiar): ")
+            tipo_vehiculo= input("Ingrese el tipo de vehículo: ")
             data_slot = crear_data_para_actualizar_slot(
                 slot_id=slot_id,
                 ocupado=ocupado,

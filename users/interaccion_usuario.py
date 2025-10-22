@@ -1,8 +1,8 @@
 def pedir_piso(garage):
     while True:
         try:
-            piso = pedir_num_natural(mensaje_personalizado="Ingrese el piso que desea consultar: ",max =len(garage)-1)
-            if piso < 0 or piso < len(garage):
+            piso = int(input(f"Ingrese el piso que desea consultar entre 0 y {len(garage)-1}: "))
+            if piso < 0 or piso > len(garage) or len(garage) == 0:
                 print("El piso ingresado no es válido. Intente nuevamente.")
             else:
                 return piso            

@@ -12,8 +12,8 @@ from users import users_garage
 
 from users.users_garage import (    
                 crear_archivo_users_garage, 
-                get_garage_data,
-                actualizar_garage)
+                get_garage_data,)
+                #actualizar_garage)
 from cache.json import leer_estado_garage, guardar_estado_garage
 
 
@@ -482,11 +482,11 @@ def registrar_entrada_auto(garage):
             
         }
         # ACTUALIZACIÓN: Registrar el vehículo en el slot encontrado
-        if actualizar_garage(garage_id=leer_estado_garage()['garage_id'], data=new_slot, bulk=False):
-            print(f"Vehículo {patente} registrado en el garage.")
-        else: 
-            print("Error actualizando el garage.")        
-        return True
+        # if actualizar_garage(garage_id=leer_estado_garage()['garage_id'], data=new_slot, bulk=False):
+        #     print(f"Vehículo {patente} registrado en el garage.")
+        # else: 
+        #     print("Error actualizando el garage.")        
+        # return True
 
 def obtener_id_por_posicion(garage, piso_idx, slot_idx):
     """Obtiene el ID del slot dado su piso y posición en el piso."""
@@ -499,7 +499,10 @@ def obtener_id_por_posicion(garage, piso_idx, slot_idx):
 def contar_por_tipo_vehiculo(garage=None, tipo_buscado=None):
     """Cuenta vehículos estacionados de un tipo (tipo_vehiculo_estacionado)."""
     datos = leer_garage_normalizado()
-    return sum(1 for slot in datos if slot.get("ocupado") == "True" and slot.get("tipo_vehiculo_estacionado") == str(tipo_buscado))
+    count = 0
+    for pisos in datos:
+        count += sum(1 for slot in pisos if slot.get("ocupado") == "True" and slot.get("tipo_vehiculo_estacionado") == str(tipo_buscado))
+    return count
 
 # CONFIGURACIÓN CONSTANTE DEL EDIFICIO
 pisos = 4

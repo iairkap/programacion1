@@ -152,13 +152,9 @@ def escribir_data_en_csv(file_path, data, headers=None):
         raise
 
 
-def crear_garage(usuario):
+def crear_garage(usuario, nombre, direccion, slots_per_floor=10, floors=2):
     """Crea un garage nuevo basado en el ID proporcionado."""
-    try:
-        nombre = input("Ingrese nombre del garage*: ")
-        direccion = input("Ingrese dirección*: ")
-        floors = int(input("Ingrese cantidad de pisos: "))
-        slots_per_floor = int(input("Ingrese cantidad de slots por piso: "))
+    try: 
         garage_id = asociar_garage_a_usuario(
             usuario['email'],
             nombre,
@@ -219,7 +215,7 @@ def crear_data_para_actualizar_slot(slot_id, tipo_slot=None, reservado_mensual=N
     """Crea un diccionario con los datos a actualizar para un slot."""
     data = {"slot_id": slot_id}
     if tipo_slot is not None:
-        data["tipo_slot"] = tipo_slot
+        data["tipo_slot"] =  enum_tipo_vehiculo()[tipo_slot.lower()]
     if reservado_mensual is not None:
         data["reservado_mensual"] = reservado_mensual
     if ocupado is not None:

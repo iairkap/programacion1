@@ -149,7 +149,7 @@ def menu_principal(garage_actual):
             if opcion.isdigit():
                 indice = int(opcion) - 1  # la lista empieza en 0 y el menú en 1
                 if 0 <= indice < len(handlers):
-                    handlers[indice](garage_data)
+                    handlers[indice](garage_actual, garage_data)
                     continue
 
             if opcion in acciones_especiales:
@@ -183,12 +183,11 @@ def main():
             if not garage_actual:
                 session_active = False
                 continue
- 
-            
+
             # 3. Menú principal
             menu_activo = True
             while menu_activo and session_active:
-                resultado = menu_principal(garage_actual_obj, garage_actual_obj['garage_name'])
+                resultado = menu_principal(garage_actual)
                 
                 if resultado == "cambiar_garage":
                     menu_activo = False
