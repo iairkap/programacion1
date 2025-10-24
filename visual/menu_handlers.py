@@ -19,6 +19,8 @@ from users.users_garage import (
 )
 
 from auxiliares.consola import clear_screen
+from colorama import Fore, Style
+
 
 
 
@@ -29,13 +31,13 @@ def handle_login():
     """Maneja el login del usuario"""
     usuario = user_login()
     if usuario:
-        print(f"¡Bienvenido {usuario['nombre']}!")
-        input("Presione Enter para continuar...")
+        print(Fore.GREEN + f"\n\n¡Bienvenido {usuario['nombre']}!" + Style.RESET_ALL)
+        input(Fore.LIGHTYELLOW_EX + "\nPresione Enter para continuar..." + Style.RESET_ALL)
         clear_screen()
         return usuario
     else:
         print("Login fallido")
-        input("Presione Enter para continuar...")
+        input(Fore.LIGHTYELLOW_EX + "Presione cualquier tecla para continuar..." + Style.RESET_ALL)
         clear_screen()
         return None
 
@@ -43,12 +45,12 @@ def handle_registro():
     """Maneja el registro de nuevo usuario"""
     if registrar_nuevo_usuario():
         print("Usuario registrado. Ahora puede iniciar sesión.")
-        input("Presione Enter para continuar...")
+        input(Fore.LIGHTYELLOW_EX + "Presione cualquier tecla para continuar..." + Style.RESET_ALL)
         clear_screen()
         return True
     else:
         print("Error en el registro")
-        input("Presione Enter para continuar...")
+        input(Fore.LIGHTYELLOW_EX + "Presione cualquier tecla para continuar..." + Style.RESET_ALL)
         clear_screen()
         
         return False
@@ -64,13 +66,16 @@ def crear_nuevo_garage(usuario):
         try:
             nombre = input("Nombre del garage: ").strip()
             if not nombre:
+                print(Fore.RED + "El nombre no puede estar vacío. Intente de nuevo." + Style.RESET_ALL)
                 break
-                print("El nombre no puede estar vacío. Intente de nuevo.")
             direccion = input("Dirección: ").strip()
             if not direccion:
+                print(Fore.RED + "La dirección no puede estar vacía. Intente de nuevo." + Style.RESET_ALL)
                 break
-                print("La dirección no puede estar vacía. Intente de nuevo.")
             slots_per_floor = int(input("Ingrese la cantidad de slots por piso (mínimo 5): "))
+            while slots_per_floor < 5:
+                print(Fore.RED + "La cantidad mínima de slots por piso es 5. Intente de nuevo." + Style.RESET_ALL)
+                slots_per_floor = int(input(Fore.LIGHTYELLOW_EX + "Ingrese la cantidad de slots por piso (mínimo 5): " + Style.RESET_ALL))
             floors = int(input("Ingrese la cantidad de pisos (mínimo 1): "))
             if slots_per_floor >= 5 and floors >= 1:
                 break
@@ -83,7 +88,13 @@ def crear_nuevo_garage(usuario):
             clear_screen()
             return None
     garage_id = crear_garage(usuario,nombre, direccion, slots_per_floor=slots_per_floor, floors=floors)
-
+    
+    print(Fore.GREEN + f"\nGarage '{nombre}' creado con éxito." + Style.RESET_ALL)
+    bulk = input(Fore.LIGHTYELLOW_EX + f"Desea configurar los slots ahora? Presione s para sí o cualquier otra tecla para continuar" + Style.RESET_ALL)
+    
+    if bulk == 's':
+        print("Ejecutar la funcion de actualizar tipo de slots")
+        
     input("Presione cualquier tecla para continuar...")
     clear_screen()
     return garage_id
@@ -94,13 +105,12 @@ def handle_seleccionar_garage(usuario):
     if garages:
         garage_seleccionado = seleccionar_solo_un_garage(garages)
         if garage_seleccionado:
-            print(f"Garage '{garage_seleccionado['garage_name']}' seleccionado")
-            
-
+            print(Fore.GREEN + f"Garage '{garage_seleccionado['garage_name']}' seleccionado" + Style.RESET_ALL)
+            clear_screen()
             return garage_seleccionado
     else:
-        print("No tiene garages asociados")
-    input("Presione Enter para continuar...")
+        print(Fore.RED + "No tiene garages asociados" + Style.RESET_ALL)
+    input(Fore.LIGHTYELLOW_EX + "Presione cualquier tecla para continuar..." + Style.RESET_ALL)
     clear_screen()
     return None
 
@@ -115,7 +125,7 @@ def handle_crear_garage(usuario):
             print(f"Garage '{garage_nuevo['garage_name']}' creado y seleccionado")
             
             return garage_nuevo
-        input("Presione Enter para continuar...")
+        input(Fore.LIGHTYELLOW_EX + "Presione cualquier tecla para continuar..." + Style.RESET_ALL)
         clear_screen()
     return None
 
@@ -127,14 +137,17 @@ def handle_actualizar_tipo_slots(garage, garage_data= None):
     data = []
     archivo_editado = False
     if bulk:
-        print("Se creara un csv en directorio actual llamado 'config_slots.csv' para actualizar los tipos de slots")
+        print("\nSe creara un csv en directorio actual llamado 'config_slots.csv' para actualizar los tipos de slots\n")
         ruta_csv = generar_csv_slots()
         if os.path.exists(ruta_csv):
-            print(f"Por favor, edite el archivo en: {os.path.abspath(ruta_csv)}")
+            print(Fore.RED + f"Por favor, edite el archivo en: {os.path.abspath(ruta_csv)}" + Style.RESET_ALL)
             print("Una vez editado, guarde el archivo y vuelva aquí para continuar.")
-            archivo_editado = input("¿Ha editado y guardado el archivo? (s/n): ").lower() == 's'
+            archivo_editado = input("\n¿Ha editado y guardado el archivo? (s/n): \n").lower() == 's'
         if archivo_editado:
-            print("Continuando con la actualización desde el archivo existente...")
+            print(Fore.GREEN + f"\n{garage['garage_name']} ha sido actualizado con exito." + Style.RESET_ALL)
+            print(Fore.GREEN + "\nContinuando con la actualización desde el archivo existente..."+ Style.RESET_ALL)
+            input(Fore.YELLOW + input("\nPresione cualquier tecla para continuar..."+ Style.RESET_ALL))
+            clear_screen()
             data = crear_data_para_actualizar_tipo_slots(ruta_csv)
             actualizar_slots(garage_id, data)
         else:

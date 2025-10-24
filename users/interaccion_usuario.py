@@ -1,3 +1,6 @@
+from colorama import Fore, Style
+
+
 def pedir_piso(garage):
     while True:
         try:
@@ -66,7 +69,7 @@ def es_subscripcion_mensual(patente):
 
 #!Funcion Lambda -> 
 def mostrar_estado_garage(garage):
-    print("\n--- ESTADO DEL GARAGE ---")
+    print(Fore.GREEN + "\n--- ESTADO DEL GARAGE ---" + Style.RESET_ALL)
     imprimir_piso = lambda idx, piso: (
         print(f"\nPiso {idx}:"),
         [print(
@@ -75,18 +78,18 @@ def mostrar_estado_garage(garage):
     )
     for idx in range(len(garage)):
         imprimir_piso(idx, garage[idx])
+    input(Fore.YELLOW + '\nPresione cualquier tecla para continuar...' + Style.RESET_ALL) 
 
 def pedir_patente():
     # estructura de patente 
     # NUEVA = AB123CD
     # VIEJA = ABC123
-
     while True:
         try:
-            patente = input("ingrese la patente:").strip().upper()
+            patente = input(Fore.YELLOW + "\nIngrese la patente:" + Style.RESET_ALL).strip().upper()
             digitos = len(patente)
             if digitos != 6 and digitos != 7:
-                print("las nuevas patentes tienen 7 digitos y las antiguas 6")
+                print(Fore.RED + "\nLas nuevas patentes tienen 7 digitos y las antiguas 6\n" + Style.RESET_ALL)
             elif digitos == 6 :
                 if patente[:3].isalpha() and patente[3:].isdigit():
                     return patente
@@ -94,9 +97,9 @@ def pedir_patente():
                 if patente[:2].isalpha() and patente[2:5].isdigit() and patente[5:].isalpha():
                     return patente
             else: 
-                print("la patente no tiene le formato correcto ej: AB123CD o ABC123")
+                print(Fore.RED + "La patente no tiene el formato correcto ej: AB123CD o ABC123" + Style.RESET_ALL)
                 
-            print("volve a intentarlo")
+            print("Volve a intentarlo")
 
         except Exception as e:
             print(e)
@@ -109,15 +112,15 @@ def pedir_tipo_vehiculo():
 
 
     
-def pedir_num_natural(max,mensaje_personalizado = "ingresa el numero: ",min = 0):
+def pedir_num_natural(max,mensaje_personalizado = "\nIngresa el numero: ",min = 0):
     while True:
         try:
             num = int(input(mensaje_personalizado))
             if num < min or num > max:
-                print(f"el nuero ingresado tiene que ser un num valido, entre {min} y {max}")
+                print(f"\nEl numero ingresado tiene que ser un numero valido, entre {min} y {max}")
             else: return num
         except ValueError:
-            print("por favor ingresa un numero")
+            print("\nPor favor ingresa un numero")
         except Exception as e : 
             print(e)
             

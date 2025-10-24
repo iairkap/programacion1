@@ -1,11 +1,12 @@
 import datetime
 from garage.mockdata import  COSTOS
+from colorama import Fore, Style
 
 
 def tipo_slot():
     while True:
-        entrada = input(
-            "Que tipo de vehiculo ingreso: \n 1. Moto \n 2. Auto \n 3. Suv - Camioneta \n ").strip().lower()
+        entrada = input(Fore.LIGHTYELLOW_EX +
+            "\nQue tipo de vehiculo ingreso: \n 1. Moto \n 2. Auto \n 3. Suv - Camioneta \n " + Style.RESET_ALL).strip().lower()
 
         try:
             tipo_slot = int(entrada)
