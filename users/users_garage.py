@@ -245,14 +245,11 @@ def actualizar_slot( garage_id, slot_id, nuevaData):
         for linea in lineas[1:]:
             datos = linea.strip().split(",")
             
-
             id_actual,piso, posicion, tipo_slot, reservado_mensual, ocupado, patente, hora_entrada, tipo_vehiculo = datos[0:]
             
-            # Si coincide el id, actualizamos
-            if id_actual == str(slot_id):
-                piso = datos[1] # esto no se actualiza, es fijo 
-                posicion = datos[2] # esto no se actualiza, es fijo 
-                
+            if id_actual == str(slot_id) and nuevaData.get("piso") == datos[1]:
+                piso = datos[1]
+                posicion = datos[2]
                 tipo_slot = str(nuevaData.get("tipo_slot", tipo_slot))
                 reservado_mensual = str(nuevaData.get("reservado_mensual", reservado_mensual))
                 ocupado = str(nuevaData.get("ocupado", ocupado))
@@ -290,20 +287,20 @@ def generar_csv_slots():
 
         if not os.path.exists(ruta_csv):
             with open(ruta_csv, "w", encoding='utf-8') as file:
-                file.write("tipo_de_slot,cantidad\n")
-                file.write("auto,0\n")
-                file.write("moto,0\n")
-                file.write("camioneta,0\n")
-            print(f"✅ Archivo de configuración CREADO en: {os.path.abspath(ruta_csv)}")
+                file.write("tipo_de_slot,cantidad,piso\n")
+                file.write("auto,0,0\n")
+                file.write("moto,0,0\n")
+                file.write("camioneta,0,0\n")
+            print(Fore.GREEN + f"✅ Archivo de configuración CREADO en: {os.path.abspath(ruta_csv)}" + Style.RESET_ALL)
         
         else:
-            print(f"ℹ️ El archivo de configuración YA EXISTE en: {os.path.abspath(ruta_csv)}")
+            print(Fore.YELLOW + f"ℹ️ El archivo de configuración YA EXISTE en: {os.path.abspath(ruta_csv)}" + Style.RESET_ALL)
 
         print("Editá este archivo para indicar las cantidades de cada tipo de slot.")
         print("Una vez editado, guardalo y ejecuta la actualización de tipos de slots nuevamente.")
         return ruta_csv
     except Exception as e:
-        print(f"❌ Ocurrió un error al intentar gestionar el archivo CSV: {e}")
+        print(Fore.RED + f"❌ Ocurrió un error al intentar gestionar el archivo CSV: {e}" + Style.RESET_ALL)
         print("Asegurate de que tu usuario tenga permisos para escribir en la carpeta 'Documents'.")
 
 def leer_config_slots(ruta_csv=None):
@@ -334,15 +331,46 @@ def crear_data_para_actualizar_tipo_slots(ruta_csv):
     """Crea una lista de diccionarios con los datos a actualizar para varios slots.
     """
     try:
-        config = leer_config_slots(ruta_csv)
         slots = []
         slot_id = 0
-        for tipo, cantidad in config.items():
+
+        with open(ruta_csv, "r", encoding="utf-8") as f:
+            lineas = f.readlines()
+        encabezado = True
+        for linea in lineas:
+            linea = linea.strip()
+            if not linea or encabezado:
+                encabezado = False
+                continue
+
+            partes = linea.split(",")
+            if len(partes) != 3:
+                print(Fore.YELLOW + f"⚠️ Línea con formato incorrecto: {linea}" + Style.RESET_ALL)
+                continue
+
+            tipo_str, cantidad_str, piso_str = partes
+            try:
+                piso = int(piso_str)
+                tipo = tipo_str.lower().strip()
+                cantidad = int(cantidad_str)
+            except ValueError:
+                print(Fore.YELLOW + f"⚠️ Error al convertir valores en línea: {linea}" + Style.RESET_ALL)
+                continue
+
+            tipo_slot = enum_tipo_vehiculo().get(tipo)
+            if tipo_slot is None:
+                print(Fore.YELLOW + f"⚠️ Tipo desconocido: {tipo}" + Style.RESET_ALL)
+                continue
+
             for _ in range(cantidad):
-                tipo_slot = enum_tipo_vehiculo()[tipo.lower()]
                 slot_id += 1
-                slot_data= {"slot_id": slot_id,"tipo_slot": tipo_slot}
+                slot_data = {
+                    "slot_id": slot_id,
+                    "tipo_slot": tipo_slot,
+                    "piso": piso
+                }
                 slots.append(slot_data)
+
         return slots
     except Exception as e:
         print(Fore.RED + f"\nError al actualizar slots: {e}\n" + Style.RESET_ALL)
@@ -385,8 +413,6 @@ def get_garage_data(garage_id: int ) -> list:
         print(f"Error al obtener datos del garage: {e}")
     return []  # devuelvo lista vacia en caso de error
 
-
-
 def actualizar_slots(garage_id, nuevaData):
     """actualizar varios slots a la vez
     nuevaData es una lista de diccionarios con los campos a actualizar
@@ -394,24 +420,22 @@ def actualizar_slots(garage_id, nuevaData):
     """
     try:
         for slotInfo in nuevaData:
-            #print(slotInfo)
             slot_id = slotInfo.get("slot_id")
             actualizar_slot(garage_id, slot_id, slotInfo)
     except Exception as e:
-        print(f"Error al actualizar los slots: {e}")
+        print(Fore.RED + f"Error al actualizar los slots: {e}" + Style.RESET_ALL)
        
 def actualizar_garage(garage_id, data, bulk=False):
      """Actualiza la información de un garage en csv."""
      try: 
          if bulk:
              actualizar_slots(garage_id, data)
-             print(f"Garage con id {garage_id} actualizado correctamente ✅")
-
+             print( Fore.GREEN + f"Garage con id {garage_id} actualizado correctamente ✅" + Style.RESET_ALL)
              return True
          else:
              actualizar_slot(garage_id, data.get("slot_id"), data)
-         print(f"Garage con id {garage_id} actualizado correctamente ✅")
+         print(Fore.GREEN + f"Garage con id {garage_id} actualizado correctamente ✅" + Style.RESET_ALL)
          return True
      except Exception as e:
-         print(f"Error al actualizar el garage: {e}")
+         print(Fore.RED + f"Error al actualizar el garage: {e}" + Style.RESET_ALL)
         
