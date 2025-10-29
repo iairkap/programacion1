@@ -24,6 +24,7 @@ from visual.menu_principal_handlers import (
 
 from cache.json import leer_estado_garage, guardar_estado_garage
 from colorama import Fore, Style
+from auxiliares.consola import clear_screen
 
 def mostrar_menu_inicial():
     """Menú de inicio de sesión y registro"""
@@ -194,9 +195,11 @@ def main():
                 
                 if resultado == "cambiar_garage":
                     menu_activo = False
+                    clear_screen()
                 elif resultado == "cerrar_sesion":
                     session_active = False
                     menu_activo = False
+                    clear_screen
                 elif resultado == "salir":
                     print("¡Hasta luego!")
                     programa_activo = False

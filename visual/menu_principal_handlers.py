@@ -102,7 +102,7 @@ def handle_editar_vehiculo(garage, garage_data):
     nuevo_tipo = pedir_tipo_vehiculo()
     nueva_patente = input("Nueva patente (dejar vacío para no cambiar): ").strip().upper()
     if nueva_patente == "":
-        nueva_patente = None
+        nueva_patente = None 
     if modificar_vehiculo(garage, patente, nuevo_tipo, nueva_patente):
         print("Vehículo modificado correctamente.")
     else:

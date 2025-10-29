@@ -1,0 +1,8 @@
+garage-id, tipo-slot, periodo, precio, descripcionNone,moto,diario,2500.0,ARS,
+None,auto,diario,3500.0,ARS,
+12,moto,diario,1500.0,ARS,
+12,auto,diario,3200.0,ARS,
+12,camioneta,diario,4200.0,ARS,
+12,moto,mensual,12000.0,ARS,
+12,auto,mensual,17500.0,ARS,
+14,moto,mensual,1500.0,ARS,

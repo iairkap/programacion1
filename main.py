@@ -3,7 +3,6 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import garage.slot_utils as slot_utils
-from garage.mockdata import GARAGE, COSTOS
 import random
 from users.interaccion_usuario import pedir_patente
 import garage.garage_util as garage_util
@@ -20,7 +19,8 @@ from colorama import Fore, Style
 
 from garage.precios import (configurar_precios, es_subscripcion_mensual,
                             buscar_por_patente, calcular_costo_de_estadia)
-import datetime
+
+from auxiliares.date import get_current_time_json
 from auxiliares.consola import clear_screen
 ## aca agregarle la lectura del json para saber cual es el garage actual 
 def leer_garage_normalizado():
@@ -91,12 +91,11 @@ def leer_garage_normalizado():
 
 #funcion para registrar salida de vehiculo en formato diccionario 
 'logica diccionario y manejo de errores'
-def registrar_salida_vehiculo(garage=None, patente=None):
-    """
+"""
+    def registrar_salida_vehiculo(garage=None, patente=None):
     Registra la salida de un vehículo del garage.
     Busca en la lista de slots del garage el vehículo con la patente especificada y marca el slot como libre,
     limpiando los datos asociados al vehículo estacionado. Si hay duplicados, solo limpia el primero encontrado
-    """
     datos = garage
     actualizado = False
 
@@ -112,6 +111,7 @@ def registrar_salida_vehiculo(garage=None, patente=None):
 
     return actualizado  # True si modificó algún slot, False si no encontró
 
+    """
 
 
 
@@ -278,15 +278,12 @@ def contar_espacios_libres(garage=None):
 
 # FUNCIÓN PARA CALCULAR EL COSTO DE ESTADÍA DE UN VEHÍCULO ||||||| MODIFICAR PORQUE GARAGE YA NO 
 'manejo de errores'
-def calcular_costo_de_estadia(patente, hora_salida):
-    """
-    Calcula el costo de estadía de un vehículo en el garage según su patente y la hora de salida.
-    Si el vehículo no tiene suscripción mensual, calcula el costo en base a las horas transcurridas desde la hora de entrada
-    hasta la hora de salida, aplicando la tarifa por hora correspondiente al tipo de vehículo. Si ocurre un error en el cálculo,
-    se cobra la tarifa mínima por hora.
-    Si el vehículo tiene suscripción mensual, se cobra la tarifa fija mensual correspondiente al tipo de vehículo.
-    """
-    # Obtiene la información completa del vehículo
+def calcular_costo_de_estadia(patente,):
+
+    """ # Obtiene la información completa del vehículo
+    
+    print(patente)
+    
     info_patente = buscar_por_patente(GARAGE, patente)
     if not info_patente:
         return 0
@@ -313,7 +310,7 @@ def calcular_costo_de_estadia(patente, hora_salida):
                 return COSTOS[tipo_de_slot][0]
     else:
         # SUSCRIPCIÓN MENSUAL: Cobra tarifa fija mensual
-        return COSTOS[tipo_de_slot][1]
+        return COSTOS[tipo_de_slot][1] """
 
     return 0
 
@@ -322,41 +319,45 @@ def calcular_costo_de_estadia(patente, hora_salida):
 #funcion para registrar salida de vehiculo en formato diccionario 
 'modificado a logica diccionario, manejo de errores y doctring'
 def registrar_salida_vehiculo(garage=None, patente=None):
-    """
-    Registra la salida de un vehículo del garage, actualizando tanto la vista de diccionarios como la estructura anidada GARAGE.
-    """
-    datos = leer_garage_normalizado()
-
+  
+    datos = leer_garage_normalizado()    
     if patente is None:
         patente = pedir_patente()
+        
+    print(f"Registrando salida para la patente: {patente}")
 
     # Buscar el slot en la vista de diccionarios
     found = None
     for piso in datos:
-        for slot in piso:
-            if slot.get("patente") == patente and slot.get("ocupado") == "True":
-                found = slot
-                break
+       for slot in piso:
+           if slot.get("patente") == patente and slot.get("ocupado") == True:
+               found = slot
+               break
 
     if not found:
         print(Fore.RED + "Vehículo no encontrado." + Style.RESET_ALL)
         return False
 
     # Solicita hora de salida para calcular costo
-    hora_salida = input("Ingrese hora de salida (HH:MM): ").strip()
-    try:
-        costo = calcular_costo_de_estadia(patente, hora_salida)
-    except Exception:
-        costo = 0
+    hora_entrada = found.get("hora_entrada")
+   
+    if not hora_entrada:
+        print(Fore.RED + "Error: No se encontró la hora de entrada del vehículo." + Style.RESET_ALL)
+        return False
+    
 
+    
+    costo = calcular_costo_de_estadia(patente, hora_salida)
+   
+  
     # Muestra el costo
     print(f"Costo de estadía para {patente}: ${costo}")
 
     # Actualiza la vista de diccionarios
     found["patente"] = ""
-    found["ocupado"] = "False"
+    found["ocupado"] = False
     found["hora_entrada"] = ""
-    found["tipo_vehiculo_estacionado"] = "0"
+    found["tipo_vehiculo_estacionado"] = ""
 
     # Intenta sincronizar con la estructura anidada GARAGE
     try:
@@ -484,13 +485,14 @@ def registrar_entrada_auto(garage):
             "slot_id": slot_id,
             "piso": piso, #no hace es necesario pero lo dejo para mantener la estructura
             "ocupado": True,
-            "hora_entrada": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "hora_entrada": get_current_time_json(),
             "tipo_slot": tipo_vehiculo,
             "patente": patente
         }
         # ACTUALIZACIÓN: Registrar el vehículo en el slot encontrado
         if actualizar_garage(garage_id=leer_estado_garage()['garage_id'], data=new_slot, bulk=False):
            print(Fore.GREEN + f"Vehículo {patente} registrado en el garage." + Style.RESET_ALL)
+           print(Fore.GREEN + f"Puede estacionarlo en piso: {piso}, Slot ID: {slot_id}" + Style.RESET_ALL)
         else:
            print(Fore.RED + "Error actualizando el garage." + Style.RESET_ALL)
         input(Fore.YELLOW + '\nPresione cualquier tecla para continuar...' + Style.RESET_ALL)
@@ -518,3 +520,6 @@ pisos = 4
 filas_por_piso = 3
 columnas_por_piso = 4
 total_slots_por_piso = filas_por_piso * columnas_por_piso
+
+
+
