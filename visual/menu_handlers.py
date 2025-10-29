@@ -115,6 +115,14 @@ def crear_nuevo_garage(usuario):
     input("Presione cualquier tecla para continuar...")
     clear_screen()
     return garage_id
+
+def handle_actualizar_tarifas(garage, garage_data=None):
+    """Maneja la actualización de tarifas del garage"""
+    print("\n=== ACTUALIZAR TARIFAS DEL GARAGE ===")
+    agregar_tarifa(garage['garage_id'], garage_name=garage['garage_name'])
+    return garage
+
+
 def agregar_tarifa(garage_id, garage_name=None):
     """Función independiente para agregar tarifas a files/tarifas.csv.
     Guarda valores numéricos: tipo (1/2/3), periodo_mensual (True/False)"""
@@ -163,22 +171,79 @@ def agregar_tarifa(garage_id, garage_name=None):
     return True
 
 
+
+
 def save_tarifa_to_csv(garage_id, tipo_num, periodo_mensual, precio, descripcion=""):
-    """Escribe tarifa en CSV con valores numéricos.
+    """Escribe o actualiza tarifa en CSV con valores numéricos.
     tipo_num: 1=moto, 2=auto, 3=camioneta
-    periodo_mensual: True=mensual, False=diario"""
-    header = False
+    periodo_mensual: True=mensual, False=diario
+    
+    Si ya existe tarifa para garage_id/tipo_num/periodo_mensual, la actualiza.
+    Si no existe, la crea.
+    """
+    csv_path = "files/tarifas.csv"
+    
+    # Intentar leer archivo existente
+    lineas_existentes = []
     try:
-        if not os.path.exists("files/tarifas.csv") or os.path.getsize("files/tarifas.csv") == 0:
-            header = True
-    except Exception:
-        header = False
-
-    with open("files/tarifas.csv", "a", encoding="utf-8", newline="") as tarifa_file:
-        if header:
-            tarifa_file.write("garage_id,tipo,periodo_mensual,precio,moneda,descripcion\n")
-        tarifa_file.write(f"{garage_id},{tipo_num},{periodo_mensual},{precio},{descripcion}\n")
-
+        with open(csv_path, "r", encoding="utf-8") as f:
+            lineas_existentes = f.readlines()
+    except FileNotFoundError:
+        # Archivo no existe, se creará con header
+        lineas_existentes = []
+    
+    # Procesar líneas
+    lineas_nuevas = []
+    tarifa_encontrada = False
+    
+    # Si hay líneas, mantener header
+    if lineas_existentes:
+        lineas_nuevas.append(lineas_existentes[0])  # Header
+        
+        # Procesar datos (desde línea 1 en adelante)
+        for i in range(1, len(lineas_existentes)):
+            linea = lineas_existentes[i].strip()
+            if not linea:
+                continue
+            
+            partes = linea.split(",")
+            if len(partes) >= 3:
+                garage_id_csv = partes[0]
+                tipo_csv = partes[1]
+                periodo_csv = partes[2]
+                
+                # Comparar si es la misma tarifa
+                if (garage_id_csv == str(garage_id) and 
+                    tipo_csv == str(tipo_num) and 
+                    periodo_csv == str(periodo_mensual)):
+                    # Actualizar línea
+                    linea_nueva = f"{garage_id},{tipo_num},{periodo_mensual},{precio},ARS,{descripcion}\n"
+                    lineas_nuevas.append(linea_nueva)
+                    tarifa_encontrada = True
+                else:
+                    # Mantener línea original
+                    lineas_nuevas.append(linea + "\n")
+            else:
+                lineas_nuevas.append(linea + "\n")
+    
+    # Si no se encontró, agregar nueva tarifa
+    if not tarifa_encontrada:
+        linea_nueva = f"{garage_id},{tipo_num},{periodo_mensual},{precio},ARS,{descripcion}\n"
+        if not lineas_existentes:
+            # Crear con header
+            lineas_nuevas = [
+                "garage_id,tipo,periodo_mensual,precio,moneda,descripcion\n",
+                linea_nueva
+            ]
+        else:
+            lineas_nuevas.append(linea_nueva)
+    
+    # Escribir archivo completo
+    try:
+        with open(csv_path, "w", encoding="utf-8", newline="") as f:
+            f.writelines(lineas_nuevas)
+    except Exception as e:
+        print(Fore.RED + f"Error al guardar tarifa: {e}" + Style.RESET_ALL)
 def handle_seleccionar_garage(usuario):
     """Maneja la selección de garage existente"""
     garages = buscar_garage_asociado(usuario['email'])
