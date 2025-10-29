@@ -2,6 +2,12 @@ TARIFAS
 Que se llame al csv y traiga la info de las tarifas cuando se seleccione el garage y cuando se actualizan las tarifas.
 Cuenado se retira un auto, realizar funcion para calcular la tarifa.
 
+1- CONSULTAR ESPACIOS libres 2- CONSULTAR CANTIDAD DE VEHICULOS
+si presiono un string no tira error, validar el menu principal
+
+3- INGRESAR UN VEHICULO
+si el vehiculo ya existe hacer un clear de consola y avisar
+
 
 MENU GERENTES 
 bug cuando el usuario logeado no tiene ningun garage.
@@ -34,10 +40,16 @@ No esta trayendo la cantidad de vehiculos bien --- pero consultar espacios libre
 
 
 
+MANDATORIO
+OPCION DE USUARIO ADMINISTRADOR DIFERENCIA DE ROLES
+
+
+
 GENERAL 
 remodularizar funciones.
 clear console optimizar.
 poner todos los outputs con mismo formato.
+validar todos los imputs
 
 
 BOUNUS TRACK 
