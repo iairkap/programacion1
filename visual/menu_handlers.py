@@ -93,6 +93,8 @@ def crear_nuevo_garage(usuario):
             return None
 
     # crear el garage y obtener su id
+    
+    
     garage_id = crear_garage(usuario, nombre, direccion, slots_per_floor=slots_per_floor, floors=floors)
     if not garage_id:
         print(Fore.RED + "No se pudo crear el garage." + Style.RESET_ALL)
@@ -114,30 +116,32 @@ def crear_nuevo_garage(usuario):
     clear_screen()
     return garage_id
 
-
 def agregar_tarifa(garage_id, garage_name=None):
     """Función independiente para agregar tarifas a files/tarifas.csv.
-    garage_name se usa sólo para mensajes amigables (opcional)."""
-    tipo_map = {"1": "moto", "2": "auto", "3": "camioneta"}
-    periodo_map = {"1": "diario", "2": "mensual"}
+    Guarda valores numéricos: tipo (1/2/3), periodo (0/1)"""
+    tipo_map = {"1": (1, "moto"), "2": (2, "auto"), "3": (3, "camioneta")}
+    periodo_map = {"1": (1, "diario"), "2": (2, "mensual")}
 
     display_name = f" '{garage_name}'" if garage_name else f" id={garage_id}"
     print(f"\nConfigurar tarifas para el garage{display_name}. Escriba 'fin' para terminar.")
+    
     while True:
         tipo_slot_in = input("Tipo (1 Moto, 2 Auto, 3 Camioneta/suv) o 'fin': ").strip().lower()
         if tipo_slot_in == "fin":
             break
 
-        tipo = tipo_map.get(tipo_slot_in) or (tipo_slot_in if tipo_slot_in in tipo_map.values() else None)
-        if not tipo:
-            print(Fore.RED + "Tipo inválido. Use 1/2/3 o el nombre ('moto','auto','camioneta')." + Style.RESET_ALL)
+        if tipo_slot_in not in tipo_map:
+            print(Fore.RED + "Tipo inválido. Use 1/2/3." + Style.RESET_ALL)
             continue
+        
+        tipo_num, tipo_nombre = tipo_map[tipo_slot_in]
 
         periodo_in = input("Periodo (1: diario, 2: mensual): ").strip()
-        periodo = periodo_map.get(periodo_in) or (periodo_in if periodo_in in periodo_map.values() else None)
-        if not periodo:
+        if periodo_in not in periodo_map:
             print(Fore.RED + "Periodo inválido. Use 1 o 2." + Style.RESET_ALL)
             continue
+        
+        periodo_num, periodo_nombre = periodo_map[periodo_in]
 
         precio_str = input("Precio (número): ").strip()
         try:
@@ -150,25 +154,31 @@ def agregar_tarifa(garage_id, garage_name=None):
 
         descripcion = input("Descripción (opcional): ").strip()
 
-        # Asegurar header si archivo no existe o está vacío
-        header = False
-        try:
-            if not os.path.exists("files/tarifas.csv") or os.path.getsize("files/tarifas.csv") == 0:
-                header = True
-        except Exception:
-            header = False
-
-        with open("files/tarifas.csv", "a", encoding="utf-8", newline="") as tarifa_file:
-            if header:
-                tarifa_file.write("garage_id,tipo,periodo,precio,moneda,descripcion\n")
-            tarifa_file.write(f"{garage_id},{tipo},{periodo},{precio},ARS,{descripcion}\n")
-
-        print(Fore.GREEN + f"Tarifa guardada: garage {garage_id} / {tipo} / {periodo} = {precio}" + Style.RESET_ALL)
+        # Guardar con valores numéricos
+        save_tarifa_to_csv(garage_id, tipo_num, periodo_num, precio, descripcion)
+        print(Fore.GREEN + f"Tarifa guardada: {tipo_nombre}/{periodo_nombre} = {precio}" + Style.RESET_ALL)
 
     # fin de la configuración de tarifas
     input("Presione cualquier tecla para continuar...")
     clear_screen()
     return True
+
+
+def save_tarifa_to_csv(garage_id, tipo_num, periodo_num, precio, descripcion=""):
+    """Escribe tarifa en CSV con valores numéricos.
+    tipo_num: 1=moto, 2=auto, 3=camioneta
+    periodo_num: 0=diario, 1=mensual"""
+    header = False
+    try:
+        if not os.path.exists("files/tarifas.csv") or os.path.getsize("files/tarifas.csv") == 0:
+            header = True
+    except Exception:
+        header = False
+
+    with open("files/tarifas.csv", "a", encoding="utf-8", newline="") as tarifa_file:
+        if header:
+            tarifa_file.write("garage_id,tipo,periodo,precio,moneda,descripcion\n")
+        tarifa_file.write(f"{garage_id},{tipo_num},{periodo_num},{precio},ARS,{descripcion}\n")
 
 
 def handle_seleccionar_garage(usuario):

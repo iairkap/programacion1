@@ -13,3 +13,4 @@ garage_id, user_email, garage_name, address, floors, slots_per_floor,
 12,a@a.com,DemoB,Demob,3,7
 13,a@a.com,fafa,fafa,3,8
 14,a@a.com,Frondizi,Frondizi 123,4,6
+15,a@a.com,Prueba,Abc23,10,5
