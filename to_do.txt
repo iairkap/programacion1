@@ -1,8 +1,10 @@
 TARIFAS 
-Que se llame al csv y traiga la info de las tarifas cuando se seleccione el garage y cuando se actualizan las tarifas
+Que se llame al csv y traiga la info de las tarifas cuando se seleccione el garage y cuando se actualizan las tarifas.
 Cuenado se retira un auto, realizar funcion para calcular la tarifa.
 
 
+MENU GERENTES 
+bug cuando el usuario logeado no tiene ningun garage.
 
 
 
@@ -13,4 +15,5 @@ Cuenado se retira un auto, realizar funcion para calcular la tarifa.
 
 
 GENERAL 
-remodularizar funciones
+remodularizar funciones.
+clear console optimizar.
