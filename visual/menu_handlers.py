@@ -217,7 +217,7 @@ def save_tarifa_to_csv(garage_id, tipo_num, periodo_mensual, precio, descripcion
                     tipo_csv == str(tipo_num) and 
                     periodo_csv == str(periodo_mensual)):
                     # Actualizar línea
-                    linea_nueva = f"{garage_id},{tipo_num},{periodo_mensual},{precio},ARS,{descripcion}\n"
+                    linea_nueva = f"{garage_id},{tipo_num},{periodo_mensual},{precio},{descripcion}\n"
                     lineas_nuevas.append(linea_nueva)
                     tarifa_encontrada = True
                 else:
@@ -228,7 +228,7 @@ def save_tarifa_to_csv(garage_id, tipo_num, periodo_mensual, precio, descripcion
     
     # Si no se encontró, agregar nueva tarifa
     if not tarifa_encontrada:
-        linea_nueva = f"{garage_id},{tipo_num},{periodo_mensual},{precio},ARS,{descripcion}\n"
+        linea_nueva = f"{garage_id},{tipo_num},{periodo_mensual},{precio},{descripcion}\n"
         if not lineas_existentes:
             # Crear con header
             lineas_nuevas = [
