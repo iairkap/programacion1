@@ -6,14 +6,40 @@ Cuenado se retira un auto, realizar funcion para calcular la tarifa.
 MENU GERENTES 
 bug cuando el usuario logeado no tiene ningun garage.
 
+6 - MOSTRAR ESTADO GARAGE
+deberiamos decir que tipo de vehiculo es en string
+poner un clear de consola una vez que se presiona una tecla
 
 
+7- BUSCAR VEHICULO POR Patente
+Emprolijar la consola y borrar con clear 
+sugerir alguna funcionalidad si se encuentra el vehiculo y si no sugerir ingresar nuevo.
 
 
+8- ESTADISITCAS RAPIDAS 
 
+
+BULK 
+-TIPO SLOT --> Que pueda especificar exactamente la catidad de slots por piso
+hacer una fila por piso y columnas por slot.
+-
+
+
+5 - EDITAR UN VEHICULO 
+Cuando quiero editar el vehiculo solo deberia modificar la posicion
+
+
+CONSULTAR CANTIDAD DE VEHICULOS Totales
+No esta trayendo la cantidad de vehiculos bien --- pero consultar espacios libres si funciona.
 
 
 
 GENERAL 
 remodularizar funciones.
 clear console optimizar.
+poner todos los outputs con mismo formato.
+
+
+BOUNUS TRACK 
+QUE PUEDA PRESETEAR LOS AUTOS YA ESTACIONADO EN METODO BULK
+QUE EL PROGRAMA BUSQUE PARECIDOS EN LAS BUSQUEDAS POR SI PIFIO AL ESCRIBIR
