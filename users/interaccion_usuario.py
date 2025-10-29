@@ -1,5 +1,16 @@
+from colorama import Fore, Style
+
+
 def pedir_piso(garage):
-    return pedir_num_natural(max =len(garage))
+    while True:
+        try:
+            piso = int(input(f"Ingrese el piso que desea consultar entre 0 y {len(garage)-1}: "))
+            if piso < 0 or piso > len(garage) or len(garage) == 0:
+                print("El piso ingresado no es válido. Intente nuevamente.")
+            else:
+                return piso            
+        except Exception as e:
+            print(e)
 
 def acceder_a_info_de_patentes(GARAGE):
     """Accede a los datos guardados de las patentes
@@ -45,17 +56,6 @@ def calcular_costo_de_estadia(patente, hora_salida):
     return costo
     
 
-
-#creo que esta la hice jp
-# def chequear_espacio_libre(garage = GARAGE):
-#     """Chequea si hay espacio libre en el estacionamiento"""
-#     for piso_idx, piso in enumerate(garage):
-#         if len(piso) < 12:
-#             fila = piso[-1][0] + 1
-#             return (piso_idx, fila) ##Falta retornar algun dato mas??
-
-
-
 def es_subscripcion_mensual(patente):
     """Chequea si la subscripcion es mensual o diaria"""
     info_patentes = acceder_a_info_de_patentes()
@@ -64,16 +64,32 @@ def es_subscripcion_mensual(patente):
             return info[3] 
 
 
+
+
+
+#!Funcion Lambda -> 
+def mostrar_estado_garage(garage):
+    print(Fore.GREEN + "\n--- ESTADO DEL GARAGE ---" + Style.RESET_ALL)
+    imprimir_piso = lambda idx, piso: (
+        print(f"\nPiso {idx}:"),
+        [print(
+            f"  Slot {slot['id']}: {'Ocupado' if slot['ocupado'] else 'Libre'} | Patente: {slot['patente'] if slot['ocupado'] else '-'} | Tipo: {slot['tipo_vehiculo_estacionado'] if slot['ocupado'] else '-'}"
+        ) for slot in piso]
+    )
+    for idx in range(len(garage)):
+        imprimir_piso(idx, garage[idx])
+    input(Fore.YELLOW + '\nPresione cualquier tecla para continuar...' + Style.RESET_ALL) 
+
 def pedir_patente():
     # estructura de patente 
     # NUEVA = AB123CD
     # VIEJA = ABC123
     while True:
         try:
-            patente = input("ingrese la patente:")
+            patente = input(Fore.YELLOW + "\nIngrese la patente:" + Style.RESET_ALL).strip().upper()
             digitos = len(patente)
             if digitos != 6 and digitos != 7:
-                print("las nuevas patentes tienen 7 digitos y las antiguas 6")
+                print(Fore.RED + "\nLas nuevas patentes tienen 7 digitos y las antiguas 6\n" + Style.RESET_ALL)
             elif digitos == 6 :
                 if patente[:3].isalpha() and patente[3:].isdigit():
                     return patente
@@ -81,9 +97,9 @@ def pedir_patente():
                 if patente[:2].isalpha() and patente[2:5].isdigit() and patente[5:].isalpha():
                     return patente
             else: 
-                print("la patente no tiene le formato correcto ej: AB123CD o ABC123")
+                print(Fore.RED + "La patente no tiene el formato correcto ej: AB123CD o ABC123" + Style.RESET_ALL)
                 
-            print("volve a intentarlo")
+            print("Volve a intentarlo")
 
         except Exception as e:
             print(e)
@@ -96,14 +112,18 @@ def pedir_tipo_vehiculo():
 
 
     
-def pedir_num_natural(max,min = 0):
+def pedir_num_natural(max,mensaje_personalizado = "\nIngresa el numero: ",min = 0):
     while True:
         try:
-            num = int(input("ingresa el numero"))
+            num = int(input(mensaje_personalizado))
             if num < min or num > max:
-                print(f"el nuero ingresado tiene que ser un num valido, entre {min} y {max}")
+                print(f"\nEl numero ingresado tiene que ser un numero valido, entre {min} y {max}")
             else: return num
         except ValueError:
-            print("por favor ingresa un numero")
+            print("\nPor favor ingresa un numero")
         except Exception as e : 
             print(e)
+            
+            
+            
+            
