@@ -10,7 +10,4 @@ garage_id, user_email, garage_name, address, floors, slots_per_floor,
 9,a@a.com,FADU,Fadu,5,6
 10,a@a.com,DEMO,Av. Siempre Viva 123,10,12
 11,a@a.com,Julian Alvarez,Julian Alvarez 2222,5,10
-12,a@a.com,DemoB,Demob,3,7
-13,a@a.com,fafa,fafa,3,8
-14,a@a.com,Frondizi,Frondizi 123,4,6
-15,a@a.com,Prueba,Abc23,10,5
+12,a@a.com,Fafa,Fafa	23,10,5

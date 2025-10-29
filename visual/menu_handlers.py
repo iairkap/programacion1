@@ -115,12 +115,11 @@ def crear_nuevo_garage(usuario):
     input("Presione cualquier tecla para continuar...")
     clear_screen()
     return garage_id
-
 def agregar_tarifa(garage_id, garage_name=None):
     """Función independiente para agregar tarifas a files/tarifas.csv.
-    Guarda valores numéricos: tipo (1/2/3), periodo (0/1)"""
+    Guarda valores numéricos: tipo (1/2/3), periodo_mensual (True/False)"""
     tipo_map = {"1": (1, "moto"), "2": (2, "auto"), "3": (3, "camioneta")}
-    periodo_map = {"1": (1, "diario"), "2": (2, "mensual")}
+    periodo_map = {"1": (False, "diario"), "2": (True, "mensual")}
 
     display_name = f" '{garage_name}'" if garage_name else f" id={garage_id}"
     print(f"\nConfigurar tarifas para el garage{display_name}. Escriba 'fin' para terminar.")
@@ -140,8 +139,8 @@ def agregar_tarifa(garage_id, garage_name=None):
         if periodo_in not in periodo_map:
             print(Fore.RED + "Periodo inválido. Use 1 o 2." + Style.RESET_ALL)
             continue
-        
-        periodo_num, periodo_nombre = periodo_map[periodo_in]
+
+        periodo_mensual, periodo_nombre = periodo_map[periodo_in]
 
         precio_str = input("Precio (número): ").strip()
         try:
@@ -155,7 +154,7 @@ def agregar_tarifa(garage_id, garage_name=None):
         descripcion = input("Descripción (opcional): ").strip()
 
         # Guardar con valores numéricos
-        save_tarifa_to_csv(garage_id, tipo_num, periodo_num, precio, descripcion)
+        save_tarifa_to_csv(garage_id, tipo_num, periodo_mensual, precio, descripcion)
         print(Fore.GREEN + f"Tarifa guardada: {tipo_nombre}/{periodo_nombre} = {precio}" + Style.RESET_ALL)
 
     # fin de la configuración de tarifas
@@ -164,10 +163,10 @@ def agregar_tarifa(garage_id, garage_name=None):
     return True
 
 
-def save_tarifa_to_csv(garage_id, tipo_num, periodo_num, precio, descripcion=""):
+def save_tarifa_to_csv(garage_id, tipo_num, periodo_mensual, precio, descripcion=""):
     """Escribe tarifa en CSV con valores numéricos.
     tipo_num: 1=moto, 2=auto, 3=camioneta
-    periodo_num: 0=diario, 1=mensual"""
+    periodo_mensual: True=mensual, False=diario"""
     header = False
     try:
         if not os.path.exists("files/tarifas.csv") or os.path.getsize("files/tarifas.csv") == 0:
@@ -177,9 +176,8 @@ def save_tarifa_to_csv(garage_id, tipo_num, periodo_num, precio, descripcion="")
 
     with open("files/tarifas.csv", "a", encoding="utf-8", newline="") as tarifa_file:
         if header:
-            tarifa_file.write("garage_id,tipo,periodo,precio,moneda,descripcion\n")
-        tarifa_file.write(f"{garage_id},{tipo_num},{periodo_num},{precio},ARS,{descripcion}\n")
-
+            tarifa_file.write("garage_id,tipo,periodo_mensual,precio,moneda,descripcion\n")
+        tarifa_file.write(f"{garage_id},{tipo_num},{periodo_mensual},{precio},{descripcion}\n")
 
 def handle_seleccionar_garage(usuario):
     """Maneja la selección de garage existente"""
