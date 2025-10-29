@@ -9,7 +9,8 @@ from visual.menu_handlers import (
     handle_seleccionar_garage, 
     handle_crear_garage,
     handle_actualizar_tipo_slots,
-    handle_actualizar_slots
+    handle_actualizar_slots, 
+    handle_actualizar_tarifas
 )
 from visual.menu_principal_handlers import (
     handle_consultar_espacios_libres,
@@ -24,6 +25,7 @@ from visual.menu_principal_handlers import (
 
 from cache.json import leer_estado_garage, guardar_estado_garage
 from colorama import Fore, Style
+from auxiliares.consola import clear_screen
 
 def mostrar_menu_inicial():
     """Menú de inicio de sesión y registro"""
@@ -54,6 +56,7 @@ def mostrar_menu_principal(garage_name):
     print("8. Estadísticas rápidas")
     print("9. Actualizar tipo de slot")
     print("10. Actualizar info de slots")
+    print("11. Actualizar tarifas")
     print("\nc. Cambiar garage")
     print("x. Cerrar sesión")
     print("z. Salir\n")
@@ -134,7 +137,8 @@ def menu_principal(garage_actual):
         handle_buscar_vehiculo,
         handle_estadisticas_rapidas,
         handle_actualizar_tipo_slots,
-        handle_actualizar_slots
+        handle_actualizar_slots, 
+        handle_actualizar_tarifas
     ]
 
     # Acciones especiales (no ejecutan función)
@@ -194,9 +198,11 @@ def main():
                 
                 if resultado == "cambiar_garage":
                     menu_activo = False
+                    clear_screen()
                 elif resultado == "cerrar_sesion":
                     session_active = False
                     menu_activo = False
+                    clear_screen
                 elif resultado == "salir":
                     print("¡Hasta luego!")
                     programa_activo = False
