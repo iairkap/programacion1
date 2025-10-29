@@ -13,3 +13,4 @@ garage_id, user_email, garage_name, address, floors, slots_per_floor,
 12,a@a.com,Fafa,Fafa	23,10,5
 13,a@a.com,Prueba123,Jufre 123,2,5
 14,a@a.com,UADEB,UADE,7,5
+15,miguel@fernandez.com,Floripondio,Migueletes 123,5,7

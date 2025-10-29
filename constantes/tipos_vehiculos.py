@@ -3,5 +3,4 @@ def enum_tipo_vehiculo():
         "moto": 1 ,
         "auto": 2,
         "camioneta": 3,
-        "bicicleta": 4
     }

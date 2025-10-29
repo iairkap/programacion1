@@ -455,8 +455,7 @@ def salida_tipo_vehiculo(tipo_slot):
         return "Auto"
     elif tipo_slot == 3:
         return "Camioneta"
-    elif tipo_slot == 4:
-        return "Bicicleta"
+
     return "Desconocido"
 
 
