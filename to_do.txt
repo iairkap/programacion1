@@ -1,6 +1,6 @@
 TARIFAS 
 Que se llame al csv y traiga la info de las tarifas cuando se seleccione el garage y cuando se actualizan las tarifas.
-Cuenado se retira un auto, realizar funcion para calcular la tarifa.
+Cuenado se retira un auto, realizar funcion para calcular la tarifa. #### IAIR
 
 1- CONSULTAR ESPACIOS libres 2- CONSULTAR CANTIDAD DE VEHICULOS
 si presiono un string no tira error, validar el menu principal

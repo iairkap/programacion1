@@ -158,15 +158,22 @@ def menu_principal(garage_actual):
                 if 0 <= indice < len(handlers):
                     handlers[indice](garage_actual, garage_data)
                     continue
+            else:
+                print(" No se ingresó una opción valida ")
+                clear_screen()
+                continue
+
 
             if opcion in acciones_especiales:
                 accion = acciones_especiales[opcion]
                 continuar = False
             else:
                 print(Fore.RED + "Opción inválida. Intente de nuevo." + Style.RESET_ALL)
+    
     except Exception as e:
         print(Fore.RED + f"Ocurrió un error: {e}" + Style.RESET_ALL)
     return accion
+
 
 
 
