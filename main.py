@@ -147,7 +147,7 @@ def buscar_por_patente(garage, patente = None):
             try:
                 patente_slot = slot["patente"]
                 ocupado_slot = slot["ocupado"]
-                if patente_slot == patente and ocupado_slot == "True":
+                if patente_slot == patente and ocupado_slot == True:
                     piso_val = int(slot["piso"]) if "piso" in slot else idx_piso
                     id_val = int(slot["id"]) if "id" in slot else 0
                     return (piso_val, id_val)
@@ -218,7 +218,7 @@ def ingresar_patente():
 def acceder_a_info_de_patentes(garage):
     """Devuelve lista de dicts con slots ocupados."""
     datos = garage
-    return [slot for slot in datos if slot.get("ocupado") == "True"]
+    return [slot for slot in datos if slot.get("ocupado") == True]
 
 
 
@@ -228,7 +228,7 @@ def chequear_existencia_patente(patente, garage ):
     """Devuelve True si la patente existe y está ocupada."""
     datos = garage
     for slot in datos:
-        if slot["patente"] == patente and slot["ocupado"] == "True":
+        if slot["patente"] == patente and slot["ocupado"] == True:
             return True
     return False
 
@@ -242,7 +242,7 @@ def es_subscripcion_mensual(patente, garage):
     """
     datos = garage
     for slot in datos:
-        if slot["patente"] == patente and slot["ocupado"] == "True":
+        if slot["patente"] == patente and slot["ocupado"] == True:
             val = slot["reservado_mensual"]
             # Normalizar distintos tipos (str "True"/"False" o booleano)
             if type(val) is str:
@@ -511,7 +511,7 @@ def contar_por_tipo_vehiculo(garage=None, tipo_buscado=None):
     datos = leer_garage_normalizado()
     count = 0
     for pisos in datos:
-        count += sum(1 for slot in pisos if slot.get("ocupado") == "True" and slot.get("tipo_vehiculo_estacionado") == str(tipo_buscado))
+        count += sum(1 for slot in pisos if slot.get("ocupado") == True and slot.get("tipo_vehiculo_estacionado") == str(tipo_buscado))
     return count
 
 # CONFIGURACIÓN CONSTANTE DEL EDIFICIO

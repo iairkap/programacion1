@@ -1,5 +1,5 @@
 slot_id,piso,posicion,tipo_slot,reservado_mensual,ocupado,patente,hora_entrada,tipo_vehiculo
-1,0,0,2,False,False,,,
+1,0,0,2,False,True,FAB123,2025-10-29 18:59:56,
 2,0,1,2,False,False,,,
 3,0,2,2,False,False,,,
 4,0,3,2,False,False,,,
@@ -14,7 +14,7 @@ slot_id,piso,posicion,tipo_slot,reservado_mensual,ocupado,patente,hora_entrada,t
 13,1,5,2,False,False,,,
 14,1,6,2,False,False,,,
 15,2,0,2,False,False,,,
-16,2,1,1,False,False,,,
+16,2,1,1,False,True,ABC123,2025-10-29 19:00:30,
 17,2,2,1,False,False,,,
 18,2,3,1,False,False,,,
 19,2,4,1,False,False,,,
