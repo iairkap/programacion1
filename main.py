@@ -278,17 +278,22 @@ def contar_espacios_libres(garage=None):
 
 # FUNCIÓN PARA CALCULAR EL COSTO DE ESTADÍA DE UN VEHÍCULO ||||||| MODIFICAR PORQUE GARAGE YA NO 
 'manejo de errores'
-def calcular_costo_de_estadia(patente,):
+def calcular_costo_de_estadia(patente, hora_salida):
 
-    """ # Obtiene la información completa del vehículo
-    
     print(patente)
     
     info_patente = buscar_por_patente(GARAGE, patente)
+    
     if not info_patente:
         return 0
+    tipo_de_slot = info_patente[6] 
+    
+    # tipo_vehiculo_estacionado
+    
+    
+    """ # Obtiene la información completa del vehículo
+    
 
-    tipo_de_slot = info_patente[6]  # tipo_vehiculo_estacionado
 
     # CÁLCULO: Diferencia entre suscripción mensual y por horas
     if not es_subscripcion_mensual(patente):
@@ -318,7 +323,7 @@ def calcular_costo_de_estadia(patente,):
 
 #funcion para registrar salida de vehiculo en formato diccionario 
 'modificado a logica diccionario, manejo de errores y doctring'
-def registrar_salida_vehiculo(garage=None, patente=None):
+def registrar_salida_vehiculo(garage=None, patente=None, tarifa = None):
   
     datos = leer_garage_normalizado()    
     if patente is None:
@@ -340,6 +345,7 @@ def registrar_salida_vehiculo(garage=None, patente=None):
 
     # Solicita hora de salida para calcular costo
     hora_entrada = found.get("hora_entrada")
+    hora_salida = get_current_time_json()
    
     if not hora_entrada:
         print(Fore.RED + "Error: No se encontró la hora de entrada del vehículo." + Style.RESET_ALL)
