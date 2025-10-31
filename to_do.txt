@@ -50,6 +50,7 @@ remodularizar funciones.
 clear console optimizar.
 poner todos los outputs con mismo formato.
 validar todos los imputs
+No se ingresa el tipo de vehiculo cuando se estaciona -> por lo que no se puede consultar por tipo de vehiculo cuando se hace la busqueda de estadisticas rapidas.
 
 
 BOUNUS TRACK 

@@ -94,7 +94,8 @@ def menu_garage(usuario):
     crear_archivo_users_garage()
     
     continuar = True
-    garage_seleccionado = None #users-garage actual
+    garage_seleccionado = None
+    tarifa = []  # ✅ INICIALIZAR AQUÍ
     
     while continuar and not garage_seleccionado:
         mostrar_menu_garage(usuario)
@@ -109,6 +110,7 @@ def menu_garage(usuario):
         elif opcion == "2":
             garage_seleccionado = handle_crear_garage(usuario)
             if garage_seleccionado:
+                tarifa = guardar_precios_garage(garage_seleccionado['garage_id'])  # ✅ AGREGAR AQUÍ TAMBIÉN
                 continuar = False
                     
         elif opcion == "3":

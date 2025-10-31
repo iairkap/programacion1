@@ -1,6 +1,9 @@
 """ 
 Creacion de usuario 
 """
+from colorama import Fore, Style
+
+
 
 
 def campo_no_vacio(msg, nombre_campo):
@@ -9,7 +12,7 @@ def campo_no_vacio(msg, nombre_campo):
             valor = input(msg)
             if valor.strip():
                 return valor.strip()
-            print(f"Error: El {nombre_campo} no puede estar vacío. Intente de nuevo.")
+            print(Fore.RED + f"Error: El {nombre_campo} no puede estar vacío. Intente de nuevo." + Style.RESET_ALL)
         except KeyboardInterrupt:
             print("\nOperación cancelada por el usuario.")
             return None
@@ -20,14 +23,14 @@ def email_valido():
         try:
             email = input("Ingrese su email: ")
             if not email.strip():
-                print("Error: El email no puede estar vacío. Intente de nuevo.")
+                print(Fore.RED + "Error: El email no puede estar vacío. Intente de nuevo." + Style.RESET_ALL)
                 continue
             
             # Validar formato
             es_valido, mensaje = validacion_formato_email(email)
             if es_valido:
                 return email.strip()
-            print(f"Error en el email: {mensaje}. Intente nuevamente.")
+            print(Fore.RED + f"Error en el email: {mensaje}. Intente nuevamente." + Style.RESET_ALL)
         
         except KeyboardInterrupt:
             return None
@@ -38,9 +41,6 @@ def email_valido():
 def creacion_usuario():
     try:
         usuario = {}
-        
-        # Bucle while solo para confirmar contraseña
-        #Validar datos que no esten vacios
         
         usuario['nombre'] = campo_no_vacio("Ingrese su nombre: ", "nombre")
         if usuario['nombre'] is None:
@@ -61,9 +61,8 @@ def creacion_usuario():
             usuario['confirmar_password'] = input("Confirme su contraseña: ")
             if usuario['password'] == usuario['confirmar_password']:
                 break
-            print("Error: Las contraseñas no coinciden. Intente nuevamente.")
-            
-            
+            print(Fore.RED + "Error: Las contraseñas no coinciden. Intente nuevamente." + Style.RESET_ALL)
+
             validacion_email = validacion_formato_email(usuario['email'])
             if not validacion_email[0]:
                 print(f"Error en el email: {validacion_email[1]}. Intente nuevamente.")
@@ -72,10 +71,10 @@ def creacion_usuario():
             if usuario['password'] == usuario['confirmar_password']:
                 break
             else:
-                print("Error: Las contraseñas no coinciden. Intente nuevamente.")
+                print(Fore.RED + "Error: Las contraseñas no coinciden. Intente nuevamente." + Style.RESET_ALL)
         
     except ValueError:
-        print("Error: Entrada inválida. Intente de nuevo.")
+        print(Fore.RED + "Error: Entrada inválida. Intente de nuevo." + Style.RESET_ALL)
         return None
     
     del usuario['confirmar_password']
