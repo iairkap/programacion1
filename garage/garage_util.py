@@ -58,5 +58,4 @@ def mostrar_estadisticas_rapidas(garage):
         cantidad = contar_por_tipo_vehiculo(garage, tipo_num)
         print(Fore.GREEN + f"{tipo_nombre}: {cantidad}" + Style.RESET_ALL)
     
-    input(Fore.YELLOW + '\nPresione cualquier tecla para continuar...' + Style.RESET_ALL)
     clear_screen()

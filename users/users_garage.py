@@ -45,7 +45,6 @@ def buscar_garage_asociado(email):
             return garages
         else:
             print(Fore.RED + "\nNo se encontró un garage asociado a este usuario.\n" + Style.RESET_ALL)
-            input("Presione cualquier tecla para continuar...")
             clear_screen()
             return None
             
@@ -127,9 +126,9 @@ def generate_garage_structure(floors, slots_per_floor):
     slot_id = 0
     for piso in range(floors):
         piso_slots = []
-        for slot in range(slots_per_floor):
+        for _ in range(slots_per_floor):
             slot_id += 1
-            piso_slots.append({"slot_id": slot_id,"piso": piso, "posicion": slot, "tipo_slot": "","reservado_mensual": False,"ocupado": False, "patente":"", "hora_entrada": "", "tipo_vehiculo":""})
+            piso_slots.append({"slot_id": slot_id,"piso": piso, "tipo_slot": "","reservado_mensual": False,"ocupado": False, "patente":"", "hora_entrada": "", "tipo_vehiculo":""})
         garage.append(piso_slots)
     return garage
 
@@ -256,11 +255,10 @@ def actualizar_slot( garage_id, slot_id, nuevaData):
         for linea in lineas[1:]:
             datos = linea.strip().split(",")
             
-            id_actual,piso, posicion, tipo_slot, reservado_mensual, ocupado, patente, hora_entrada, tipo_vehiculo = datos[0:]
+            id_actual,piso, tipo_slot, reservado_mensual, ocupado, patente, hora_entrada, tipo_vehiculo = datos[0:]
             
             if id_actual == str(slot_id) and str(nuevaData.get("piso")) == datos[1]:
                 piso = datos[1]
-                posicion = datos[2]
                 tipo_slot = str(nuevaData.get("tipo_slot", tipo_slot))
                 reservado_mensual = str(nuevaData.get("reservado_mensual", reservado_mensual))
                 ocupado = str(nuevaData.get("ocupado", ocupado))
@@ -269,7 +267,7 @@ def actualizar_slot( garage_id, slot_id, nuevaData):
                 tipo_vehiculo = str(nuevaData.get("tipo_vehiculo", tipo_vehiculo))
             
             # Agregamos la fila (actualizada o no)
-            nuevas_lineas.append([id_actual, piso, posicion, tipo_slot, reservado_mensual, ocupado, patente, hora_entrada, tipo_vehiculo])
+            nuevas_lineas.append([id_actual, piso, tipo_slot, reservado_mensual, ocupado, patente, hora_entrada, tipo_vehiculo])
 
         with open(f"files/garage-{garage_id}.csv", "w") as file:
             # Reescribir encabezado
@@ -278,7 +276,6 @@ def actualizar_slot( garage_id, slot_id, nuevaData):
             for fila in nuevas_lineas[1:]:
                 file.write(",".join(fila) + "\n")
         
-        #print(f"Slot con id {slot_id} actualizado correctamente ✅")
     except FileNotFoundError:
         print(f"Archivo garage-{garage_id}.csv no encontrado.")
     except Exception as e:
@@ -401,7 +398,7 @@ def get_garage_data(garage_id):
         for linea in lineas[1:]:
             datos = linea.strip().split(",")
             
-            if len(datos) < 9:
+            if len(datos) < 8:
                 continue
             
             # Obtener piso para crear estructura
@@ -414,16 +411,15 @@ def get_garage_data(garage_id):
             # Crear slot con conversión de tipos
             slot = {
                 "id": int(datos[0]) if len(datos) > 0 and datos[0].isdigit() else 0,
-                "posicion": int(datos[2]) if len(datos) > 2 and datos[2].isdigit() else 0,
-                "tipo_slot": int(datos[3]) if len(datos) > 3 and datos[3].isdigit() else 0,
-                "reservado_mensual": datos[4].lower() == "true" if len(datos) > 4 else False,
-                "ocupado": datos[5].lower() == "true" if len(datos) > 5 else False,
-                "patente": datos[6].strip() if len(datos) > 6 else "",
-                "hora_entrada": datos[7].strip() if len(datos) > 7 and datos[7].strip() else None,
-                "tipo_vehiculo_estacionado": int(datos[8]) if len(datos) > 8 and datos[8].isdigit() else 0,
+                "piso": int(datos[1]) if len(datos) > 2 and datos[1].isdigit() else 0,
+                "tipo_slot": int(datos[2]) if len(datos) > 3 and datos[2].isdigit() else 0,
+                "reservado_mensual": datos[3].lower() == "true" if len(datos) > 4 else False,
+                "ocupado": datos[4].lower() == "true" if len(datos) > 5 else False,
+                "patente": datos[5].strip() if len(datos) > 6 else "",
+                "hora_entrada": datos[6].strip() if len(datos) > 7 and datos[6].strip() else None,
+                "tipo_vehiculo_estacionado": int(datos[7]) if len(datos) > 8 and datos[7].isdigit() else 0,
             }
            
-
             garage[piso_csv].append(slot)
 
         return garage

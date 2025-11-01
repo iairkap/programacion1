@@ -36,7 +36,6 @@ def handle_consultar_espacios_libres(garage, garage_data):
         
         libres = contar_espacios_libres([garage_data[piso]])
         print(Fore.GREEN + f"\nEspacios libres en el piso {piso}: {libres}" + Style.RESET_ALL)
-        input('\nPresione cualquier tecla para continuar...')
         clear_screen()
     elif subop == "2":
         print("\nTipos de vehículo:")
@@ -49,13 +48,11 @@ def handle_consultar_espacios_libres(garage, garage_data):
         
         tipo_texto = [k for k, v in tipos.items() if v == tipo]
         print(Fore.GREEN + f"\nEspacios libres para tipo {tipo_texto[0] if tipo_texto else tipo}: {libres}" + Style.RESET_ALL)
-        input('\nPresione cualquier tecla para continuar...')
         clear_screen()
         
     elif subop == "3":
         libres = contar_espacios_libres(garage_data)
         print(Fore.GREEN   + f"\nEspacios libres en todo el garage: {libres}" + Style.RESET_ALL)
-        input('\nPresione cualquier tecla para continuar...')
         clear_screen()
 
 def handle_consultar_vehiculos_estacionados(garage, garage_data):
@@ -80,7 +77,6 @@ def handle_consultar_vehiculos_estacionados(garage, garage_data):
         for tipo_nombre, tipo_num in tipos.items():
             cantidad = contar_por_tipo_vehiculo(garage_data, tipo_num)
             print(Fore.GREEN + f"{tipo_nombre.capitalize()}: {cantidad}" + Style.RESET_ALL)
-    input('\nPresione cualquier tecla para continuar...')
     clear_screen()
 
 
@@ -102,10 +98,12 @@ def handle_editar_vehiculo(garage, garage_data):
     nuevo_tipo = pedir_tipo_vehiculo()
     nueva_patente = input("Nueva patente (dejar vacío para no cambiar): ").strip().upper()
     nueva_estadia = input("Ingrese la nueva estadía (mensual/diaria): ").strip().lower()
+    if not patente:
+        print("Patente no encontrada.")
+        return
     if modificar_vehiculo(garage, patente, nuevo_tipo, nueva_patente, nueva_estadia):
         print("Vehículo modificado correctamente.")
-    else:
-        print("Patente no encontrada.")
+    return True
 
 def handle_mostrar_estado_garage(garage, garage_data):
     """Maneja mostrar el estado del garage"""

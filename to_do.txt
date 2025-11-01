@@ -32,20 +32,8 @@ BULK
 hacer una fila por piso y columnas por slot.
 -
 
-klear
-5 - EDITAR UN VEHICULO 
-Cuando quiero editar el vehiculo solo deberia modificar la posicion
-
-klear
-CONSULTAR CANTIDAD DE VEHICULOS Totales
-No esta trayendo la cantidad de vehiculos bien --- pero consultar espacios libres si funciona.
-
-
-
 MANDATORIO
 OPCION DE USUARIO ADMINISTRADOR DIFERENCIA DE ROLES
-
-
 
 GENERAL 
 remodularizar funciones.
@@ -53,13 +41,15 @@ clear console optimizar.
 poner todos los outputs con mismo formato.
 validar todos los imputs
 
-klear
-No se ingresa el tipo de vehiculo cuando se estaciona -> por lo que no se puede consultar por tipo de vehiculo cuando se hace la busqueda de estadisticas rapidas.
-
-CREAR NUEVO GARAGE manejo de errores, mejorar
-Editar garage, mejorar cuando la patente no esta, dar la opcion de volver para atras
 
 
 BOUNUS TRACK 
 QUE PUEDA PRESETEAR LOS AUTOS YA ESTACIONADO EN METODO BULK
 QUE EL PROGRAMA BUSQUE PARECIDOS EN LAS BUSQUEDAS POR SI PIFIO AL ESCRIBIR
+
+HACER UN CHECK PARA VERIFICAR SI LOS SLOTS YA TIENEN TIPOS ASIGNADOS ANTES DE AGREGAR VEHICULOS
+CREAR NUEVO GARAGE mejorar manejo de errores
+Editar garage, mejorar cuando la patente no esta, dar la opcion de volver para atras
+Mover garage, mejorar la bsuqueda de datos anteriores. 
+ingresar vehiculo- mandatorio haber elegido los tipos de slots
+salida de vehiculo, mandatorio haber puestos las tarifas

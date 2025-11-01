@@ -33,32 +33,12 @@ def chequear_existencia_patente(patente):
                 return True
     return False
 
-
-
 def buscar_patente(patente):
     info_patentes= acceder_a_info_de_patentes()
     for info in info_patentes:
         if patente in info:
             return info
-
-
-def calcular_costo_de_estadia(patente, hora_salida):
-    info_patente = buscar_patente(patente)
-    costo = 0
-    if not info_patente:
-        return "Patente no registrada"
-    tipo_de_slot = info_patente[-1]
-    if not es_subscripcion_mensual(patente):
-        min_entrada = info_patente[-2].split(" ")[1].replace(":", "")
-        min_transcurridos = int(hora_salida.replace(":", "")) - int(min_entrada)
-        horas_transcurridas = min_transcurridos / 60
-        print(f"Horas transcurridas: {horas_transcurridas}")
-        costo = COSTOS[tipo_de_slot][0] * horas_transcurridas
-    else:
-        costo = COSTOS[tipo_de_slot][1] ### Debemos agregar la {ultima fecha de pago??? 
-    return costo
     
-
 def es_subscripcion_mensual(patente):
     """Chequea si la subscripcion es mensual o diaria"""
     info_patentes = acceder_a_info_de_patentes()
@@ -66,12 +46,10 @@ def es_subscripcion_mensual(patente):
         if patente in info:
             return info[3] 
 
-
 def mostrar_estado_garage(garage):
     print(Fore.GREEN + "\n--- ESTADO DEL GARAGE ---" + Style.RESET_ALL)
     
     #para el tipo_vehiculo estacionado no quiero imprimir el numero sino el texto del def enum_tipo_vehiculo
-
     
     imprimir_piso = lambda idx, piso: (
         print(f"\nPiso {idx}:"),
@@ -81,7 +59,6 @@ def mostrar_estado_garage(garage):
     )
     for idx in range(len(garage)):
         imprimir_piso(idx, garage[idx])
-    input(Fore.YELLOW + '\nPresione cualquier tecla para continuar...' + Style.RESET_ALL) 
     clear_screen()
     
 

@@ -91,7 +91,6 @@ GARAGE = [
     ]
 ]
 
-# Representacion costos posicion0: precio por hora posicion1 precio por dia
 
 COSTOS = [
     [],  # vacio, seria el 0 que no representa nada,

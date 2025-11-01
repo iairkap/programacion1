@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from users.users_garage import crear_archivo_users_garage, leer_garage_desde_csv, get_garage_data
+from users.users_garage import crear_archivo_users_garage, get_garage_data
 from visual.menu_handlers import (
     handle_login, 
     handle_registro, 
@@ -49,7 +49,7 @@ def mostrar_menu_principal(garage_name):
     """Menú principal del sistema"""
 
     opciones_menu_principal = [
-    "\nConsultar espacios libres",
+    "Consultar espacios libres",
     "Consultar cantidad de vehículos estacionados",
     "Ingresar un vehículo",
     "Registrar salida de un vehículo",
@@ -66,18 +66,6 @@ def mostrar_menu_principal(garage_name):
     print(Fore.GREEN + f"\n=== MENÚ PRINCIPAL - {garage_name['garage_name'].upper()} ===" + Style.RESET_ALL)
     for i, opcion in enumerate(opciones_menu_principal, start=1):
         print(f"{i}. {opcion}")
-    # print("\n1. Consultar espacios libres")
-    # print("2. Consultar cantidad de vehículos estacionados")
-    # print("3. Ingresar un vehículo")
-    # print("4. Registrar salida de un vehículo")
-    # print("5. Editar un vehículo")
-    # print("6. Mostrar estado del garage")
-    # print("7. Buscar vehículo por patente")
-    # print("8. Estadísticas rápidas")
-    # print("9. Actualizar tipo de slot")
-    # print("10. Actualizar info de slots")
-    # print("11. Actualizar tarifas")
-    # print("12. Mover vehículo")
     print("\nc. Cambiar garage")
     print("x. Cerrar sesión")
     print("z. Salir\n")
@@ -102,7 +90,7 @@ def menu_inicial():
         elif opcion == "3":
             print("¡Hasta luego!")
             continuar = False
-            
+            clear_screen()
         else:
             print(Fore.RED + "Opción inválida" + Style.RESET_ALL)
     
@@ -175,6 +163,7 @@ def menu_principal(garage_actual, tarifa):
     }
     try: 
         while continuar and not accion:
+
             mostrar_menu_principal(garage_actual)
             garage_data = get_garage_data(garage_actual['garage_id'])
             opcion = input("Seleccione una opción: \n")
@@ -187,10 +176,6 @@ def menu_principal(garage_actual, tarifa):
                     else:
                         handlers[indice](garage_actual, garage_data)
                     continue
-                #Tengo que pasar las tarifas si es la opción 4 (registrar salida)
-          
-            
-
             if opcion in acciones_especiales:
                 accion = acciones_especiales[opcion]
                 continuar = False
@@ -200,8 +185,6 @@ def menu_principal(garage_actual, tarifa):
     except Exception as e:
         print(Fore.RED + f"Ocurrió un error: {e}" + Style.RESET_ALL)
     return accion
-
-
 
 
 def main():
@@ -243,6 +226,7 @@ def main():
                     programa_activo = False
                     session_active = False
                     menu_activo = False
+                    clear_screen()
 
 if __name__ == "__main__":
     main()

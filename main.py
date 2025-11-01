@@ -56,17 +56,20 @@ def modificar_vehiculo(garage, patente, nuevo_tipo=None, nueva_patente=None, nue
     Busca el vehículo por su patente en la estructura garage y actualiza el tipo de vehículo y/o la patente si se proporcionan nuevos valores.
     """
     # Busca el vehículo por patente
-    for piso in garage:
-        for slot in piso:
-            if slot["ocupado"] == True and slot["patente"] == patente:
-                # Modifica solo los campos que no son None
-                if nuevo_tipo:
-                    slot["tipo_vehiculo_estacionado"] = nuevo_tipo        # Cambia tipo de vehículo
-                if nueva_patente:
-                    slot["patente"] = nueva_patente     # Cambia patente
-                if nueva_estadia:
-                    slot["reservado_mensual"] = nueva_estadia  # Cambia tipo de estadía
-                return True
+    try:
+        for piso in garage:
+            for slot in piso:
+                if slot["ocupado"] == True and slot["patente"] == patente:
+                    # Modifica solo los campos que no son None
+                    if nuevo_tipo:
+                        slot["tipo_vehiculo_estacionado"] = nuevo_tipo        # Cambia tipo de vehículo
+                    if nueva_patente:
+                        slot["patente"] = nueva_patente     # Cambia patente
+                    if nueva_estadia:
+                        slot["reservado_mensual"] = nueva_estadia  # Cambia tipo de estadía
+                    return True
+    except Exception as e:
+        print(Fore.RED + f"Error modificando vehículo: {e}" + Style.RESET_ALL)
     return False
 
 def buscar_por_patente(garage, patente = None):
@@ -381,7 +384,6 @@ def registrar_salida_vehiculo(patente=None, tarifa=None):
         actualizar_csv_garage(garage_id, garage)
         
         print(Fore.GREEN + f"Salida registrada. Slot {found_slot.get('id')} liberado." + Style.RESET_ALL)
-        input(Fore.YELLOW + "\nPresione cualquier tecla para continuar..." + Style.RESET_ALL)
         clear_screen()
         
         return True
@@ -402,14 +404,13 @@ def actualizar_csv_garage(garage_id, garage):
         
         with open(csv_path, "w", encoding="utf-8", newline="") as f:
             # Escribir header
-            f.write("slot_id,piso,posicion,tipo_slot,reservado_mensual,ocupado,patente,hora_entrada,tipo_vehiculo\n")
+            f.write("slot_id,piso,tipo_slot,reservado_mensual,ocupado,patente,hora_entrada,tipo_vehiculo\n")
             
             # Escribir slots
             for piso_idx, piso in enumerate(garage):
                 for slot in piso:
                     slot_id = slot.get("id", 0)
                     piso = slot.get("piso", piso_idx)
-                    posicion = slot.get("posicion", 0)
                     tipo_slot = slot.get("tipo_slot", 0)
                     reservado = slot.get("reservado_mensual", False)
                     ocupado = slot.get("ocupado", False)
@@ -417,7 +418,7 @@ def actualizar_csv_garage(garage_id, garage):
                     hora_entrada = slot.get("hora_entrada", "")
                     tipo_vehiculo = slot.get("tipo_vehiculo_estacionado", 0)
                     
-                    f.write(f"{slot_id},{piso},{posicion},{tipo_slot},{reservado},{ocupado},{patente},{hora_entrada},{tipo_vehiculo}\n")
+                    f.write(f"{slot_id},{piso},{tipo_slot},{reservado},{ocupado},{patente},{hora_entrada},{tipo_vehiculo}\n")
         
         print(Fore.GREEN + f"Garage {garage_id} actualizado en CSV." + Style.RESET_ALL)
     
@@ -475,17 +476,8 @@ def registrar_entrada_auto(garage):
            print(Fore.GREEN + f"Puede estacionarlo en piso: {piso}, Slot ID: {slot_id}" + Style.RESET_ALL)
         else:
            print(Fore.RED + "Error actualizando el garage." + Style.RESET_ALL)
-        input(Fore.YELLOW + '\nPresione cualquier tecla para continuar...' + Style.RESET_ALL)
         clear_screen()
         return True 
-
-def obtener_id_por_posicion(garage, piso_idx, slot_idx):
-    """Obtiene el ID del slot dado su piso y posición en el piso."""
-    try:
-        slot = garage[piso_idx][slot_idx]
-        return int(slot["id"])
-    except Exception:
-        return None
     
 def contar_por_tipo_vehiculo(garage=None, tipo_buscado=None):
     """Cuenta vehículos estacionados de un tipo (tipo_vehiculo_estacionado)."""
