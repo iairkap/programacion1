@@ -1,6 +1,6 @@
+#Archivo para crear garage, relacionarlos con usuarios y demas
 from auxiliares.consola import clear_screen
 from cache.json import guardar_estado_garage, leer_estado_garage
-#Archivo para crear garage, relacionarlos con usuarios y demas
 import os
 from constantes.tipos_vehiculos import enum_tipo_vehiculo
 from colorama import Fore, Style
@@ -247,7 +247,7 @@ def actualizar_slot( garage_id, slot_id, nuevaData):
             
             id_actual,piso, posicion, tipo_slot, reservado_mensual, ocupado, patente, hora_entrada, tipo_vehiculo = datos[0:]
             
-            if id_actual == str(slot_id) and nuevaData.get("piso") == datos[1]:
+            if id_actual == str(slot_id) and str(nuevaData.get("piso")) == datos[1]:
                 piso = datos[1]
                 posicion = datos[2]
                 tipo_slot = str(nuevaData.get("tipo_slot", tipo_slot))
@@ -273,7 +273,7 @@ def actualizar_slot( garage_id, slot_id, nuevaData):
     except Exception as e:
         print(f"Error al actualizar el slot: {e}")
 
-def generar_csv_slots():
+def generar_csv_slots(garage):
     """
     Crea un archivo CSV si no existe en la ruta
     ~/Documents/data/config_slots.csv para que el usuario edite
@@ -288,11 +288,11 @@ def generar_csv_slots():
         if not os.path.exists(ruta_csv):
             with open(ruta_csv, "w", encoding='utf-8') as file:
                 file.write("tipo_de_slot,cantidad,piso\n")
-                file.write("auto,0,0\n")
-                file.write("moto,0,0\n")
-                file.write("camioneta,0,0\n")
-            print(Fore.GREEN + f"✅ Archivo de configuración CREADO en: {os.path.abspath(ruta_csv)}" + Style.RESET_ALL)
-        
+                for piso in range(garage.get('floors')):
+                    file.write(f"auto,0,{piso}\n")
+                    file.write(f"moto,0,0{piso}\n")
+                    file.write(f"camioneta,0,{piso}\n")
+            print(Fore.GREEN + f"✅ Archivo de configuración CREADO en: {os.path.abspath(ruta_csv)}" + Style.RESET_ALL) 
         else:
             print(Fore.YELLOW + f"ℹ️ El archivo de configuración YA EXISTE en: {os.path.abspath(ruta_csv)}" + Style.RESET_ALL)
 

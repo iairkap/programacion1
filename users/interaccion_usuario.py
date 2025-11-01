@@ -64,10 +64,6 @@ def es_subscripcion_mensual(patente):
             return info[3] 
 
 
-
-
-
-#!Funcion Lambda -> 
 def mostrar_estado_garage(garage):
     print(Fore.GREEN + "\n--- ESTADO DEL GARAGE ---" + Style.RESET_ALL)
     imprimir_piso = lambda idx, piso: (
@@ -104,15 +100,10 @@ def pedir_patente():
         except Exception as e:
             print(e)
     
-
-
-
 def pedir_tipo_vehiculo():
     return pedir_num_natural(min = 1, max = 4)
-
-
     
-def pedir_num_natural(max,mensaje_personalizado = "\nIngresa el numero: ",min = 0):
+def pedir_num_natural(max,mensaje_personalizado = "\nIngresa el tipo de vehiculo (1/Moto. 2/Auto. 3/Camioneta ): ",min = 0):
     while True:
         try:
             num = int(input(mensaje_personalizado))

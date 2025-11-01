@@ -7,7 +7,6 @@ from garage.mockdata import GARAGE, COSTOS
 import random
 from users.interaccion_usuario import pedir_patente
 import garage.garage_util as garage_util
-#from auxiliares.date import get_current_time_json
 from users import users_garage
 
 from users.users_garage import (    
@@ -17,12 +16,11 @@ from users.users_garage import (
 from cache.json import leer_estado_garage, guardar_estado_garage
 
 from colorama import Fore, Style
-
 from garage.precios import (configurar_precios, es_subscripcion_mensual,
                             buscar_por_patente, calcular_costo_de_estadia)
 import datetime
 from auxiliares.consola import clear_screen
-## aca agregarle la lectura del json para saber cual es el garage actual 
+
 def leer_garage_normalizado():
     """
     Lee el garage y retorna una lista de diccionarios normalizados.
@@ -31,66 +29,6 @@ def leer_garage_normalizado():
     garage_id = leer_estado_garage()['garage_id']
     return users_garage.get_garage_data(garage_id)
 
-
-# def leer_garage():
-#     """
-#     Recorre la estructura global GARAGE y retorna una lista de diccionarios normalizados
-#     representando cada slot de estacionamiento.
-#     Cada slot puede estar representado como un diccionario o como una lista/tupla.
-#     """
-#     garage = users_garage.get_garage(1)  # leer desde CSV
-#     resultados = []
-#     for piso_idx, piso in enumerate(GARAGE):
-#         for slot in piso:
-#             # asumimos slot como lista/tupla en la forma esperada [id, patente, tipo_slot, ocupado, reservado, hora, tipo_veh]
-#             if type(slot) is dict:
-#                 s = dict(slot)
-#                 s["piso"] = str(s["piso"]) if "piso" in s else str(piso_idx)
-#                 s["id"] = str(s["id"]) if "id" in s else "0"
-#                 s["patente"] = "" if ("patente" not in s or s["patente"] is None) else str(s["patente"])
-#                 s["tipo_slot"] = str(s["tipo_slot"]) if "tipo_slot" in s else "0"
-#                 s["ocupado"] = "True" if ("ocupado" in s and s["ocupado"]) else "False"
-#                 s["reservado_mensual"] = "True" if ("reservado_mensual" in s and s["reservado_mensual"]) else "False"
-#                 s["hora_entrada"] = "" if ("hora_entrada" not in s or not s["hora_entrada"]) else str(s["hora_entrada"])
-#                 s["tipo_vehiculo_estacionado"] = str(s["tipo_vehiculo_estacionado"]) if "tipo_vehiculo_estacionado" in s else "0"
-#                 resultados.append(s)
-#                 continue
-
-#             # Si es lista/tupla:
-#             if type(slot) in (list, tuple):
-#                 id_val = slot[0] if len(slot) > 0 else 0
-#                 patente_val = slot[1] if len(slot) > 1 else ""
-#                 tipo_slot_val = slot[2] if len(slot) > 2 else 0
-#                 ocupado_val = slot[3] if len(slot) > 3 else False
-#                 reservado_val = slot[4] if len(slot) > 4 else False
-#                 hora_val = slot[5] if len(slot) > 5 else None
-#                 tipo_veh_val = slot[6] if len(slot) > 6 else 0
-
-#                 resultados.append({
-#                     "piso": str(piso_idx),
-#                     "id": str(id_val),
-#                     "patente": "" if patente_val is None else str(patente_val),
-#                     "tipo_slot": str(tipo_slot_val),
-#                     "ocupado": "True" if ocupado_val else "False",
-#                     "reservado_mensual": "True" if reservado_val else "False",
-#                     "hora_entrada": "" if not hora_val else str(hora_val),
-#                     "tipo_vehiculo_estacionado": str(tipo_veh_val),
-#                 })
-#                 continue
-
-            
-#             continue
-
-#     return resultados
-
-
-#! TODO MODULARIZAR CODIGO
-## En main solo debemos tener la logica de iniciarlizar el programa y de ahí se pueden llamar a los otros modulos
-
-# FUNCIÓN PARA MOSTRAR ESTADÍSTICAS GENERALES DEL GARAGE
-
-#funcion para registrar salida de vehiculo en formato diccionario 
-'logica diccionario y manejo de errores'
 def registrar_salida_vehiculo(garage=None, patente=None):
     """
     Registra la salida de un vehículo del garage.
@@ -107,18 +45,11 @@ def registrar_salida_vehiculo(garage=None, patente=None):
             slot["hora_entrada"] = ""
             slot["tipo_vehiculo_estacionado"] = "0"
             actualizado = True
-            # no hacemos break para limpiar duplicados si hubiese; si prefieres break, descomenta:
             break
 
-    return actualizado  # True si modificó algún slot, False si no encontró
+    return actualizado
 
 
-
-
-
-
-# FUNCIÓN PARA MODIFICAR DATOS DE UN VEHÍCULO ESTACIONADO
-'doctring'
 def modificar_vehiculo(garage, patente, nuevo_tipo=None, nueva_patente=None):
     """
     Modifica los datos de un vehículo en el garage según la patente.
@@ -136,7 +67,6 @@ def modificar_vehiculo(garage, patente, nuevo_tipo=None, nueva_patente=None):
                 return True
     return False
 
-'manejo de errores'
 def buscar_por_patente(garage, patente = None):
     """ 
     Busca la patente en la estructura de garage.
@@ -160,9 +90,6 @@ def buscar_por_patente(garage, patente = None):
     return (-1, -1)
 
 
-
-
-# FUNCIÓN AUXILIAR PARA GENERAR FECHAS ALEATORIAS
 def generar_fecha_aleatoria():
     """Genera una fecha y hora aleatoria en formato 'YYYY-MM-DD HH:MM'"""
     year = "2025"
@@ -173,9 +100,6 @@ def generar_fecha_aleatoria():
     return f"{year}-{month}-{day} {hour}:{minute}"
 
 
-
-# FUNCIÓN PARA ELIMINAR UNA FILA COMPLETA DEL GARAGE
-'agregue manejo de errores ' 
 def eliminar_fila_por_valor(valor, garage):
     """Elimina la primera fila que contiene el valor dado, con manejo de errores."""
     try:
@@ -190,10 +114,6 @@ def eliminar_fila_por_valor(valor, garage):
     print(Fore.YELLOW + "No se encontró ninguna fila con el valor especificado." + Style.RESET_ALL)
     return False
 
-
-
-# FUNCIÓN ALTERNATIVA PARA INGRESAR PATENTES CON VALIDACIÓN
-'manejo de errores'
 def ingresar_patente():
     """Solicita y valida una patente, con manejo de errores y colorama."""
     while True:
@@ -210,20 +130,11 @@ def ingresar_patente():
         except Exception as e:
             print(Fore.RED + f"Error procesando la patente: {e}. Intente nuevamente." + Style.RESET_ALL)
 
-# FUNCIÓN PARA OBTENER INFORMACIÓN DE TODOS LOS VEHÍCULOS ESTACIONADOS
-
-
-#funcion para acceder a info de patentes en formato diccionario
-'modificado a logica diccionario '
 def acceder_a_info_de_patentes(garage):
     """Devuelve lista de dicts con slots ocupados."""
     datos = garage
     return [slot for slot in datos if slot.get("ocupado") == "True"]
 
-
-
-# FUNCIÓN PARA VERIFICAR SI UNA PATENTE EXISTE
-'modificado a logica diccionario '
 def chequear_existencia_patente(patente, garage ):
     """Devuelve True si la patente existe y está ocupada."""
     datos = garage
@@ -232,9 +143,6 @@ def chequear_existencia_patente(patente, garage ):
             return True
     return False
 
-
-# FUNCIÓN PARA VERIFICAR SI UN VEHÍCULO TIENE SUSCRIPCIÓN MENSUAL
-'modificado a logica diccionario '
 def es_subscripcion_mensual(patente, garage):
     """Chequea si la subscripcion es mensual usando la vista de diccionarios.
 
@@ -250,8 +158,6 @@ def es_subscripcion_mensual(patente, garage):
             return bool(val)
     return False
 
-# FUNCIÓN SIMPLE PARA VERIFICAR SI HAY ESPACIOS LIBRES
-'modifcado a logica diccionario '
 def busqueda_espacio_libre(garage, tipo_vehiculo=None):
     for piso in garage: 
         for slot in piso:
@@ -264,8 +170,6 @@ def busqueda_espacio_libre(garage, tipo_vehiculo=None):
     return (-1, -1)
 
 
-# FUNCIÓN PARA CONTAR ESPACIOS LIBRES
-'modificado a logica diccionario y doctring'
 def contar_espacios_libres(garage=None):
     """
     Cuenta la cantidad de espacios libres en el garage.
@@ -275,9 +179,6 @@ def contar_espacios_libres(garage=None):
     return sum(1 for slot in datos if slot["ocupado"] == "False")
 
 
-
-# FUNCIÓN PARA CALCULAR EL COSTO DE ESTADÍA DE UN VEHÍCULO ||||||| MODIFICAR PORQUE GARAGE YA NO 
-'manejo de errores'
 def calcular_costo_de_estadia(patente, hora_salida):
     """
     Calcula el costo de estadía de un vehículo en el garage según su patente y la hora de salida.
@@ -317,10 +218,6 @@ def calcular_costo_de_estadia(patente, hora_salida):
 
     return 0
 
-# FUNCIÓN COMPLETA PARA REGISTRAR SALIDA CON CÁLCULO DE COSTO
-
-#funcion para registrar salida de vehiculo en formato diccionario 
-'modificado a logica diccionario, manejo de errores y doctring'
 def registrar_salida_vehiculo(garage=None, patente=None):
     """
     Registra la salida de un vehículo del garage, actualizando tanto la vista de diccionarios como la estructura anidada GARAGE.
@@ -354,7 +251,7 @@ def registrar_salida_vehiculo(garage=None, patente=None):
 
     # Actualiza la vista de diccionarios
     found["patente"] = ""
-    found["ocupado"] = "False"
+    found["ocupado"] = False
     found["hora_entrada"] = ""
     found["tipo_vehiculo_estacionado"] = "0"
 
@@ -406,42 +303,6 @@ def registrar_salida_vehiculo(garage=None, patente=None):
 
     return True
 
-""" 
-def registrar_salida_vehiculo(garage):
-    # Solicita patente al usuario
-    patente = pedir_patente()
-    # Busca la posición del vehículo
-    pos = buscar_por_patente(garage, patente)
-    if pos == (-1, -1):
-        print("Vehículo no encontrado.")
-        return False
-
-    # Solicita hora de salida para calcular costo
-    hora_salida = input("Ingrese hora de salida (HH:MM): ").strip()
-    costo = calcular_costo_de_estadia(patente, hora_salida)
-
-    piso_idx, slot_id = pos
-    # LIBERACIÓN: Busca el slot específico y lo libera
-    for slot in garage[piso_idx]:
-        if slot[0] == slot_id:
-            # Muestra el costo antes de liberar
-            print(f"Costo de estadía para {patente}: ${costo}")
-            # ACTUALIZACIÓN: Libera el slot
-            slot[1] = ""        # Borra patente
-            slot[3] = False     # Marca como libre
-            slot[5] = None      # Borra fecha de entrada
-            slot[6] = 0         # Borra tipo de vehículo
-            print(
-                f"Salida registrada. Piso {piso_idx}, Slot {slot_id} liberado.")
-            return True
-
-    print("Error interno liberando el slot.")
-    return False """
-
-# FUNCIÓN AUXILIAR PARA CONVERTIR TIPOS NUMÉRICOS A TEXTO
-
-#funcion para convertir tipo numerico a texto
-'dosctring'
 def salida_tipo_vehiculo(tipo_slot):
     """
     Convierte un valor numérico que representa el tipo de vehículo en una cadena de texto descriptiva.
@@ -458,9 +319,6 @@ def salida_tipo_vehiculo(tipo_slot):
         return "Bicicleta"
     return "Desconocido"
 
-
-#funciones viejas -> Actualizar 
-# FUNCIÓN PRINCIPAL PARA REGISTRAR ENTRADA DE VEHÍCULOS
 def registrar_entrada_auto(garage):
     # Solicita la patente al usuario
     patente = pedir_patente()

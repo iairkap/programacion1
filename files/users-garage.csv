@@ -8,3 +8,4 @@ garage_id, user_email, garage_name, address, floors, slots_per_floor
 4,kmadera@gmail.com,klear's garage,av belgrano 555,1,10
 8,kmadera@gmail.com,klear 2 garage,9 de julio,1,5
 9,a@a.com,FADU,Fadu,5,6
+10,kmadera@gmail.com,x,x,3,5
