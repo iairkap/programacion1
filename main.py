@@ -29,66 +29,6 @@ def leer_garage_normalizado():
     garage_id = leer_estado_garage()['garage_id']
     return users_garage.get_garage_data(garage_id)
 
-
-# def leer_garage():
-#     """
-#     Recorre la estructura global GARAGE y retorna una lista de diccionarios normalizados
-#     representando cada slot de estacionamiento.
-#     Cada slot puede estar representado como un diccionario o como una lista/tupla.
-#     """
-#     garage = users_garage.get_garage(1)  # leer desde CSV
-#     resultados = []
-#     for piso_idx, piso in enumerate(GARAGE):
-#         for slot in piso:
-#             # asumimos slot como lista/tupla en la forma esperada [id, patente, tipo_slot, ocupado, reservado, hora, tipo_veh]
-#             if type(slot) is dict:
-#                 s = dict(slot)
-#                 s["piso"] = str(s["piso"]) if "piso" in s else str(piso_idx)
-#                 s["id"] = str(s["id"]) if "id" in s else "0"
-#                 s["patente"] = "" if ("patente" not in s or s["patente"] is None) else str(s["patente"])
-#                 s["tipo_slot"] = str(s["tipo_slot"]) if "tipo_slot" in s else "0"
-#                 s["ocupado"] = "True" if ("ocupado" in s and s["ocupado"]) else "False"
-#                 s["reservado_mensual"] = "True" if ("reservado_mensual" in s and s["reservado_mensual"]) else "False"
-#                 s["hora_entrada"] = "" if ("hora_entrada" not in s or not s["hora_entrada"]) else str(s["hora_entrada"])
-#                 s["tipo_vehiculo_estacionado"] = str(s["tipo_vehiculo_estacionado"]) if "tipo_vehiculo_estacionado" in s else "0"
-#                 resultados.append(s)
-#                 continue
-
-#             # Si es lista/tupla:
-#             if type(slot) in (list, tuple):
-#                 id_val = slot[0] if len(slot) > 0 else 0
-#                 patente_val = slot[1] if len(slot) > 1 else ""
-#                 tipo_slot_val = slot[2] if len(slot) > 2 else 0
-#                 ocupado_val = slot[3] if len(slot) > 3 else False
-#                 reservado_val = slot[4] if len(slot) > 4 else False
-#                 hora_val = slot[5] if len(slot) > 5 else None
-#                 tipo_veh_val = slot[6] if len(slot) > 6 else 0
-
-#                 resultados.append({
-#                     "piso": str(piso_idx),
-#                     "id": str(id_val),
-#                     "patente": "" if patente_val is None else str(patente_val),
-#                     "tipo_slot": str(tipo_slot_val),
-#                     "ocupado": "True" if ocupado_val else "False",
-#                     "reservado_mensual": "True" if reservado_val else "False",
-#                     "hora_entrada": "" if not hora_val else str(hora_val),
-#                     "tipo_vehiculo_estacionado": str(tipo_veh_val),
-#                 })
-#                 continue
-
-            
-#             continue
-
-#     return resultados
-
-
-#! TODO MODULARIZAR CODIGO
-## En main solo debemos tener la logica de iniciarlizar el programa y de ahí se pueden llamar a los otros modulos
-
-# FUNCIÓN PARA MOSTRAR ESTADÍSTICAS GENERALES DEL GARAGE
-
-#funcion para registrar salida de vehiculo en formato diccionario 
-'logica diccionario y manejo de errores'
 """
     def registrar_salida_vehiculo(garage=None, patente=None):
     Registra la salida de un vehículo del garage.
@@ -248,6 +188,9 @@ def contar_espacios_libres(garage=None):
     return sum(1 for slot in datos if slot["ocupado"] == "False")
 
 
+
+# FUNCIÓN PARA CALCULAR EL COSTO DE ESTADÍA DE UN VEHÍCULO ||||||| MODIFICAR PORQUE GARAGE YA NO 
+'manejo de errores'
 def calcular_costo_de_estadia(patente,):
 
     """ # Obtiene la información completa del vehículo
@@ -321,7 +264,6 @@ def registrar_salida_vehiculo(garage=None, patente=None):
 
     # Actualiza la vista de diccionarios
     found["patente"] = ""
-    found["ocupado"] = False
     found["ocupado"] = False
     found["hora_entrada"] = ""
     found["tipo_vehiculo_estacionado"] = ""
