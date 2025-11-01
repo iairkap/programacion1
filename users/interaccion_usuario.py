@@ -1,4 +1,7 @@
 from colorama import Fore, Style
+from constantes.tipos_vehiculos import obtener_nombre_vehiculo
+from auxiliares.consola import clear_screen
+
 
 
 def pedir_piso(garage):
@@ -70,15 +73,21 @@ def es_subscripcion_mensual(patente):
 #!Funcion Lambda -> 
 def mostrar_estado_garage(garage):
     print(Fore.GREEN + "\n--- ESTADO DEL GARAGE ---" + Style.RESET_ALL)
+    
+    #para el tipo_vehiculo estacionado no quiero imprimir el numero sino el texto del def enum_tipo_vehiculo
+
+    
     imprimir_piso = lambda idx, piso: (
         print(f"\nPiso {idx}:"),
         [print(
-            f"  Slot {slot['id']}: {'Ocupado' if slot['ocupado'] else 'Libre'} | Patente: {slot['patente'] if slot['ocupado'] else '-'} | Tipo: {slot['tipo_vehiculo_estacionado'] if slot['ocupado'] else '-'}"
+            f"  Slot {slot['id']}: {'Ocupado' if slot['ocupado'] else 'Libre'} | Patente: {slot['patente'] if slot['ocupado'] else '-'} | Tipo: {obtener_nombre_vehiculo(slot['tipo_vehiculo_estacionado']) if slot['ocupado'] else '-'}"
         ) for slot in piso]
     )
     for idx in range(len(garage)):
         imprimir_piso(idx, garage[idx])
     input(Fore.YELLOW + '\nPresione cualquier tecla para continuar...' + Style.RESET_ALL) 
+    clear_screen()
+    
 
 def pedir_patente():
     # estructura de patente 

@@ -235,6 +235,22 @@ def actualizar_slot( garage_id, slot_id, nuevaData):
     nuevaData es un diccionario con los campos a actualizar
     """
     
+    
+    
+    """ 
+    {
+        'slot_id': 3,
+        'piso': 0,
+        'ocupado': True,
+        'hora_entrada': '2025-10-31 13:40:55',
+        'tipo_slot': 2,
+        'patente': 'FAB144',
+        "tipo_vehiculo": 2
+        
+        }
+    
+    """
+    
     try: 
         with open(f"files/garage-{garage_id}.csv", "r") as file:
             lineas = file.readlines()
@@ -348,43 +364,53 @@ def crear_data_para_actualizar_tipo_slots(ruta_csv):
         print(Fore.RED + f"\nError al actualizar slots: {e}\n" + Style.RESET_ALL)
         return []
     
-def get_garage_data(garage_id: int ) -> list:
+def get_garage_data(garage_id):
+    """Lee la estructura del garage desde CSV y retorna lista de pisos con slots."""
     garage = []
     try:
         with open(f"files/garage-{garage_id}.csv", "r") as file:
             lineas = file.readlines()
 
-        encabezado = lineas[0].strip().split(",")
+        if not lineas:
+            return garage
 
+        # Saltar encabezado (línea 0)
         for linea in lineas[1:]:
             datos = linea.strip().split(",")
+            
+            if len(datos) < 9:
+                continue
+            
+            # Obtener piso para crear estructura
             piso_csv = int(datos[1]) if len(datos) > 1 and datos[1].isdigit() else 0
 
-            #agrego pisos vacios si es necesario
+            # Crear pisos vacíos si es necesario
             while len(garage) <= piso_csv:
                 garage.append([])
 
+            # Crear slot con conversión de tipos
             slot = {
                 "id": int(datos[0]) if len(datos) > 0 and datos[0].isdigit() else 0,
                 "posicion": int(datos[2]) if len(datos) > 2 and datos[2].isdigit() else 0,
                 "tipo_slot": int(datos[3]) if len(datos) > 3 and datos[3].isdigit() else 0,
                 "reservado_mensual": datos[4].lower() == "true" if len(datos) > 4 else False,
                 "ocupado": datos[5].lower() == "true" if len(datos) > 5 else False,
-                "patente": datos[6] if len(datos) > 6 else "",
-                "hora_entrada": datos[7] if len(datos) > 7 and datos[7].strip() else None,
+                "patente": datos[6].strip() if len(datos) > 6 else "",
+                "hora_entrada": datos[7].strip() if len(datos) > 7 and datos[7].strip() else None,
                 "tipo_vehiculo_estacionado": int(datos[8]) if len(datos) > 8 and datos[8].isdigit() else 0,
             }
+           
 
-            garage[piso_csv].append(slot)  # Agrego slot al piso correspondiente
+            garage[piso_csv].append(slot)
 
         return garage
 
     except FileNotFoundError:
         print(f"Archivo garage-{garage_id}.csv no encontrado.")
+        return garage
     except Exception as e:
         print(f"Error al obtener datos del garage: {e}")
-    return []  # devuelvo lista vacia en caso de error
-
+        return garage
 
 
 def actualizar_slots(garage_id, nuevaData):

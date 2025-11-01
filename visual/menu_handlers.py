@@ -65,22 +65,18 @@ def crear_nuevo_garage(usuario):
                 print(Fore.RED + "La dirección no puede estar vacía. Intente de nuevo." + Style.RESET_ALL)
                 continue
 
-            try:
-                slots_per_floor = int(input("Ingrese la cantidad de slots por piso (mínimo 5): ").strip())
-            except ValueError:
-                print(Fore.RED + "Ingrese un número válido para slots por piso." + Style.RESET_ALL)
-                continue
+
+            slots_per_floor = int(input("Ingrese la cantidad de slots por piso (mínimo 5): ").strip())
+            
             if slots_per_floor < 5:
                 print(Fore.RED + "La cantidad mínima de slots por piso es 5. Intente de nuevo." + Style.RESET_ALL)
                 continue
 
-            try:
-                floors = int(input("Ingrese la cantidad de pisos (mínimo 1): ").strip())
-            except ValueError:
-                print(Fore.RED + "Ingrese un número válido para cantidad de pisos." + Style.RESET_ALL)
-                continue
-            if floors < 1:
-                print(Fore.RED + "La cantidad mínima de pisos es 1. Intente de nuevo." + Style.RESET_ALL)
+        
+            floors = int(input("Ingrese la cantidad de pisos (mínimo 1 - maximo 10): ").strip())
+
+            if not (1 <= floors <= 10):
+                print(Fore.RED + "La cantidad de pisos debe estar entre 1 y 10. Intente de nuevo." + Style.RESET_ALL)
                 continue
 
             # todos los inputs son válidos -> salir del loop
@@ -91,6 +87,10 @@ def crear_nuevo_garage(usuario):
             input("Presione cualquier tecla para continuar...")
             clear_screen()
             return None
+        except ValueError:
+            print(Fore.RED + "Entrada inválida. Por favor ingrese valores numéricos donde se requiera." + Style.RESET_ALL)
+        except Exception as e:
+            print(Fore.RED + f"Error en la entrada: {e}. Intente de nuevo." + Style.RESET_ALL)
 
     # crear el garage y obtener su id
     

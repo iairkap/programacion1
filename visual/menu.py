@@ -23,6 +23,8 @@ from visual.menu_principal_handlers import (
     handle_estadisticas_rapidas,
 )
 
+from constantes.tarifa import guardar_precios_garage
+
 from cache.json import leer_estado_garage, guardar_estado_garage
 from colorama import Fore, Style
 from auxiliares.consola import clear_screen
@@ -92,7 +94,8 @@ def menu_garage(usuario):
     crear_archivo_users_garage()
     
     continuar = True
-    garage_seleccionado = None #users-garage actual
+    garage_seleccionado = None
+    tarifa = []  # ✅ INICIALIZAR AQUÍ
     
     while continuar and not garage_seleccionado:
         mostrar_menu_garage(usuario)
@@ -101,11 +104,13 @@ def menu_garage(usuario):
         if opcion == "1":
             garage_seleccionado = handle_seleccionar_garage(usuario)
             if garage_seleccionado:
+                tarifa = guardar_precios_garage(garage_seleccionado['garage_id'])
                 continuar = False
                 
         elif opcion == "2":
             garage_seleccionado = handle_crear_garage(usuario)
             if garage_seleccionado:
+                tarifa = guardar_precios_garage(garage_seleccionado['garage_id'])  # ✅ AGREGAR AQUÍ TAMBIÉN
                 continuar = False
                     
         elif opcion == "3":
@@ -114,9 +119,9 @@ def menu_garage(usuario):
         else:
             print(Fore.RED + "Opción inválida" + Style.RESET_ALL)
     
-    return garage_seleccionado
+    return garage_seleccionado, tarifa
 
-def menu_principal(garage_actual):
+def menu_principal(garage_actual, tarifa):
     """Menú principal del sistema - retorna acción a realizar"""
     #SUBO MI GARAGE ACTUAL AL JSON PARA QUE SEA ACCESIBLE DESDE CUALQUIER PARTE DEL PROYECTO
     guardar_estado_garage(garage_actual)    
@@ -156,13 +161,14 @@ def menu_principal(garage_actual):
             if opcion.isdigit():
                 indice = int(opcion) - 1  # la lista empieza en 0 y el menú en 1
                 if 0 <= indice < len(handlers):
-                    handlers[indice](garage_actual, garage_data)
+                    if indice == 3:  # Opción 4: registrar salida
+                        handlers[indice](garage_actual, garage_data, tarifa)
+                    else:
+                        handlers[indice](garage_actual, garage_data)
                     continue
-            else:
-                print(" No se ingresó una opción valida ")
-                clear_screen()
-                continue
-
+                #Tengo que pasar las tarifas si es la opción 4 (registrar salida)
+          
+            
 
             if opcion in acciones_especiales:
                 accion = acciones_especiales[opcion]
@@ -191,7 +197,8 @@ def main():
         # 2. Selección/Creación de garage
         session_active = True
         while session_active and programa_activo:
-            garage_actual = menu_garage(usuario_actual)
+            (garage_actual, tarifa) = menu_garage(usuario_actual)
+            print(tarifa)
             guardar_estado_garage(garage_actual)#guardo el garage actual en el json para acceder desde todo el proyecto
             
             if not garage_actual:
@@ -201,7 +208,7 @@ def main():
             # 3. Menú principal
             menu_activo = True
             while menu_activo and session_active:
-                resultado = menu_principal(garage_actual)
+                resultado = menu_principal(garage_actual, tarifa)
                 
                 if resultado == "cambiar_garage":
                     menu_activo = False
