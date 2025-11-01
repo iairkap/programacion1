@@ -124,6 +124,7 @@ def menu_garage(usuario):
             garage_seleccionado = handle_seleccionar_garage(usuario)
             if garage_seleccionado:
                 tarifa = guardar_precios_garage(garage_seleccionado['garage_id'])
+                print(tarifa)
                 continuar = False
                 
         elif opcion == "2":

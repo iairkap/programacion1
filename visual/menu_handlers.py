@@ -51,7 +51,7 @@ def handle_registro():
 
 def crear_nuevo_garage(usuario):
     """Interfaz para crear un nuevo garage"""
-    print("\n=== CREAR NUEVO GARAGE ===")
+    print(Fore.GREEN + "\n=== CREAR NUEVO GARAGE ===" + Style.RESET_ALL)
     while True:
         try:
             nombre = input("Nombre del garage: ").strip()
@@ -106,8 +106,7 @@ def crear_nuevo_garage(usuario):
     if configurar_tar:
         agregar_tarifa(garage_id, garage_name=nombre)
 
-    print(Fore.GREEN + f"\nGarage '{nombre}' creado con éxito." + Style.RESET_ALL)
-    bulk = input(Fore.LIGHTYELLOW_EX + "¿Desea configurar los slots ahora? (s para sí): " + Style.RESET_ALL).strip().lower()
+    bulk = input(Fore.LIGHTYELLOW_EX + "\n¿Desea configurar los slots ahora? (s para sí): \n" + Style.RESET_ALL).strip().lower()
     if bulk == 's':
         print("Ejecutar la función de actualizar tipo de slots")
 

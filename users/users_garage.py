@@ -172,7 +172,7 @@ def crear_garage(usuario, nombre, direccion, slots_per_floor=10, floors=2):
             for slot in piso_slots:
                 rows.append(slot.values())
         escribir_data_en_csv(f"files/garage-{garage_id}.csv", rows, headers=headers)
-        print(f"Garage {nombre} creado con {floors} pisos y {slots_per_floor} slots por piso.")
+        print(Fore.GREEN + f"Garage {nombre} creado con {floors} pisos y {slots_per_floor} slots por piso." + Style.RESET_ALL)
         return garage_id
     except Exception as e:
         print(f"Error al crear el garage: {e}")
