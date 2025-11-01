@@ -1,16 +1,57 @@
-actualizar carga de informacion a nivel unitario.
+TARIFAS 
+Que se llame al csv y traiga la info de las tarifas cuando se seleccione el garage y cuando se actualizan las tarifas.
+Cuenado se retira un auto, realizar funcion para calcular la tarifa. #### IAIR
 
-nice_to_have:
-carga de informacion a nivel archivo user friendly bulk. 
+1- CONSULTAR ESPACIOS libres 2- CONSULTAR CANTIDAD DE VEHICULOS
+si presiono un string no tira error, validar el menu principal
+
+3- INGRESAR UN VEHICULO
+si el vehiculo ya existe hacer un clear de consola y avisar
+
+
+MENU GERENTES 
+bug cuando el usuario logeado no tiene ningun garage.
+
+6 - MOSTRAR ESTADO GARAGE
+deberiamos decir que tipo de vehiculo es en string
+poner un clear de consola una vez que se presiona una tecla
+
+
+7- BUSCAR VEHICULO POR Patente
+Emprolijar la consola y borrar con clear 
+sugerir alguna funcionalidad si se encuentra el vehiculo y si no sugerir ingresar nuevo.
+
+
+8- ESTADISITCAS RAPIDAS 
+
+
+BULK 
+-TIPO SLOT --> Que pueda especificar exactamente la catidad de slots por piso
+hacer una fila por piso y columnas por slot.
+-
+
+
+5 - EDITAR UN VEHICULO 
+Cuando quiero editar el vehiculo solo deberia modificar la posicion
+
+
+CONSULTAR CANTIDAD DE VEHICULOS Totales
+No esta trayendo la cantidad de vehiculos bien --- pero consultar espacios libres si funciona.
 
 
 
-Mejorar - especiados entre el menu 
-agregar colores con colorama en los errores para distinguir la terminal 
+MANDATORIO
+OPCION DE USUARIO ADMINISTRADOR DIFERENCIA DE ROLES
 
 
-to do juampi : 
-    
-    -permitir setear el tipo de slot al crear garage nuevo por las dudas, especificar cuantos quiere de cada -- crear un archivo de configuracion para eso ameno para el usuario, que tengamos una bandera para ver si ya se configuracion
-    - mejorar la validacion del logeo( dice que el mail ya esta pero en realidad ya esta el nombre de usuario y el apellido no el mail, que sea solo por mail)
-    - si se borra el archivo en medio de la ejecucion, que no tire error raro, que lo cree de nuevo, guardar las caracteristicas del garage en un archivo de configuracion aparte
+
+GENERAL 
+remodularizar funciones.
+clear console optimizar.
+poner todos los outputs con mismo formato.
+validar todos los imputs
+
+
+BOUNUS TRACK 
+QUE PUEDA PRESETEAR LOS AUTOS YA ESTACIONADO EN METODO BULK
+QUE EL PROGRAMA BUSQUE PARECIDOS EN LAS BUSQUEDAS POR SI PIFIO AL ESCRIBIR

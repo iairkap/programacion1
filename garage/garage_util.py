@@ -52,7 +52,7 @@ def mostrar_estadisticas_rapidas(garage):
     print(Fore.GREEN + f"Total de espacios libres: {total_libres}" + Style.RESET_ALL)
     print(Fore.GREEN + f"Total de vehículos estacionados: {total_estacionados}" + Style.RESET_ALL)
     # Diccionario para convertir números de tipo a nombres legibles
-    tipos = {1: "Motos", 2: "Autos", 3: "Camionetas", 4: "Bicicletas"}
+    tipos = {1: "Motos", 2: "Autos", 3: "Camionetas"}
     # Muestra la cantidad de cada tipo de vehículo estacionado
     for tipo_num, tipo_nombre in tipos.items():
         cantidad = contar_por_tipo_vehiculo(garage, tipo_num)

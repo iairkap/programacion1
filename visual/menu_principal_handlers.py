@@ -40,7 +40,7 @@ def handle_consultar_espacios_libres(garage, garage_data):
         clear_screen()
     elif subop == "2":
         print("\nTipos de vehículo:")
-        print("1. Moto\n2. Auto\n3. Camioneta\n4. Bicicleta")
+        print("1. Moto\n2. Auto\n3. Camioneta\n")
         tipo = pedir_tipo_vehiculo()
         libres = contar_espacios_libres_por_tipo(garage_data, tipo)
         #Formatear tipo a texto
@@ -65,7 +65,7 @@ def handle_consultar_vehiculos_estacionados(garage, garage_data):
     
     if subop == "1":
         print("\nTipos de vehículo:")
-        print("1. Moto\n2. Auto\n3. Camioneta\n4. Bicicleta")
+        print("1. Moto\n2. Auto\n3. Camioneta")
         tipo = pedir_tipo_vehiculo()
         cantidad = contar_por_tipo_vehiculo(garage_data, tipo)
         tipos = enum_tipo_vehiculo()
@@ -102,7 +102,7 @@ def handle_editar_vehiculo(garage, garage_data):
     nuevo_tipo = pedir_tipo_vehiculo()
     nueva_patente = input("Nueva patente (dejar vacío para no cambiar): ").strip().upper()
     if nueva_patente == "":
-        nueva_patente = None
+        nueva_patente = None 
     if modificar_vehiculo(garage, patente, nuevo_tipo, nueva_patente):
         print("Vehículo modificado correctamente.")
     else:
