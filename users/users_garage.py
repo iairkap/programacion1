@@ -236,7 +236,6 @@ def actualizar_slot( garage_id, slot_id, nuevaData):
     """
     
     
-    print(nuevaData) 
     
     """ 
     {

@@ -1,7 +1,7 @@
 slot_id,piso,posicion,tipo_slot,reservado_mensual,ocupado,patente,hora_entrada,tipo_vehiculo
-1,0,0,2,False,True,FAB123,2025-10-31 13:20:53,
-2,0,1,2,False,True,FAB111,2025-10-31 13:38:50,
-3,0,2,2,False,True,FAB144,2025-10-31 13:40:55,
+1,0,4,2,False,False,,,
+2,0,4,2,False,False,,,
+3,0,4,2,False,False,,,
 4,0,3,2,False,True,FAB333,2025-10-31 13:44:07,2
 5,0,4,2,False,False,,,
 6,1,0,2,False,False,,,

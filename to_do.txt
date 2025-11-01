@@ -12,6 +12,7 @@ si el vehiculo ya existe hacer un clear de consola y avisar
 MENU GERENTES 
 bug cuando el usuario logeado no tiene ningun garage.
 
+//HECHO 
 6 - MOSTRAR ESTADO GARAGE
 deberiamos decir que tipo de vehiculo es en string
 poner un clear de consola una vez que se presiona una tecla
