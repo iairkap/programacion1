@@ -1,1 +1,3 @@
 garage_id,user_email,garage_name,address,floors,slots_per_floor
+1,a@a.com,UADE,Lima 123,10,7
+2,a@a.com,Fab,Pob 123,10,6

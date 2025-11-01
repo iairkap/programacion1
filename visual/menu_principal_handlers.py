@@ -91,7 +91,7 @@ def handle_ingresar_vehiculo(garage, garage_data):
 def handle_registrar_salida(garage, garage_data, tarifa):
     """Maneja la salida de vehículos"""
     patente = pedir_patente()
-    if registrar_salida_vehiculo(garage_data, patente, tarifa):
+    if registrar_salida_vehiculo(patente, tarifa):
         print("Salida registrada correctamente.")
     else:
         print("Patente no encontrada.")

@@ -1,0 +1,4 @@
+garage_id,tipo,periodo_mensual,precio,moneda,descripcion
+2,1,False,3000.0,
+2,2,False,5000.0,
+2,3,False,7000.0,
