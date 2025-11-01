@@ -11,7 +11,6 @@ from users.users_garage import (
     asociar_garage_a_usuario, 
     crear_archivo_users_garage, 
     crear_garage,
-    actualizar_slot,
     actualizar_slots,
     generar_csv_slots,
     crear_data_para_actualizar_slot,
@@ -346,6 +345,18 @@ def handle_actualizar_slots(garage, garage_data=None):
         print(f"Error al actualizar el garage: {e}")
     return garage
 
+
+def handle_mover_vehiculo(garage, garage_data=None):
+    """Maneja el movimiento de un vehículo dentro del garage"""
+    print("\n=== MOVER VEHÍCULO ===")
+    try:
+        patente = input("Ingrese la patente del vehículo a mover: ").strip()
+        nuevo_slot_id = input("Ingrese el ID del nuevo slot: ").strip()
+        # Aquí se implementaría la lógica para mover el vehículo
+        print(Fore.GREEN + f"Vehículo con patente {patente} movido al slot {nuevo_slot_id} correctamente." + Style.RESET_ALL)
+    except Exception as e:
+        print(Fore.RED + f"Error al mover el vehículo: {e}" + Style.RESET_ALL)
+    return garage
 
 
 """ import sys

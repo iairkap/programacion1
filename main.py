@@ -50,14 +50,7 @@ def leer_garage_normalizado():
 
     """
 
-
-
-
-
-
-
-
-def modificar_vehiculo(garage, patente, nuevo_tipo=None, nueva_patente=None):
+def modificar_vehiculo(garage, patente, nuevo_tipo=None, nueva_patente=None, nueva_estadia=None):
     """
     Modifica los datos de un vehículo en el garage según la patente.
     Busca el vehículo por su patente en la estructura garage y actualiza el tipo de vehículo y/o la patente si se proporcionan nuevos valores.
@@ -67,10 +60,12 @@ def modificar_vehiculo(garage, patente, nuevo_tipo=None, nueva_patente=None):
         for slot in piso:
             if slot["ocupado"] == True and slot["patente"] == patente:
                 # Modifica solo los campos que no son None
-                if nuevo_tipo is not None:
+                if nuevo_tipo:
                     slot["tipo_vehiculo_estacionado"] = nuevo_tipo        # Cambia tipo de vehículo
-                if nueva_patente is not None:
+                if nueva_patente:
                     slot["patente"] = nueva_patente     # Cambia patente
+                if nueva_estadia:
+                    slot["reservado_mensual"] = nueva_estadia  # Cambia tipo de estadía
                 return True
     return False
 

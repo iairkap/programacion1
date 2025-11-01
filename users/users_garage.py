@@ -233,11 +233,6 @@ def crear_data_para_actualizar_slot(slot_id, tipo_slot=None, reservado_mensual=N
 def actualizar_slot( garage_id, slot_id, nuevaData):
     """actualizar un slot en particular
     nuevaData es un diccionario con los campos a actualizar
-    """
-    
-    
-    
-    """ 
     {
         'slot_id': 3,
         'piso': 0,

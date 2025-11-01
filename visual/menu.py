@@ -10,7 +10,8 @@ from visual.menu_handlers import (
     handle_crear_garage,
     handle_actualizar_tipo_slots,
     handle_actualizar_slots, 
-    handle_actualizar_tarifas
+    handle_actualizar_tarifas,
+    handle_mover_vehiculo
 )
 from visual.menu_principal_handlers import (
     handle_consultar_espacios_libres,
@@ -20,7 +21,7 @@ from visual.menu_principal_handlers import (
     handle_editar_vehiculo,
     handle_mostrar_estado_garage,
     handle_buscar_vehiculo,
-    handle_estadisticas_rapidas,
+    handle_estadisticas_rapidas
 )
 
 from constantes.tarifa import guardar_precios_garage
@@ -44,21 +45,39 @@ def mostrar_menu_garage(usuario):
     print("3. Cerrar sesión\n")
     
 
-
 def mostrar_menu_principal(garage_name):
     """Menú principal del sistema"""
+
+    opciones_menu_principal = [
+    "\nConsultar espacios libres",
+    "Consultar cantidad de vehículos estacionados",
+    "Ingresar un vehículo",
+    "Registrar salida de un vehículo",
+    "Editar un vehículo",
+    "Mostrar estado del garage",
+    "Buscar vehículo por patente",
+    "Estadísticas rápidas",
+    "Actualizar tipo de slot",
+    "Actualizar info de slots",
+    "Actualizar tarifas",
+    "Mover vehículo"
+    ]
+
     print(Fore.GREEN + f"\n=== MENÚ PRINCIPAL - {garage_name['garage_name'].upper()} ===" + Style.RESET_ALL)
-    print("\n1. Consultar espacios libres")
-    print("2. Consultar cantidad de vehículos estacionados")
-    print("3. Ingresar un vehículo")
-    print("4. Registrar salida de un vehículo")
-    print("5. Editar un vehículo")
-    print("6. Mostrar estado del garage")
-    print("7. Buscar vehículo por patente")
-    print("8. Estadísticas rápidas")
-    print("9. Actualizar tipo de slot")
-    print("10. Actualizar info de slots")
-    print("11. Actualizar tarifas")
+    for i, opcion in enumerate(opciones_menu_principal, start=1):
+        print(f"{i}. {opcion}")
+    # print("\n1. Consultar espacios libres")
+    # print("2. Consultar cantidad de vehículos estacionados")
+    # print("3. Ingresar un vehículo")
+    # print("4. Registrar salida de un vehículo")
+    # print("5. Editar un vehículo")
+    # print("6. Mostrar estado del garage")
+    # print("7. Buscar vehículo por patente")
+    # print("8. Estadísticas rápidas")
+    # print("9. Actualizar tipo de slot")
+    # print("10. Actualizar info de slots")
+    # print("11. Actualizar tarifas")
+    # print("12. Mover vehículo")
     print("\nc. Cambiar garage")
     print("x. Cerrar sesión")
     print("z. Salir\n")
@@ -143,7 +162,8 @@ def menu_principal(garage_actual, tarifa):
         handle_estadisticas_rapidas,
         handle_actualizar_tipo_slots,
         handle_actualizar_slots, 
-        handle_actualizar_tarifas
+        handle_actualizar_tarifas,
+        handle_mover_vehiculo
     ]
 
     # Acciones especiales (no ejecutan función)
