@@ -44,7 +44,7 @@ def buscar_garage_asociado(email):
         if garages:
             return garages
         else:
-            print("No se encontró un garage asociado a este usuario.")
+            print(Fore.RED + "\nNo se encontró un garage asociado a este usuario.\n" + Style.RESET_ALL)
             input("Presione cualquier tecla para continuar...")
             clear_screen()
             return None
