@@ -12,6 +12,7 @@ si el vehiculo ya existe hacer un clear de consola y avisar
 MENU GERENTES 
 bug cuando el usuario logeado no tiene ningun garage.
 
+//HECHO 
 6 - MOSTRAR ESTADO GARAGE
 deberiamos decir que tipo de vehiculo es en string
 poner un clear de consola una vez que se presiona una tecla
@@ -50,6 +51,7 @@ remodularizar funciones.
 clear console optimizar.
 poner todos los outputs con mismo formato.
 validar todos los imputs
+No se ingresa el tipo de vehiculo cuando se estaciona -> por lo que no se puede consultar por tipo de vehiculo cuando se hace la busqueda de estadisticas rapidas.
 
 
 BOUNUS TRACK 

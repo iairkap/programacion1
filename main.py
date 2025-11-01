@@ -54,9 +54,7 @@ def leer_garage_normalizado():
 
 
 
-# FUNCIÓN PARA MODIFICAR DATOS DE UN VEHÍCULO ESTACIONADO
-'doctring'
-    return actualizado
+
 
 
 def modificar_vehiculo(garage, patente, nuevo_tipo=None, nueva_patente=None):
@@ -191,17 +189,22 @@ def contar_espacios_libres(garage=None):
 
 # FUNCIÓN PARA CALCULAR EL COSTO DE ESTADÍA DE UN VEHÍCULO ||||||| MODIFICAR PORQUE GARAGE YA NO 
 'manejo de errores'
-def calcular_costo_de_estadia(patente,):
+def calcular_costo_de_estadia(patente, hora_salida):
 
-    """ # Obtiene la información completa del vehículo
-    
     print(patente)
     
     info_patente = buscar_por_patente(GARAGE, patente)
+    
     if not info_patente:
         return 0
+    tipo_de_slot = info_patente[6] 
+    
+    # tipo_vehiculo_estacionado
+    
+    
+    """ # Obtiene la información completa del vehículo
+    
 
-    tipo_de_slot = info_patente[6]  # tipo_vehiculo_estacionado
 
     # CÁLCULO: Diferencia entre suscripción mensual y por horas
     if not es_subscripcion_mensual(patente):
@@ -227,7 +230,11 @@ def calcular_costo_de_estadia(patente,):
 
     return 0
 
-def registrar_salida_vehiculo(garage=None, patente=None):
+# FUNCIÓN COMPLETA PARA REGISTRAR SALIDA CON CÁLCULO DE COSTO
+
+#funcion para registrar salida de vehiculo en formato diccionario 
+'modificado a logica diccionario, manejo de errores y doctring'
+def registrar_salida_vehiculo(garage=None, patente=None, tarifa = None):
   
     datos = leer_garage_normalizado()    
     if patente is None:
@@ -249,6 +256,7 @@ def registrar_salida_vehiculo(garage=None, patente=None):
 
     # Solicita hora de salida para calcular costo
     hora_entrada = found.get("hora_entrada")
+    hora_salida = get_current_time_json()
    
     if not hora_entrada:
         print(Fore.RED + "Error: No se encontró la hora de entrada del vehículo." + Style.RESET_ALL)
@@ -355,8 +363,9 @@ def registrar_entrada_auto(garage):
             "piso": piso, #no hace es necesario pero lo dejo para mantener la estructura
             "ocupado": True,
             "hora_entrada": get_current_time_json(),
-            "tipo_slot": tipo_vehiculo,
-            "patente": patente
+            "tipo_slot": tipo_vehiculo, #no hace es necesario pero lo dejo para mantener la estructura
+            "patente": patente,
+            "tipo_vehiculo": tipo_vehiculo
         }
         # ACTUALIZACIÓN: Registrar el vehículo en el slot encontrado
         if actualizar_garage(garage_id=leer_estado_garage()['garage_id'], data=new_slot, bulk=False):
@@ -381,7 +390,7 @@ def contar_por_tipo_vehiculo(garage=None, tipo_buscado=None):
     datos = leer_garage_normalizado()
     count = 0
     for pisos in datos:
-        count += sum(1 for slot in pisos if slot.get("ocupado") == True and slot.get("tipo_vehiculo_estacionado") == str(tipo_buscado))
+        count += sum(1 for slot in pisos if slot.get("ocupado") == True and slot.get("tipo_vehiculo_estacionado") == tipo_buscado)
     return count
 
 # CONFIGURACIÓN CONSTANTE DEL EDIFICIO
