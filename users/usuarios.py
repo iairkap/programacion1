@@ -5,6 +5,16 @@ from colorama import Fore, Style
 
 
 
+def mostrar_mensaje(msg, tipo="info"):
+    colores = {
+        "info": Fore.CYAN,
+        "ok": Fore.GREEN,
+        "error": Fore.RED,
+        "warning": Fore.YELLOW
+    }
+    color = colores.get(tipo, Fore.WHITE)
+    print(f"{color}{msg}{Style.RESET_ALL}")
+
 
 def campo_no_vacio(msg, nombre_campo):
     while True:
@@ -12,30 +22,30 @@ def campo_no_vacio(msg, nombre_campo):
             valor = input(msg)
             if valor.strip():
                 return valor.strip()
-            print(Fore.RED + f"Error: El {nombre_campo} no puede estar vacío. Intente de nuevo." + Style.RESET_ALL)
+            mostrar_mensaje(f"Error: El {nombre_campo} no puede estar vacío. Intente de nuevo.", "error")
         except KeyboardInterrupt:
-            print("\nOperación cancelada por el usuario.")
+            mostrar_mensaje("Operación cancelada por el usuario.", "warning")
             return None
         
-        
+
 def email_valido():
     while True:
         try:
             email = input("Ingrese su email: ")
             if not email.strip():
-                print(Fore.RED + "Error: El email no puede estar vacío. Intente de nuevo." + Style.RESET_ALL)
+                mostrar_mensaje("Error: El email no puede estar vacío. Intente de nuevo.", "error")
                 continue
             
             # Validar formato
             es_valido, mensaje = validacion_formato_email(email)
             if es_valido:
                 return email.strip()
-            print(Fore.RED + f"Error en el email: {mensaje}. Intente nuevamente." + Style.RESET_ALL)
+            mostrar_mensaje(f"Error en el email: {mensaje}. Intente nuevamente.", "error")
         
         except KeyboardInterrupt:
+            mostrar_mensaje("Operación cancelada por el usuario.", "warning")
             return None
     
-
 
 
 def creacion_usuario():
@@ -61,20 +71,20 @@ def creacion_usuario():
             usuario['confirmar_password'] = input("Confirme su contraseña: ")
             if usuario['password'] == usuario['confirmar_password']:
                 break
-            print(Fore.RED + "Error: Las contraseñas no coinciden. Intente nuevamente." + Style.RESET_ALL)
+            mostrar_mensaje("Error: Las contraseñas no coinciden. Intente nuevamente.", "error")
 
             validacion_email = validacion_formato_email(usuario['email'])
             if not validacion_email[0]:
-                print(f"Error en el email: {validacion_email[1]}. Intente nuevamente.")
+                mostrar_mensaje(f"Error en el email: {validacion_email[1]}. Intente nuevamente.", "error")
                 usuario['email'] = input("Ingrese su email: ")
                 continue
             if usuario['password'] == usuario['confirmar_password']:
                 break
             else:
-                print(Fore.RED + "Error: Las contraseñas no coinciden. Intente nuevamente." + Style.RESET_ALL)
+                mostrar_mensaje("Error: Las contraseñas no coinciden. Intente nuevamente.", "error")
         
     except ValueError:
-        print(Fore.RED + "Error: Entrada inválida. Intente de nuevo." + Style.RESET_ALL)
+        mostrar_mensaje("Error: Entrada inválida. Intente de nuevo.", "error")
         return None
     
     del usuario['confirmar_password']
@@ -113,13 +123,10 @@ def chequear_existencia_email(email):
         return False
     
     except FileNotFoundError:
-        print("Error: El archivo de usuarios no existe.")
+        mostrar_mensaje("Error: El archivo de usuarios no existe.", "error")
         return False
 
 
-    
-    
-    
 def user_login():
     """Funcion para loguearse - retorna el usuario completo"""
     try:
@@ -140,12 +147,12 @@ def user_login():
                     'password': user_password
                 }
         
-        print("Error: Email o contraseña incorrectos.")
+        mostrar_mensaje("Error: Email o contraseña incorrectos.", "error")
         arch_users.close()
         return None
     
     except FileNotFoundError:
-        print("Error: El archivo de usuarios no existe.")
+        mostrar_mensaje("Error: El archivo de usuarios no existe.", "error")
         return None
         
 def registrar_nuevo_usuario():
@@ -154,12 +161,12 @@ def registrar_nuevo_usuario():
     usuario = creacion_usuario()
     
     if not usuario:
-        print("No se pudo crear el usuario.")
+        mostrar_mensaje("No se pudo crear el usuario.", "error")
         return False
     
     # Verificar si el email ya existe
     if chequear_existencia_email(usuario['email']):
-        print("Error: El email ya existe en el sistema.")
+        mostrar_mensaje("Error: El email ya existe en el sistema.", "error")
         return False
     
     # Escribir el usuario al archivo
@@ -167,10 +174,10 @@ def registrar_nuevo_usuario():
         arch_users = open("files/users.csv", mode="a", encoding="utf-8")
         arch_users.write(f"{usuario['nombre']},{usuario['apellido']},{usuario['email']},{usuario['password']}\n")
         arch_users.close()
-        print("Usuario creado exitosamente:", usuario)
+        mostrar_mensaje(f"Usuario creado exitosamente: {usuario}", "ok")
         return True
     except Exception as e:
-        print(f"Error al guardar el usuario: {e}")
+        mostrar_mensaje(f"Error al guardar el usuario: {e}", "error")
         return False
     
     
@@ -240,4 +247,3 @@ def validacion_formato_email(email):
             return False, "El TLD debe tener solo letras"
 
     return True, "OK"
-        
