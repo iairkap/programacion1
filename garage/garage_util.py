@@ -1,15 +1,27 @@
 from colorama import Fore, Style
 from auxiliares.consola import clear_screen
 
-
-def buscar_por_patente(garage, patente):
-    for i in range(len(garage)):
-        piso = garage[i]
+def buscar_por_patente(garage, patente = None):
+    """ 
+    Busca la patente en la estructura de garage.
+    Si encuentra, retorna (piso_idx, slot_id), si no, retorna (-1, -1).
+    """
+    for idx_piso, piso in enumerate(garage):
         for slot in piso:
-            if slot["ocupado"] == True and patente == slot["patente"]:
-                return (i, slot["id"])
+            try:
+                patente_slot = slot["patente"]
+                ocupado_slot = slot["ocupado"]
+                if patente_slot == patente and ocupado_slot:
+                    piso_val = int(slot["piso"]) if "piso" in slot else idx_piso
+                    id_val = int(slot["id"]) if "id" in slot else 0
+                    return (piso_val, id_val)
+            except Exception:
+                try:
+                    if len(slot) > 1 and slot["patente"] == patente and len(slot) > 3 and slot["ocupado"] == True:
+                        return (idx_piso, slot["id"])
+                except Exception:
+                    continue
     return (-1, -1)
-
 
 def buscar_espacio_libre(garage, tipo_vehiculo):
     for i in range(len(garage)):

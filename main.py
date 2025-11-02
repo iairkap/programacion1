@@ -5,19 +5,13 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import garage.slot_utils as slot_utils
 import random
 from users.interaccion_usuario import pedir_patente
-import garage.garage_util as garage_util
+from garage.garage_util import buscar_por_patente
 from users import users_garage
-
-from users.users_garage import (    
-                crear_archivo_users_garage, 
-                get_garage_data,
-                actualizar_garage)
+from users.users_garage import (get_garage_data, actualizar_garage)
 from cache.json import leer_estado_garage, guardar_estado_garage
-
 from colorama import Fore, Style
 from garage.precios import (configurar_precios, es_subscripcion_mensual,
-                            buscar_por_patente, calcular_costo_de_estadia)
-
+                        calcular_costo_de_estadia)
 from auxiliares.date import get_current_time_json
 from auxiliares.consola import clear_screen
 
@@ -51,29 +45,6 @@ def modificar_vehiculo(garage, patente, nuevo_tipo=None, nueva_patente=None, nue
     except Exception as e:
         print(Fore.RED + f"Error modificando vehículo: {e}" + Style.RESET_ALL)
     return False
-
-def buscar_por_patente(garage, patente = None):
-    """ 
-    Busca la patente en la estructura de garage.
-    Si encuentra, retorna (piso_idx, slot_id), si no, retorna (-1, -1).
-    """
-    for idx_piso, piso in enumerate(garage):
-        for slot in piso:
-            try:
-                patente_slot = slot["patente"]
-                ocupado_slot = slot["ocupado"]
-                if patente_slot == patente and ocupado_slot == True:
-                    piso_val = int(slot["piso"]) if "piso" in slot else idx_piso
-                    id_val = int(slot["id"]) if "id" in slot else 0
-                    return (piso_val, id_val)
-            except Exception:
-                try:
-                    if len(slot) > 1 and slot["patente"] == patente and len(slot) > 3 and slot["ocupado"] == True:
-                        return (idx_piso, slot["id"])
-                except Exception:
-                    continue
-    return (-1, -1)
-
 
 def generar_fecha_aleatoria():
     """Genera una fecha y hora aleatoria en formato 'YYYY-MM-DD HH:MM'"""
@@ -404,8 +375,6 @@ def actualizar_csv_garage(garage_id, garage):
     
     except Exception as e:
         print(Fore.RED + f"Error actualizando CSV: {e}" + Style.RESET_ALL)
-
-
 
 def salida_tipo_vehiculo(tipo_slot):
     """

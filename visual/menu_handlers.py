@@ -3,20 +3,16 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from cache.json import guardar_estado_garage, leer_estado_garage
 from users.usuarios import user_login, registrar_nuevo_usuario
 from users.users_garage import (
     buscar_garage_asociado,
     seleccionar_solo_un_garage,
-    asociar_garage_a_usuario, 
-    crear_archivo_users_garage, 
     crear_garage,
     actualizar_slots,
     generar_csv_slots,
     crear_data_para_actualizar_slot,
     crear_data_para_actualizar_tipo_slots,
 )
-
 from auxiliares.consola import clear_screen
 from colorama import Fore, Style
 from garage.garage_util import buscar_por_patente, buscar_slots_por_tipo

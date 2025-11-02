@@ -40,4 +40,7 @@ QUE EL PROGRAMA BUSQUE PARECIDOS EN LAS BUSQUEDAS POR SI PIFIO AL ESCRIBIR
 CREAR NUEVO GARAGE mejorar manejo de errores
 Mover garage, mejorar la bsuqueda de datos anteriores. 
 ingresar vehiculo- mandatorio haber elegido los tipos de slots
-salida de vehiculo, mandatorio haber puestos las tarifas
+salida de vehiculo, mandatorio haber puestos las 
+
+
+ver funciones actualizar_csv_garage y actualizar_garage (hacen cosas parecidas)

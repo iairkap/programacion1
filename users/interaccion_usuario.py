@@ -2,8 +2,6 @@ from colorama import Fore, Style
 from constantes.tipos_vehiculos import obtener_nombre_vehiculo
 from auxiliares.consola import clear_screen
 
-
-
 def pedir_piso(garage):
     while True:
         try:

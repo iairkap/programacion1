@@ -4,12 +4,14 @@ Módulo de precios y suscripciones para el garage.
 Funciones principales:
 - configurar_precios()
 - es_subscripcion_mensual(patente, datos)
-- buscar_por_patente(datos, patente)
 - calcular_costo_de_estadia(patente, hora_salida, datos)
 
 
 """
-
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from garage.garage_util import buscar_por_patente
 
 from datetime import datetime
 from colorama import init, Fore, Style
@@ -46,12 +48,12 @@ def es_subscripcion_mensual(patente, garage):
     return False
 
 
-def buscar_por_patente(garage, patente):
-    """Busca un vehículo por patente en la lista de diccionarios."""
-    for slot in garage:
-        if slot["patente"].lower() == patente.lower():
-            return slot
-    return None
+# def buscar_patente_en_garage(garage, patente):
+#     """Busca un vehículo por patente en la lista de diccionarios."""
+#     for slot in garage:
+#         if slot["patente"].lower() == patente.lower():
+#             return slot
+#     return None
 
 # FUNCIÓN PRINCIPAL: CÁLCULO DE COSTO
 
@@ -68,7 +70,7 @@ def calcular_costo_de_estadia(patente, hora_salida=None, garage=None):
            raise ValueError("Se requiere una lista de slots (garage) para calcular el costo.")
 
     precios = configurar_precios()
-    slot = buscar_por_patente(garage, patente)
+    _,slot = buscar_por_patente(garage, patente)
 
     if not slot:
            print(Fore.YELLOW + f"No se encontró la patente {patente}")

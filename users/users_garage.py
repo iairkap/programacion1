@@ -177,41 +177,6 @@ def crear_garage(usuario, nombre, direccion, slots_per_floor=10, floors=2):
         print(f"Error al crear el garage: {e}")
         return 
     
-def leer_garage_desde_csv(garage_id):
-    """
-    Lee la estructura del garage desde su archivo CSV y devuelve
-    una lista de diccionarios con el formato estandarizado.
-    """
-    ruta = f"files/garage-{garage_id}.csv"
-    try:
-        with open(ruta, mode="r", encoding="utf-8") as arch:
-            next(arch)  # Saltar header
-            garage = []
-            for line in arch:
-                parts = line.strip().split(",")
-                if len(parts) < 9:
-                    continue  # Evitar líneas incompletas
-
-                slot = {
-                    "id": int(parts[0]),
-                    "patente": parts[6].strip(),
-                    "tipo_slot": int(parts[3]) if parts[3].isdigit() else parts[3],
-                    "ocupado": parts[5].lower() == "true",
-                    "reservado_mensual": parts[4].lower() == "true",
-                    "hora_entrada": parts[7].strip() if parts[7].strip() != "" else None,
-                    "tipo_vehiculo": int(parts[8]) if parts[8].isdigit() else 0
-                }
-
-                garage.append(slot)
-
-            return garage
-    except FileNotFoundError:
-        print(f"⚠️ Archivo 'garage-{garage_id}.csv' no encontrado.")
-        return []
-    except Exception as e:
-        print(f"❌ Error al leer el garage: {e}")
-        return []
-    
 def crear_data_para_actualizar_slot(slot_id, tipo_slot=None, reservado_mensual=None, ocupado=None, patente=None, hora_entrada=None, tipo_vehiculo=None):
     """Crea un diccionario con los datos a actualizar para un slot."""
     data = {"slot_id": slot_id}
