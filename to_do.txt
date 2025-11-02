@@ -21,16 +21,7 @@ poner un clear de consola una vez que se presiona una tecla
 7- BUSCAR VEHICULO POR Patente
 Emprolijar la consola y borrar con clear 
 sugerir alguna funcionalidad si se encuentra el vehiculo y si no sugerir ingresar nuevo.
-
-
-8- ESTADISITCAS RAPIDAS 
-
-
-Hecho.
-BULK 
--TIPO SLOT --> Que pueda especificar exactamente la catidad de slots por piso
-hacer una fila por piso y columnas por slot.
--
+ 
 
 MANDATORIO
 OPCION DE USUARIO ADMINISTRADOR DIFERENCIA DE ROLES
@@ -41,15 +32,12 @@ clear console optimizar.
 poner todos los outputs con mismo formato.
 validar todos los imputs
 
-
-
 BOUNUS TRACK 
 QUE PUEDA PRESETEAR LOS AUTOS YA ESTACIONADO EN METODO BULK
 QUE EL PROGRAMA BUSQUE PARECIDOS EN LAS BUSQUEDAS POR SI PIFIO AL ESCRIBIR
 
-HACER UN CHECK PARA VERIFICAR SI LOS SLOTS YA TIENEN TIPOS ASIGNADOS ANTES DE AGREGAR VEHICULOS
+
 CREAR NUEVO GARAGE mejorar manejo de errores
-Editar garage, mejorar cuando la patente no esta, dar la opcion de volver para atras
 Mover garage, mejorar la bsuqueda de datos anteriores. 
 ingresar vehiculo- mandatorio haber elegido los tipos de slots
 salida de vehiculo, mandatorio haber puestos las tarifas

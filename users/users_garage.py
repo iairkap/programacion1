@@ -199,7 +199,7 @@ def leer_garage_desde_csv(garage_id):
                     "ocupado": parts[5].lower() == "true",
                     "reservado_mensual": parts[4].lower() == "true",
                     "hora_entrada": parts[7].strip() if parts[7].strip() != "" else None,
-                    "tipo_vehiculo_estacionado": int(parts[8]) if parts[8].isdigit() else 0
+                    "tipo_vehiculo": int(parts[8]) if parts[8].isdigit() else 0
                 }
 
                 garage.append(slot)
@@ -402,7 +402,7 @@ def get_garage_data(garage_id):
                 continue
             
             # Obtener piso para crear estructura
-            piso_csv = int(datos[1]) if len(datos) > 1 and datos[1].isdigit() else 0
+            piso_csv = int(datos[1]) if len(datos) > 1 else 0
 
             # Crear pisos vacíos si es necesario
             while len(garage) <= piso_csv:
@@ -416,8 +416,8 @@ def get_garage_data(garage_id):
                 "reservado_mensual": datos[3].lower() == "true" if len(datos) > 4 else False,
                 "ocupado": datos[4].lower() == "true" if len(datos) > 5 else False,
                 "patente": datos[5].strip() if len(datos) > 6 else "",
-                "hora_entrada": datos[6].strip() if len(datos) > 7 and datos[6].strip() else None,
-                "tipo_vehiculo_estacionado": int(datos[7]) if len(datos) > 8 and datos[7].isdigit() else 0,
+                "hora_entrada": datos[6].strip() if len(datos) > 7 else None,
+                "tipo_vehiculo": int(datos[7]) if datos[7] and len(datos) >= 8 else 0,
             }
            
             garage[piso_csv].append(slot)

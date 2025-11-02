@@ -95,6 +95,10 @@ def handle_registrar_salida(garage, garage_data, tarifa):
 def handle_editar_vehiculo(garage, garage_data):
     """Maneja la edición de vehículos guardados"""
     patente = pedir_patente()
+    piso, slot = buscar_por_patente(garage_data, patente)
+    if piso == -1 and slot ==-1:
+        print('Patente no encontrada')
+        return
     nuevo_tipo = pedir_tipo_vehiculo()
     nueva_patente = input("Nueva patente (dejar vacío para no cambiar): ").strip().upper()
     nueva_estadia = input("Ingrese la nueva estadía (mensual/diaria): ").strip().lower()

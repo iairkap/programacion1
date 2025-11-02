@@ -53,9 +53,6 @@ def buscar_por_patente(garage, patente):
             return slot
     return None
 
-
-
-
 # FUNCIÓN PRINCIPAL: CÁLCULO DE COSTO
 
 def calcular_costo_de_estadia(patente, hora_salida=None, garage=None):
@@ -77,7 +74,7 @@ def calcular_costo_de_estadia(patente, hora_salida=None, garage=None):
            print(Fore.YELLOW + f"No se encontró la patente {patente}")
            return 0
 
-    tipo = slot.get("tipo_vehiculo_estacionado", "").lower()
+    tipo = slot.get("tipo_vehiculo", "").lower()
     if tipo not in precios:
            print(Fore.YELLOW + f"Tipo de vehículo desconocido para {patente}")
            return 0

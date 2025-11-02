@@ -54,7 +54,7 @@ def mostrar_estado_garage(garage):
     imprimir_piso = lambda idx, piso: (
         print(f"\nPiso {idx}:"),
         [print(
-            f"  Slot {slot['id']}: {'Ocupado' if slot['ocupado'] else 'Libre'} | Patente: {slot['patente'] if slot['ocupado'] else '-'} | Tipo: {obtener_nombre_vehiculo(slot['tipo_vehiculo_estacionado']) if slot['ocupado'] else '-'}"
+            f"  Slot {slot['id']}: {'Ocupado' if slot['ocupado'] else 'Libre'} | Patente: {slot['patente'] if slot['ocupado'] else '-'} | Tipo: {obtener_nombre_vehiculo(slot['tipo_vehiculo']) if slot['ocupado'] else '-'}"
         ) for slot in piso]
     )
     for idx in range(len(garage)):
@@ -81,7 +81,7 @@ def pedir_patente():
             else: 
                 print(Fore.RED + "La patente no tiene el formato correcto ej: AB123CD o ABC123" + Style.RESET_ALL)
                 
-            print("Volve a intentarlo")
+            print("Volve a intentarlo") #####Arreglar esto
 
         except Exception as e:
             print(e)

@@ -29,26 +29,6 @@ def leer_garage_normalizado():
     garage_id = leer_estado_garage()['garage_id']
     return users_garage.get_garage_data(garage_id)
 
-"""
-    def registrar_salida_vehiculo(garage=None, patente=None):
-    Registra la salida de un vehículo del garage.
-    Busca en la lista de slots del garage el vehículo con la patente especificada y marca el slot como libre,
-    limpiando los datos asociados al vehículo estacionado. Si hay duplicados, solo limpia el primero encontrado
-    datos = garage
-    actualizado = False
-
-    for slot in datos:
-        if slot.get("patente") == patente and slot.get("ocupado") == "True":
-            slot["patente"] = ""
-            slot["ocupado"] = "False"
-            slot["hora_entrada"] = ""
-            slot["tipo_vehiculo_estacionado"] = "0"
-            actualizado = True
-            break
-
-    return actualizado  # True si modificó algún slot, False si no encontró
-
-    """
 
 def modificar_vehiculo(garage, patente, nuevo_tipo=None, nueva_patente=None, nueva_estadia=None):
     """
@@ -62,7 +42,7 @@ def modificar_vehiculo(garage, patente, nuevo_tipo=None, nueva_patente=None, nue
                 if slot["ocupado"] == True and slot["patente"] == patente:
                     # Modifica solo los campos que no son None
                     if nuevo_tipo:
-                        slot["tipo_vehiculo_estacionado"] = nuevo_tipo        # Cambia tipo de vehículo
+                        slot["tipo_vehiculo"] = nuevo_tipo        # Cambia tipo de vehículo
                     if nueva_patente:
                         slot["patente"] = nueva_patente     # Cambia patente
                     if nueva_estadia:
@@ -221,7 +201,7 @@ def calcular_costo_de_estadia(patente, hora_salida, tarifa):
         slot = garage[piso_idx][slot_id - 1]  # slot_id comienza en 1
         
         # Obtener tipo de vehículo
-        tipo_vehiculo = slot.get("tipo_vehiculo_estacionado", 0)
+        tipo_vehiculo = slot.get("tipo_vehiculo", 0)
         hora_entrada = slot.get("hora_entrada")
         
         # Obtener tarifa según tipo de vehículo
@@ -378,7 +358,7 @@ def registrar_salida_vehiculo(patente=None, tarifa=None):
         found_slot["patente"] = ""
         found_slot["ocupado"] = False
         found_slot["hora_entrada"] = None
-        found_slot["tipo_vehiculo_estacionado"] = 0
+        found_slot["tipo_vehiculo"] = 0
         
         # Actualizar CSV
         actualizar_csv_garage(garage_id, garage)
@@ -416,7 +396,7 @@ def actualizar_csv_garage(garage_id, garage):
                     ocupado = slot.get("ocupado", False)
                     patente = slot.get("patente", "")
                     hora_entrada = slot.get("hora_entrada", "")
-                    tipo_vehiculo = slot.get("tipo_vehiculo_estacionado", 0)
+                    tipo_vehiculo = slot.get("tipo_vehiculo", 0)
                     
                     f.write(f"{slot_id},{piso},{tipo_slot},{reservado},{ocupado},{patente},{hora_entrada},{tipo_vehiculo}\n")
         
@@ -484,7 +464,7 @@ def contar_por_tipo_vehiculo(garage=None, tipo_buscado=None):
     datos = leer_garage_normalizado()
     count = 0
     for pisos in datos:
-        count += sum(1 for slot in pisos if slot.get("ocupado") == True and slot.get("tipo_vehiculo_estacionado") == tipo_buscado)
+        count += sum(1 for slot in pisos if slot.get("ocupado") == True and slot.get("tipo_vehiculo") == tipo_buscado)
     return count
 
 # CONFIGURACIÓN CONSTANTE DEL EDIFICIO

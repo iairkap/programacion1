@@ -19,6 +19,8 @@ from users.users_garage import (
 
 from auxiliares.consola import clear_screen
 from colorama import Fore, Style
+from garage.garage_util import buscar_por_patente, buscar_slots_por_tipo
+from users.interaccion_usuario import pedir_patente
 
 
 def handle_login():
@@ -338,22 +340,34 @@ def handle_mover_vehiculo(garage, garage_data=None):
     """Maneja el movimiento de un vehículo dentro del garage"""
     print("\n=== MOVER VEHÍCULO ===")
     try:
-        patente = 'IMPORTAR PEDIR PATENTE Y BUSCAR LOS DATOS DEL AUTO'#
-        cantidad_slots = garage.get("slots_per_floor") * garage.get("floors")
+        patente = pedir_patente()
+        piso, slot = buscar_por_patente(garage_data, patente)
+        data =  garage_data[piso][slot-1]
+        tipo_vehiculo = data.get('tipo_vehiculo')
+
+        if piso == -1 and slot == -1:
+            print("Vehiculo no encontrado en el garage")
+            return False
+        pisos_slots_por_tipo = buscar_slots_por_tipo(garage_data, tipo_vehiculo)
+        slots_por_tipo =  [slot for sub in pisos_slots_por_tipo.values() for slot in sub]
         while True:
-            nuevo_slot_id = int(input("Ingrese el ID del nuevo slot: "))
-            if nuevo_slot_id < 1 or nuevo_slot_id > cantidad_slots:
-                print(Fore.RED + f"El ID del slot debe estar entre 1 y {cantidad_slots}." + Style.RESET_ALL)
+            if not slots_por_tipo:
+                print("No hay mas lugares disponibles para este tipo de vehiculo.")
+                raise Exception("No hay lugar")
+            nuevo_slot_id = int(input(f"Ingrese el ID del nuevo slot debe coincidir con {slots_por_tipo}: "))
+            if nuevo_slot_id < 1 or nuevo_slot_id not in slots_por_tipo:
+                print(Fore.RED + f"El ID del slot debe estar entre {slots_por_tipo}." + Style.RESET_ALL)
             else:
                 break
+        nuevo_piso = [ i for i in pisos_slots_por_tipo.keys() if nuevo_slot_id in pisos_slots_por_tipo[i]][0]
+        old_slot_id = data.get("id")
+        hora_entrada = data.get('hora_entrada')
         
-        old_slot_id = garage_data.get('slot')
-        hora_de_entrada = garage_data.get('hora_entrada')
-        tipo_vehiculo = garage_data.get('tipo_vehiculo')
         print(f"Moviendo vehículo con patente {patente} al slot {nuevo_slot_id}...")
-        data = [{"slot_id": old_slot_id, "ocupado": False, "patente": "", "hora_entrada": "", "tipo_vehiculo": ""}, {"slot_id": nuevo_slot_id, "ocupado": True, "patente": patente, "hora_de_entrada": hora_de_entrada, "tipo_vehiculo": tipo_vehiculo}]
-        actualizar_slots(garage['garage_id'], data )
+        data_actualizada = [{"slot_id": old_slot_id, "piso": piso, "ocupado": False, "patente": "", "hora_entrada": "", "tipo_vehiculo": ""}, {"slot_id": nuevo_slot_id, "piso": nuevo_piso, "ocupado": True, "patente": patente, "hora_entrada": hora_entrada, "tipo_vehiculo": tipo_vehiculo}]
+        actualizar_slots(garage['garage_id'],  data_actualizada)
         print(Fore.GREEN + f"Vehículo con patente {patente} movido al slot {nuevo_slot_id} correctamente." + Style.RESET_ALL)
     except Exception as e:
-        print(Fore.RED + f"Error al mover el vehículo: {e}" + Style.RESET_ALL)
+        print(Fore.RED + f"Error al mover el vehículo" + Style.RESET_ALL)
     return garage
+

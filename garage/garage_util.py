@@ -39,7 +39,7 @@ def contar_espacios_libres_por_tipo(garage, tipo_vehiculo):
 
 def contar_por_tipo_vehiculo(garage, tipo_buscado):
     # Cuenta slots donde slot[6] = tipo_buscado Y slot[3] = True (ocupado)
-    return sum(slot["tipo_vehiculo_estacionado"] == tipo_buscado and slot["ocupado"] for piso in garage for slot in piso)
+    return sum(slot["tipo_vehiculo"] == tipo_buscado and slot["ocupado"] for piso in garage for slot in piso)
 
 
 def mostrar_estadisticas_rapidas(garage):
@@ -59,3 +59,15 @@ def mostrar_estadisticas_rapidas(garage):
         print(Fore.GREEN + f"{tipo_nombre}: {cantidad}" + Style.RESET_ALL)
     
     clear_screen()
+
+def buscar_slots_por_tipo(garage, tipo_slot):
+    """Busca todos los ids de slots en el garage que coinciden con el tipo de slot pasado por parametro
+    output: {piso: slots_disponibles_por_tippo}"""
+    slots_por_tipo = []
+    pisos = {}
+    for num_piso, piso_data in enumerate(garage):
+        for slot in piso_data:
+            if slot.get('tipo_slot') == tipo_slot and not slot.get('ocupado'):
+                slots_por_tipo.append(slot.get('id'))
+        pisos.update({num_piso: slots_por_tipo})
+    return pisos
