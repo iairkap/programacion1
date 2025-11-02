@@ -271,7 +271,6 @@ def registrar_salida_vehiculo(patente=None, tarifa=None):
     - Actualiza CSV
     """
     
-    print(tarifa)
     try:
         # Leer garage_id desde cache
         cache_data = leer_estado_garage()

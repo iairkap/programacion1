@@ -1,2 +1,4 @@
 garage_id,user_email,garage_name,address,floors,slots_per_floor
 1,km@gmail.com,x,x,1,6
+2,a@a.com,UADE,Lima 123,10,5
+3,a@a.com,UADE,Lima 123,10,6

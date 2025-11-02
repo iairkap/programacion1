@@ -21,7 +21,8 @@ from visual.menu_principal_handlers import (
     handle_editar_vehiculo,
     handle_mostrar_estado_garage,
     handle_buscar_vehiculo,
-    handle_estadisticas_rapidas
+    handle_estadisticas_rapidas, 
+    handle_imprimir_tarifas
 )
 
 from constantes.tarifa import guardar_precios_garage
@@ -60,6 +61,7 @@ def mostrar_menu_principal(garage_name):
     "Actualizar tipo de slot",
     "Actualizar info de slots",
     "Actualizar tarifas",
+    "Imprimir tarifas",
     "Mover vehículo"
     ]
 
@@ -112,7 +114,6 @@ def menu_garage(usuario):
             garage_seleccionado = handle_seleccionar_garage(usuario)
             if garage_seleccionado:
                 tarifa = guardar_precios_garage(garage_seleccionado['garage_id'])
-                print(tarifa)
                 continuar = False
                 
         elif opcion == "2":
@@ -123,6 +124,7 @@ def menu_garage(usuario):
                     
         elif opcion == "3":
             continuar = False  # Cerrar sesión
+            
             
         else:
             print(Fore.RED + "Opción inválida" + Style.RESET_ALL)
@@ -152,6 +154,7 @@ def menu_principal(garage_actual, tarifa):
         handle_actualizar_tipo_slots,
         handle_actualizar_slots, 
         handle_actualizar_tarifas,
+        handle_imprimir_tarifas,
         handle_mover_vehiculo
     ]
 
@@ -173,6 +176,10 @@ def menu_principal(garage_actual, tarifa):
                 if 0 <= indice < len(handlers):
                     if indice == 3:  # Opción 4: registrar salida
                         handlers[indice](garage_actual, garage_data, tarifa)
+                    elif indice == 10:  # Opción 11: actualizar tarifas
+                        handlers[indice](garage_actual, tarifa)
+                    elif indice == 11:  # Opción 12: imprimir tarifas
+                        handlers[indice](tarifa)
                     else:
                         handlers[indice](garage_actual, garage_data)
                     continue
@@ -202,7 +209,6 @@ def main():
         session_active = True
         while session_active and programa_activo:
             (garage_actual, tarifa) = menu_garage(usuario_actual)
-            print(tarifa)
             guardar_estado_garage(garage_actual)#guardo el garage actual en el json para acceder desde todo el proyecto
             
             if not garage_actual:
