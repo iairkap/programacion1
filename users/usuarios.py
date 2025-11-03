@@ -2,7 +2,7 @@
 Creacion de usuario 
 """
 from colorama import Fore, Style
-
+from .pass_logic import login, UsuarioNoExisteError
 
 
 def mostrar_mensaje(msg, tipo="info"):
@@ -48,7 +48,7 @@ def email_valido():
     
 
 
-def creacion_usuario():
+def creacion_usuario(mail):
     try:
         usuario = {}
         
@@ -59,35 +59,14 @@ def creacion_usuario():
         if usuario['apellido'] is None:
             return None
         
-        usuario['email'] = email_valido()
+        usuario['email'] = mail
         if usuario['email'] is None:
             return None
-
-        usuario['password'] = campo_no_vacio("Ingrese su contraseña: ", "contraseña")
-        if usuario['password'] is None:
-            return None
-
-        while True:
-            usuario['confirmar_password'] = input("Confirme su contraseña: ")
-            if usuario['password'] == usuario['confirmar_password']:
-                break
-            mostrar_mensaje("Error: Las contraseñas no coinciden. Intente nuevamente.", "error")
-
-            validacion_email = validacion_formato_email(usuario['email'])
-            if not validacion_email[0]:
-                mostrar_mensaje(f"Error en el email: {validacion_email[1]}. Intente nuevamente.", "error")
-                usuario['email'] = input("Ingrese su email: ")
-                continue
-            if usuario['password'] == usuario['confirmar_password']:
-                break
-            else:
-                mostrar_mensaje("Error: Las contraseñas no coinciden. Intente nuevamente.", "error")
         
     except ValueError:
         mostrar_mensaje("Error: Entrada inválida. Intente de nuevo.", "error")
         return None
     
-    del usuario['confirmar_password']
     return usuario
 
 def crear_archivo_users():
@@ -114,7 +93,7 @@ def chequear_existencia_email(email):
         next(arch_users)  # Saltar la primera linea (headers)
         
         for line in arch_users:
-            nombre, apellido, user_email, user_password = line.strip().split(',')
+            nombre, apellido, user_email = line.strip().split(',')
             if user_email == email:
                 arch_users.close()
                 return True
@@ -130,23 +109,26 @@ def chequear_existencia_email(email):
 def user_login():
     """Funcion para loguearse - retorna el usuario completo"""
     try:
-        email = input("Ingrese su email: ")
-        password = input("Ingrese su contraseña: ")
-        
+        # email = input("Ingrese su email: ")
+        # password = input("Ingrese su contraseña: ")
+        email,password = login()
         arch_users = open("files/users.csv", mode="r", encoding="utf-8")
         next(arch_users)  # Saltar la primera linea (headers)
         
         for line in arch_users:
-            nombre, apellido, user_email, user_password = line.strip().split(',')
-            if user_email == email and user_password == password:
+            nombre, apellido, user_email = line.strip().split(',')
+            if user_email == email :
                 arch_users.close()
                 return {
                     'nombre': nombre,
                     'apellido': apellido,
                     'email': user_email,
-                    'password': user_password
                 }
-        
+        nuevo_usuario = registrar_nuevo_usuario(email)
+        if nuevo_usuario:
+            print(Fore.GREEN + "Usuario registrado. Ahora puede iniciar sesión." + Style.RESET_ALL)
+            clear_screen()
+            return True
         mostrar_mensaje("Error: Email o contraseña incorrectos.", "error")
         arch_users.close()
         return None
@@ -154,28 +136,27 @@ def user_login():
     except FileNotFoundError:
         mostrar_mensaje("Error: El archivo de usuarios no existe.", "error")
         return None
+    except UsuarioNoExisteError as e:
+        Print(e, "se cancelo la creacion del usuario ")
+        return None
         
-def registrar_nuevo_usuario():
+def registrar_nuevo_usuario(email):
     """Función completa para registrar un nuevo usuario"""
     crear_archivo_users()
-    usuario = creacion_usuario()
+    usuario = creacion_usuario(email)
     
     if not usuario:
         mostrar_mensaje("No se pudo crear el usuario.", "error")
         return False
     
-    # Verificar si el email ya existe
-    if chequear_existencia_email(usuario['email']):
-        mostrar_mensaje("Error: El email ya existe en el sistema.", "error")
-        return False
-    
+ 
     # Escribir el usuario al archivo
     try:
         arch_users = open("files/users.csv", mode="a", encoding="utf-8")
-        arch_users.write(f"{usuario['nombre']},{usuario['apellido']},{usuario['email']},{usuario['password']}\n")
+        arch_users.write(f"{usuario['nombre']},{usuario['apellido']},{usuario['email']}\n")
         arch_users.close()
         mostrar_mensaje(f"Usuario creado exitosamente: {usuario}", "ok")
-        return True
+        return usuario
     except Exception as e:
         mostrar_mensaje(f"Error al guardar el usuario: {e}", "error")
         return False

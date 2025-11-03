@@ -2,7 +2,7 @@ import sys
 import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+from users.pass_logic import login
 from users.usuarios import user_login, registrar_nuevo_usuario
 from users.users_garage import (
     buscar_garage_asociado,
@@ -33,7 +33,8 @@ def handle_login():
 
 def handle_registro():
     """Maneja el registro de nuevo usuario"""
-    if registrar_nuevo_usuario():
+    email,password = login(crear_usuario=True)
+    if registrar_nuevo_usuario(email):
         print(Fore.GREEN + "Usuario registrado. Ahora puede iniciar sesión." + Style.RESET_ALL)
         clear_screen()
         return True
