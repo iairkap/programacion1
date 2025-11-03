@@ -45,7 +45,6 @@ def buscar_garage_asociado(email):
             return garages
         else:
             print(Fore.RED + "\nNo se encontró un garage asociado a este usuario.\n" + Style.RESET_ALL)
-            clear_screen()
             return None
             
     except FileNotFoundError:
