@@ -271,16 +271,16 @@ def handle_actualizar_tipo_slots(garage, garage_data=None):
     archivo_editado = False
     if bulk:
         print("\nSe creara un csv en directorio actual llamado 'config_slots.csv' para actualizar los tipos de slots\n")
-        ruta_csv = generar_csv_slots(garage_data)
+        ruta_csv = generar_csv_slots(garage)
         if os.path.exists(ruta_csv):
             print(Fore.RED + f"Por favor, edite el archivo en: {os.path.abspath(ruta_csv)}" + Style.RESET_ALL)
             print("Una vez editado, guarde el archivo y vuelva aquí para continuar.")
             archivo_editado = input("\n¿Ha editado y guardado el archivo? (s/n): \n").lower() == 's'
         if archivo_editado:
-            print(Fore.GREEN + f"\n{garage['garage_name']} ha sido actualizado con exito." + Style.RESET_ALL)
-            print(Fore.GREEN + "\nContinuando con la actualización desde el archivo existente..."+ Style.RESET_ALL)
-            clear_screen()
+            # print(Fore.GREEN + "\nContinuando con la actualización desde el archivo existente..."+ Style.RESET_ALL)
+            # clear_screen()
             data = crear_data_para_actualizar_tipo_slots(ruta_csv)
+            print(Fore.GREEN + f"\n{garage['garage_name']} ha sido actualizado con exito." + Style.RESET_ALL)
             actualizar_slots(garage_id, data)
         else:
             print("Actualización postergada. Por favor, edite el archivo y vuelva a intentarlo.")

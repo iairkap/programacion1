@@ -24,6 +24,7 @@ from main import (
 from colorama import Back, Fore, Style
 from auxiliares.consola import clear_screen
 from constantes.tipos_vehiculos import enum_tipo_vehiculo
+from users.users_garage import actualizar_slot
 
 
 def handle_consultar_espacios_libres(garage, garage_data):
@@ -102,10 +103,12 @@ def handle_editar_vehiculo(garage, garage_data):
     nuevo_tipo = pedir_tipo_vehiculo()
     nueva_patente = input("Nueva patente (dejar vacío para no cambiar): ").strip().upper()
     nueva_estadia = input("Ingrese la nueva estadía (mensual/diaria): ").strip().lower()
+    estadia = True if nueva_estadia == "mensual" else False
     if not patente:
         print("Patente no encontrada.")
         return
-    if modificar_vehiculo(garage, patente, nuevo_tipo, nueva_patente, nueva_estadia):
+    data = {"patente": patente, "tipo_vehiculo": nuevo_tipo, "reservado_mensual": estadia }
+    if actualizar_slot(garage.get('garage_id'), slot, data):
         print("Vehículo modificado correctamente.")
     return True
 
