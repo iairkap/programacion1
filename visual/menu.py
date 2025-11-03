@@ -46,10 +46,20 @@ def mostrar_menu_garage(usuario):
     print("3. Cerrar sesión\n")
     
 
-def mostrar_menu_principal(garage_name):
+def mostrar_menu_principal(garage_name,permisos):
     """Menú principal del sistema"""
-
-    opciones_menu_principal = [
+    opciones_menu_principal_operador = [
+    "Consultar espacios libres",
+    "Consultar cantidad de vehículos estacionados",
+    "Ingresar un vehículo",
+    "Registrar salida de un vehículo",
+    "Editar un vehículo",
+    "Mostrar estado del garage",
+    "Buscar vehículo por patente",
+    "Estadísticas rápidas",
+    ]
+    
+    opciones_menu_principal_admin = [
     "Consultar espacios libres",
     "Consultar cantidad de vehículos estacionados",
     "Ingresar un vehículo",
@@ -65,6 +75,11 @@ def mostrar_menu_principal(garage_name):
     "Mover vehículo"
     ]
 
+    if permisos == "Operador":
+        opciones_menu_principal = opciones_menu_principal_operador
+    else:
+        opciones_menu_principal = opciones_menu_principal_admin
+    
     print(Fore.GREEN + f"\n=== MENÚ PRINCIPAL - {garage_name['garage_name'].upper()} ===" + Style.RESET_ALL)
     for i, opcion in enumerate(opciones_menu_principal, start=1):
         print(f"{i}. {opcion}")

@@ -4,6 +4,71 @@ Creacion de usuario
 from colorama import Fore, Style
 from .pass_logic import login, UsuarioNoExisteError
 
+USERS_CSV = "files/users.csv" 
+# ---- roles de usuarios -----
+
+
+DEFAULT_ROLE = "Operador"
+
+def Enum_permisos(numero):
+    """Enumera los permisos disponibles"""
+    permisos = {
+        1: "Operador",
+        2: "Administrador"
+    }
+    return permisos.get(numero, "Desconocido")
+
+def es_rol_valido(rol: str) -> bool:
+    return rol in ROLES
+
+def rol_por_defecto() -> str:
+    return DEFAULT_ROLE
+
+
+def obtener_rol_usuario(email: str) -> str:
+    """Devuelve el role del usuario (o rol por defecto si no está)."""
+    try:
+        with open(USERS_CSV, "r", encoding="utf-8") as f:
+            next(f)  # header
+            for linea in f:
+                partes = linea.strip().split(",")
+                if len(partes) >= 3 and partes[2] == email:
+                    # role puede estar en la 4ta columna
+                    return partes[3] if len(partes) >= 4 and partes[3] else rol_por_defecto()
+    except FileNotFoundError:
+        pass
+    return rol_por_defecto()
+
+def asignar_rol_a_usuario(email: str, nuevo_rol: str) -> bool:
+    if not es_rol_valido(nuevo_rol):
+        print("Rol inválido:", nuevo_rol)
+        return False
+    try:
+        with open(USERS_CSV, "r", encoding="utf-8") as f:
+            lineas = f.readlines()
+    except FileNotFoundError:
+        return False
+
+    encabezado = lineas[0] if lineas else "nombre,apellido,email,role\n"
+    cuerpo = []
+    cambiado = False
+    for linea in lineas[1:]:
+        partes = linea.strip().split(",")
+        if len(partes) >= 3 and partes[2] == email:
+            while len(partes) < 4:
+                partes.append("")
+            partes[3] = nuevo_rol
+            cambiado = True
+        cuerpo.append(",".join(partes) + "\n")
+
+    if cambiado:
+        with open(USERS_CSV, "w", encoding="utf-8") as f:
+            f.write(encabezado)
+            f.writelines(cuerpo)
+    return cambiado
+
+
+
 
 def mostrar_mensaje(msg, tipo="info"):
     colores = {
@@ -68,16 +133,19 @@ def creacion_usuario(mail):
     
     return usuario
 
+
+
+
 def crear_archivo_users():
     """Crea el archivo users.csv con headers si no existe"""
     try:
         # Intenta abrir el archivo en modo lectura para ver si existe
-        arch_test = open("files/users.csv", mode="r", encoding="utf-8")
+        arch_test = open(USERS_CSV, mode="r", encoding="utf-8")
         arch_test.close()
     except FileNotFoundError:
         # Si no existe, lo crea con los headers
-        arch_users = open("files/users.csv", mode="w", encoding="utf-8")
-        arch_users.write("nombre,apellido,email,password\n")
+        arch_users = open(USERS_CSV, mode="w", encoding="utf-8")
+        arch_users.write("nombre,apellido,email,rol\n")
         arch_users.close()
 
 # Crear archivo si no existe
@@ -88,7 +156,7 @@ def chequear_existencia_email(email):
     """Chequea si el email existe en el sistema
     retorna True si existe, else False"""
     try:
-        arch_users = open("files/users.csv", mode="r", encoding="utf-8")
+        arch_users = open(USERS_CSV, mode="r", encoding="utf-8")
         next(arch_users)  # Saltar la primera linea (headers)
         
         for line in arch_users:
@@ -110,7 +178,7 @@ def user_login(email):
     try:
         # email = input("Ingrese su email: ")
         # password = input("Ingrese su contraseña: ")
-        arch_users = open("files/users.csv", mode="r", encoding="utf-8")
+        arch_users = open(USERS_CSV, mode="r", encoding="utf-8")
         next(arch_users)  # Saltar la primera linea (headers)
         
         for line in arch_users:
@@ -150,7 +218,7 @@ def registrar_nuevo_usuario(email):
  
     # Escribir el usuario al archivo
     try:
-        arch_users = open("files/users.csv", mode="a", encoding="utf-8")
+        arch_users = open(USERS_CSV, mode="a", encoding="utf-8")
         arch_users.write(f"{usuario['nombre']},{usuario['apellido']},{usuario['email']}\n")
         arch_users.close()
         mostrar_mensaje(f"Usuario creado exitosamente: {usuario}", "ok")
