@@ -51,7 +51,6 @@ def email_valido():
 def creacion_usuario(mail):
     try:
         usuario = {}
-        
         usuario['nombre'] = campo_no_vacio("Ingrese su nombre: ", "nombre")
         if usuario['nombre'] is None:
             return None
@@ -106,12 +105,11 @@ def chequear_existencia_email(email):
         return False
 
 
-def user_login():
+def user_login(email):
     """Funcion para loguearse - retorna el usuario completo"""
     try:
         # email = input("Ingrese su email: ")
         # password = input("Ingrese su contraseña: ")
-        email,password = login()
         arch_users = open("files/users.csv", mode="r", encoding="utf-8")
         next(arch_users)  # Saltar la primera linea (headers)
         
@@ -160,7 +158,7 @@ def registrar_nuevo_usuario(email):
     except Exception as e:
         mostrar_mensaje(f"Error al guardar el usuario: {e}", "error")
         return False
-    
+
     
 def validacion_formato_email(email):
 

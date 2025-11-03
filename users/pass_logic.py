@@ -165,6 +165,9 @@ def login(crear_usuario = False,users_path="./files/users/"):
         
     try:
         with open(archivo_usuario, mode="rt", encoding="utf-8") as archivo:
+            if crear_usuario:
+                print(COLORES["alerta"] + f"⚠ El usuario '{user}' ya existe." + COLORES["reset"])
+                print(COLORES["info"] + " Ingrese su contraseña existente..." + COLORES["reset"])
             contraseña_archivada= archivo.readline().strip()
             #Intentamos desencriptar si tiene formato encriptado.
             if ";" in contraseña_archivada:
@@ -209,9 +212,10 @@ def login(crear_usuario = False,users_path="./files/users/"):
             respuesta = input(COLORES["alerta"]+"✖ Respuesta INVALIDA, debe ingresar s o n: "+COLORES["reset"]).lower()
         
         if respuesta == "n":
-            raise UsuarioNoExisteError(COLORES["alerta"] + "⚠ No se creó el usuario. Saliendo del login."+ COLORES["reset"])
-          
-
+        #     # raise UsuarioNoExisteError(COLORES["alerta"] + "⚠ No se creó el usuario. Saliendo del login."+ COLORES["reset"])
+            print("\n" + COLORES["bright"] + "⚠ No se creó el usuario, volvé a intentar logearte!" + COLORES["reset"])
+            login()
+        
         print("Creando nueva cuenta...")
         while True:
             nuevaContraseña = input(COLORES["bright"]+ "🔑 Crea tu contraseña: "+ COLORES["reset"])
