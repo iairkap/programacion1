@@ -34,11 +34,11 @@ def handle_login():
 def handle_registro():
     """Maneja el registro de nuevo usuario"""
     if registrar_nuevo_usuario():
-        print("Usuario registrado. Ahora puede iniciar sesión.")
+        print(Fore.GREEN + "Usuario registrado. Ahora puede iniciar sesión." + Style.RESET_ALL)
         clear_screen()
         return True
     else:
-        print("Error en el registro")
+        print(Fore.RED + "Error en el registro" + Style.RESET_ALL)
         clear_screen()
         return False
 
@@ -98,7 +98,7 @@ def crear_nuevo_garage(usuario):
     if configurar_tar:
         agregar_tarifa(garage_id, garage_name=nombre)
 
-    bulk = input(Fore.LIGHTYELLOW_EX + "\n¿Desea configurar los slots ahora? (s para sí): \n" + Style.RESET_ALL).strip().lower()
+    bulk = input(Fore.LIGHTYELLOW_EX + "\n¿Desea configurar los slots ahora? (s/n): \n" + Style.RESET_ALL).strip().lower()
     if bulk == 's':
         print("Ejecutar la función de actualizar tipo de slots")
 
@@ -107,7 +107,7 @@ def crear_nuevo_garage(usuario):
 
 def handle_actualizar_tarifas(garage, garage_data=None):
     """Maneja la actualización de tarifas del garage"""
-    print("\n=== ACTUALIZAR TARIFAS DEL GARAGE ===")
+    print(Fore.GREEN + "\n=== ACTUALIZAR TARIFAS DEL GARAGE ===" + Style.RESET_ALL)
     agregar_tarifa(garage['garage_id'], garage_name=garage['garage_name'])
     return garage
 
@@ -115,14 +115,14 @@ def handle_actualizar_tarifas(garage, garage_data=None):
 def agregar_tarifa(garage_id, garage_name=None):
     """Función independiente para agregar tarifas a files/tarifas.csv.
     Guarda valores numéricos: tipo (1/2/3), periodo_mensual (True/False)"""
-    tipo_map = {"1": (1, "moto"), "2": (2, "auto"), "3": (3, "camioneta")}
-    periodo_map = {"1": (False, "diario"), "2": (True, "mensual")}
+    tipo_map = {"1": (1, ":moto"), "2": (2, ":auto"), "3": (3, ":camioneta")}
+    periodo_map = {"1": (False, ":diario"), "2": (True, ":mensual")}
 
     display_name = f" '{garage_name}'" if garage_name else f" id={garage_id}"
     print(f"\nConfigurar tarifas para el garage{display_name}. Escriba 'fin' para terminar.")
     
     while True:
-        tipo_slot_in = input("Tipo (1 Moto, 2 Auto, 3 Camioneta/suv) o 'fin': ").strip().lower()
+        tipo_slot_in = input("Tipo (1: Moto, 2: Auto, 3: Camioneta/suv) o 'fin' ").strip().lower()
         if tipo_slot_in == "fin":
             break
 
