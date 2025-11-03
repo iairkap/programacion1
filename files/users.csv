@@ -1,4 +1,9 @@
-nombre,apellido,email,password
-NOV,Primero,a@a.com,aa
-k,m,km@gmail.com,123456
-Emma,Aprile,aprileemma1@gmail.com,3000
+nombre,apellido,email
+NOV,Primero,a@a.com
+k,m,km@gmail.com
+Emma,Aprile,aprileemma1@gmail.com
+Juancito,Etchart,Juan123@gmail.com
+Juan,Etchart,Juan123@gmail.com
+Lautarito,Pettrini,lautaro123@gmail.com
+Lautarito,Pettrini,lautaro123@gmail.com
+Fatima,Roldan,Fat123@gmail.com
