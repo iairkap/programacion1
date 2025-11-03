@@ -148,10 +148,9 @@ def agregar_tarifa(garage_id, garage_name=None):
             print(Fore.RED + "Precio inválido. Ingrese un número mayor o igual a 0." + Style.RESET_ALL)
             continue
 
-        descripcion = input("Descripción (opcional): ").strip()
 
         # Guardar con valores numéricos
-        save_tarifa_to_csv(garage_id, tipo_num, periodo_mensual, precio, descripcion)
+        save_tarifa_to_csv(garage_id, tipo_num, periodo_mensual, precio)
         print(Fore.GREEN + f"Tarifa guardada: {tipo_nombre}/{periodo_nombre} = {precio}" + Style.RESET_ALL)
 
     # fin de la configuración de tarifas
@@ -159,7 +158,7 @@ def agregar_tarifa(garage_id, garage_name=None):
     return True
 
 
-def save_tarifa_to_csv(garage_id, tipo_num, periodo_mensual, precio, descripcion=""):
+def save_tarifa_to_csv(garage_id, tipo_num, periodo_mensual, precio):
     """Escribe o actualiza tarifa en CSV con valores numéricos.
     tipo_num: 1=moto, 2=auto, 3=camioneta
     periodo_mensual: True=mensual, False=diario
@@ -203,7 +202,7 @@ def save_tarifa_to_csv(garage_id, tipo_num, periodo_mensual, precio, descripcion
                     tipo_csv == str(tipo_num) and 
                     periodo_csv == str(periodo_mensual)):
                     # Actualizar línea
-                    linea_nueva = f"{garage_id},{tipo_num},{periodo_mensual},{precio},{descripcion}\n"
+                    linea_nueva = f"{garage_id},{tipo_num},{periodo_mensual},{precio}\n"
                     lineas_nuevas.append(linea_nueva)
                     tarifa_encontrada = True
                 else:
@@ -214,11 +213,11 @@ def save_tarifa_to_csv(garage_id, tipo_num, periodo_mensual, precio, descripcion
     
     # Si no se encontró, agregar nueva tarifa
     if not tarifa_encontrada:
-        linea_nueva = f"{garage_id},{tipo_num},{periodo_mensual},{precio},{descripcion}\n"
+        linea_nueva = f"{garage_id},{tipo_num},{periodo_mensual},{precio}\n"
         if not lineas_existentes:
             # Crear con header
             lineas_nuevas = [
-                "garage_id,tipo,periodo_mensual,precio,moneda,descripcion\n",
+                "garage_id,tipo,periodo_mensual,precio\n",
                 linea_nueva
             ]
         else:

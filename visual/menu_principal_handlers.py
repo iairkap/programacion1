@@ -21,6 +21,11 @@ from main import (
     registrar_salida_vehiculo,
     modificar_vehiculo,
 )
+
+
+from constantes.tarifa import print_tarifas
+
+
 from colorama import Back, Fore, Style
 from auxiliares.consola import clear_screen
 from constantes.tipos_vehiculos import enum_tipo_vehiculo
@@ -128,3 +133,9 @@ def handle_buscar_vehiculo(garage, garage_data):
 def handle_estadisticas_rapidas(garage, garage_data= None):
     """Maneja las estadísticas rápidas"""
     mostrar_estadisticas_rapidas(garage_data)
+    
+    
+def handle_imprimir_tarifas(tarifa):
+    """Maneja la impresión de las tarifas del garage"""
+    print_tarifas(tarifa)
+    clear_screen()
