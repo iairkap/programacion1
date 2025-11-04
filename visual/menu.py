@@ -59,6 +59,9 @@ def mostrar_menu_principal(garage_name,permisos):
     "Estadísticas rápidas",
     ]
     
+
+
+    
     opciones_menu_principal_admin = [
     "Consultar espacios libres",
     "Consultar cantidad de vehículos estacionados",
@@ -68,11 +71,12 @@ def mostrar_menu_principal(garage_name,permisos):
     "Mostrar estado del garage",
     "Buscar vehículo por patente",
     "Estadísticas rápidas",
+    "Imprimir tarifas",
+    "Mover vehículo",
     "Actualizar tipo de slot",
     "Actualizar info de slots",
     "Actualizar tarifas",
-    "Imprimir tarifas",
-    "Mover vehículo"
+    "Administrar usuarios"
     ]
 
     if permisos == "Operador":
@@ -157,7 +161,7 @@ def menu_principal(garage_actual, tarifa):
 
     # Lista indexada desde 0 → por eso usamos un desplazamiento (-1)
     # Agregar nuevos handlers aquí según se vayan creando
-    handlers = [
+    handlers_admin= [
         handle_consultar_espacios_libres,
         handle_consultar_vehiculos_estacionados,
         handle_ingresar_vehiculo,
@@ -166,13 +170,14 @@ def menu_principal(garage_actual, tarifa):
         handle_mostrar_estado_garage,
         handle_buscar_vehiculo,
         handle_estadisticas_rapidas,
+        handle_imprimir_tarifas,
+        handle_mover_vehiculo,
         handle_actualizar_tipo_slots,
         handle_actualizar_slots, 
         handle_actualizar_tarifas,
-        handle_imprimir_tarifas,
-        handle_mover_vehiculo
+        handle_administrar_usuarios
     ]
-
+    handlers_operador= [ handlers_admin[:9]]
     # Acciones especiales (no ejecutan función)
     acciones_especiales = {
         "c": "cambiar_garage",
@@ -219,7 +224,7 @@ def main():
         if not usuario_actual:
             programa_activo = False
             continue
-            
+        print(usuario_actual)    
         # 2. Selección/Creación de garage
         session_active = True
         while session_active and programa_activo:
@@ -233,7 +238,7 @@ def main():
             # 3. Menú principal
             menu_activo = True
             while menu_activo and session_active:
-                resultado = menu_principal(garage_actual, tarifa)
+                resultado = menu_principal(garage_actual, tarifa, usuario_actual['rol'])
                 
                 if resultado == "cambiar_garage":
                     menu_activo = False

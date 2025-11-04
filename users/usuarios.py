@@ -182,13 +182,14 @@ def user_login(email):
         next(arch_users)  # Saltar la primera linea (headers)
         
         for line in arch_users:
-            nombre, apellido, user_email = line.strip().split(',')
+            nombre, apellido, user_email, rol = line.strip().split(',')
             if user_email == email :
                 arch_users.close()
                 return {
                     'nombre': nombre,
                     'apellido': apellido,
                     'email': user_email,
+                    'rol': rol
                 }
         nuevo_usuario = registrar_nuevo_usuario(email)
         if nuevo_usuario:
