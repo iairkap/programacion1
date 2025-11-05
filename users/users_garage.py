@@ -6,6 +6,35 @@ from constantes.tipos_vehiculos import enum_tipo_vehiculo
 from colorama import Fore, Style
 
 
+
+
+def mostrar_garages_asociados(email):
+    """Mostramos todos los garages asociados al usuario"""
+    if not email:
+        return None
+    
+    try:
+        arch = open("files/users-garage.csv", mode="r", encoding="utf-8")
+        next(arch)  # Saltear la línea de encabezado
+        garages = []
+        cont += 1
+        for line in arch:
+            parts = line.strip().split(",")
+            if len(parts) < 6:
+                continue
+            
+            # Solo procesar si el email coincide
+            if parts[1] == email:
+                print(cont," - ",parts[2])
+                cont += 1
+        return cont - 1
+    
+    except FileNotFoundError:
+        print("Archivo users-garage.csv no encontrado.")
+        return None
+
+
+
 def buscar_garage_asociado(email):
     """
     Busca el garage asociado a un usuario dado su email.
@@ -52,34 +81,50 @@ def buscar_garage_asociado(email):
         return None
 
 
-def seleccionar_solo_un_garage(garages):
+def seleccionar_solo_un_garage(email,cant_garages):
     "Se recibe como parametro una lista de garages, permitiendo al usuario seleccionar uno."
-    if not garages:
+    if not email:
         return None
-    elif len(garages) == 1:
-        return garages[0]
-    else:
-        print("\nSeleccione un garage:\n")
-        print(Fore.RED + "0. Salir." + Style.RESET_ALL)
-        for i, garage in enumerate(garages):
-            print(f"{i + 1}. {garage['garage_name']} - {garage['address']}")
-        seleccion = input("Ingrese el número del garage deseado: ")
-        
-        try:
-            seleccion = int(seleccion)
-            if seleccion == 0:
-                print("Operación cancelada.")
-                return None
-            if 1 <= seleccion <= len(garages):
-                
-                return garages[seleccion - 1]
-            else:
-                print(Fore.RED + "Selección inválida." + Style.RESET_ALL)
-                return None
-        except ValueError:
-            print(Fore.RED + "Entrada no válida." + Style.RESET_ALL)
-            return None
-        
+
+    try:
+        while True:
+            try :
+                numero_garage = int(input("Seleccione un garage: "))
+                if numero_garage > 0 and numero_garage <= cant_garages:
+                    break
+            except ValueError:
+                print(Fore.RED + "Entrada inválida. Por favor, ingrese un número válido." + Style.RESET_ALL)
+
+        arch = open("files/users-garage.csv", mode="r", encoding="utf-8")
+        next(arch)  # Saltear la línea de encabezado
+        garages = []
+        count = 1
+        for line in arch:
+            parts = line.strip().split(",")
+            if len(parts) < 6:
+                continue
+            
+            # Solo procesar si el email coincide
+            if parts[1] == email:
+                if count == numero_garage:
+                    garage = {
+                        "garage_id": parts[0],
+                        "user_email": parts[1],
+                        "garage_name": parts[2],
+                        "address": parts[3],
+                        "floors": int(parts[4]),
+                        "slots_per_floor": int(parts[5])
+                    }
+                    arch.close()
+                    return garage
+                else: 
+                    cont += 1
+        arch.close()
+        return None
+
+    except FileNotFoundError:
+        print("Archivo users-garage.csv no encontrado.")
+        return None
         
         
 def crear_archivo_users_garage():

@@ -12,6 +12,7 @@ from users.users_garage import (
     generar_csv_slots,
     crear_data_para_actualizar_slot,
     crear_data_para_actualizar_tipo_slots,
+    mostrar_garages_asociados
 )
 from auxiliares.consola import clear_screen
 from colorama import Fore, Style
@@ -239,9 +240,9 @@ def save_tarifa_to_csv(garage_id, tipo_num, periodo_mensual, precio):
 
 def handle_seleccionar_garage(usuario):
     """Maneja la selección de garage existente"""
-    garages = buscar_garage_asociado(usuario['email'])
-    if garages:
-        garage_seleccionado = seleccionar_solo_un_garage(garages)
+    cant_garages_asociados = mostrar_garages_asociados(usuario["email"])
+    if cant_garages_asociados != 0:
+        garage_seleccionado = seleccionar_solo_un_garage(usuario["email"])
         if garage_seleccionado:
             print(Fore.GREEN + f"Garage '{garage_seleccionado['garage_name']}' seleccionado" + Style.RESET_ALL)
             clear_screen()
