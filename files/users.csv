@@ -1,10 +1,3 @@
-nombre,apellido,email,permisos 
-NOV,Primero,a@a.com
-k,m,km@gmail.com
-Emma,Aprile,aprileemma1@gmail.com
-Juancito,Etchart,Juan123@gmail.com
-Juan,Etchart,Juan123@gmail.com
-Lautarito,Pettrini,lautaro123@gmail.com
-Lautarito,Pettrini,lautaro123@gmail.com
-Fatima,Roldan,Fat123@gmail.com
-hoho,mohohoho,hoho123@gmail.com
+nombre,apellido,email,password
+Prueba,Probada,a@a.com
+Emma,Aprile,b@b.com

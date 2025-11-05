@@ -139,3 +139,6 @@ def handle_imprimir_tarifas(tarifa):
     """Maneja la impresión de las tarifas del garage"""
     print_tarifas(tarifa)
     clear_screen()
+    
+    
+    """ N@choRollinga123"""

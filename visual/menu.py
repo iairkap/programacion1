@@ -178,6 +178,8 @@ def menu_principal(garage_actual, tarifa):
                         handlers[indice](garage_actual, garage_data, tarifa)
                     elif indice == 10:  # Opción 11: actualizar tarifas
                         handlers[indice](garage_actual, tarifa)
+                        tarifa = guardar_precios_garage(garage_actual['garage_id'])
+                        
                     elif indice == 11:  # Opción 12: imprimir tarifas
                         handlers[indice](tarifa)
                     else:
@@ -219,6 +221,8 @@ def main():
             menu_activo = True
             while menu_activo and session_active:
                 resultado = menu_principal(garage_actual, tarifa)
+                # ✅ ACTUALIZAR TARIFA EN MEMORIA SI SE CAMBIÓ DE GARAGE
+                tarifa = guardar_precios_garage(garage_actual['garage_id'])
                 
                 if resultado == "cambiar_garage":
                     menu_activo = False
@@ -226,7 +230,7 @@ def main():
                 elif resultado == "cerrar_sesion":
                     session_active = False
                     menu_activo = False
-                    clear_screen
+                    clear_screen()
                 elif resultado == "salir":
                     print("¡Hasta luego!")
                     programa_activo = False
