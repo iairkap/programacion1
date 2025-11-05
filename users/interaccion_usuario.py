@@ -86,6 +86,15 @@ def pedir_patente():
     
 def pedir_tipo_vehiculo():
     return pedir_num_natural(min = 1, max = 4)
+
+def configuracion_diario_mensual():
+    abono = int(input("Ingrese el tipo de abono para el vehiculo (1/Diario. 2/Mensual)"))
+    if abono == 2:
+        return True
+    else:
+        return False
+
+
     
 def pedir_num_natural(max,mensaje_personalizado = "\nIngresa el tipo de vehiculo (1/Moto. 2/Auto. 3/Camioneta ): ",min = 0):
     while True:

@@ -4,7 +4,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import garage.slot_utils as slot_utils
 import random
-from users.interaccion_usuario import pedir_patente
+from users.interaccion_usuario import (pedir_patente, configuracion_diario_mensual)
 from garage.garage_util import buscar_por_patente
 from users import users_garage
 from users.users_garage import (get_garage_data, actualizar_garage)
@@ -134,7 +134,6 @@ def contar_espacios_libres(garage=None):
     datos = leer_garage_normalizado()
     return sum(1 for slot in datos if slot["ocupado"] == "False")
 
-
 def calcular_costo_de_estadia(patente, hora_salida, tarifa):
     """
     Calcula el costo de estadía de un vehículo.
@@ -171,59 +170,71 @@ def calcular_costo_de_estadia(patente, hora_salida, tarifa):
         # Obtener slot del garage
         slot = garage[piso_idx][slot_id - 1]  # slot_id comienza en 1
         
-        # Obtener tipo de vehículo
-        tipo_vehiculo = slot.get("tipo_vehiculo", 0)
+        # Obtener datos del slot
+        tipo_vehiculo = slot.get("tipo_vehiculo_estacionado", 0)
         hora_entrada = slot.get("hora_entrada")
-        
-        # Obtener tarifa según tipo de vehículo
-        precio_tarifa = _obtener_precio_tarifa(tipo_vehiculo, tarifa)
-        if precio_tarifa is None:
-            print(Fore.RED + "Error: No hay tarifa configurada para este tipo de vehículo." + Style.RESET_ALL)
-            return 0
-        
-        # Verificar si es suscripción mensual
         es_mensual = slot.get("reservado_mensual", False)
         
+        # Convertir booleano si viene como string
+        if isinstance(es_mensual, str):
+            es_mensual = es_mensual.lower() == "true"
+        
+        # Obtener tarifa según tipo de vehículo Y período
+        precio_tarifa = _obtener_precio_tarifa(tipo_vehiculo, es_mensual, tarifa)
+        if precio_tarifa is None:
+            periodo_str = "Mensual" if es_mensual else "Diario"
+            print(Fore.RED + f"Error: No hay tarifa configurada para {periodo_str}." + Style.RESET_ALL)
+            return 0
+        
+        # Si es suscripción mensual, retorna la tarifa fija
         if es_mensual:
-            # Tarifa mensual fija
+            print(Fore.CYAN + f"Suscripción Mensual - Precio fijo: ${precio_tarifa}" + Style.RESET_ALL)
             return precio_tarifa
-        else:
-            # Tarifa por horas
-            if not hora_entrada:
-                print(Fore.YELLOW + "Advertencia: No se encontró hora de entrada. Cobrando tarifa mínima." + Style.RESET_ALL)
-                return precio_tarifa
-            
-            horas_transcurridas = _calcular_horas(hora_entrada, hora_salida)
-            if horas_transcurridas < 1:
-                horas_transcurridas = 1  # Mínimo 1 hora
-            
-            costo = precio_tarifa * horas_transcurridas
-            return round(costo, 2)
+        
+        # Si es diario, calcula por horas
+        if not hora_entrada:
+            print(Fore.YELLOW + "Advertencia: No se encontró hora de entrada. Cobrando tarifa mínima." + Style.RESET_ALL)
+            return precio_tarifa
+        
+        horas_transcurridas = _calcular_horas(hora_entrada, hora_salida)
+        if horas_transcurridas < 1:
+            horas_transcurridas = 1  # Mínimo 1 hora
+        
+        costo = precio_tarifa * horas_transcurridas
+        print(Fore.CYAN + f"Diario - {horas_transcurridas:.1f} horas × ${precio_tarifa}/h = ${costo}" + Style.RESET_ALL)
+        return round(costo, 2)
     
     except Exception as e:
         print(Fore.RED + f"Error calculando costo: {e}" + Style.RESET_ALL)
         return 0
 
 
-def _obtener_precio_tarifa(tipo_vehiculo, tarifa):
-    """Busca el precio de tarifa según tipo de vehículo (diario).
+def _obtener_precio_tarifa(tipo_vehiculo, es_mensual, tarifa):
+    """Busca el precio de tarifa según tipo de vehículo y período.
     
     tipo_vehiculo: número (1=moto, 2=auto, 3=camioneta)
+    es_mensual: booleano (True=mensual, False=diario)
     tarifa: lista de listas [[garage_id, tipo, periodo_mensual, precio, ...], ...]
     Retorna: precio (float) o None si no existe
     """
     if not tarifa:
         return None
     
+    # Convertir booleano a string para comparar con CSV
+    periodo_buscado = "True" if es_mensual else "False"
+    
     for row in tarifa:
         # row[1] = tipo, row[2] = periodo_mensual, row[3] = precio
+        if len(row) < 4:
+            continue
+        
         try:
             tipo_tarifa = int(row[1]) if row[1] else 0
-            es_diario = row[2].lower() == "false" if isinstance(row[2], str) else not row[2]
+            tarifa_periodo = str(row[2])
             
-            if tipo_tarifa == tipo_vehiculo and es_diario:
+            if tipo_tarifa == tipo_vehiculo and tarifa_periodo == periodo_buscado:
                 return float(row[3])
-        except (ValueError, IndexError, AttributeError):
+        except (ValueError, IndexError, TypeError):
             continue
     
     return None
@@ -395,6 +406,8 @@ def registrar_entrada_auto(garage):
     patente = pedir_patente()
     # Solicita el tipo de vehículo
     tipo_vehiculo = slot_utils.tipo_slot()
+    
+    es_mensual = configuracion_diario_mensual()
 
     # VALIDACIÓN: Verificar si la patente ya existe en el sistema
     posicion_existente = buscar_por_patente(garage, patente)
@@ -415,6 +428,7 @@ def registrar_entrada_auto(garage):
             "ocupado": True,
             "hora_entrada": get_current_time_json(),
             "tipo_slot": tipo_vehiculo, #no hace es necesario pero lo dejo para mantener la estructura
+            "reservado_mensual": es_mensual,
             "patente": patente,
             "tipo_vehiculo": tipo_vehiculo
         }
