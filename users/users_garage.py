@@ -6,8 +6,6 @@ from constantes.tipos_vehiculos import enum_tipo_vehiculo
 from colorama import Fore, Style
 
 
-
-
 def mostrar_garages_asociados(email):
     """Mostramos todos los garages asociados al usuario"""
     if not email:
@@ -16,8 +14,10 @@ def mostrar_garages_asociados(email):
     try:
         arch = open("files/users-garage.csv", mode="r", encoding="utf-8")
         next(arch)  # Saltear la línea de encabezado
-        garages = []
-        cont += 1
+        cont = 0  # ✅ EMPEZAR EN 0
+        
+        print(Fore.CYAN + "\n=== GARAGES DISPONIBLES ===" + Style.RESET_ALL)
+        
         for line in arch:
             parts = line.strip().split(",")
             if len(parts) < 6:
@@ -25,14 +25,19 @@ def mostrar_garages_asociados(email):
             
             # Solo procesar si el email coincide
             if parts[1] == email:
-                print(cont," - ",parts[2])
-                cont += 1
-        return cont - 1
+                cont += 1  # ✅ INCREMENTAR PRIMERO
+                print(f"{cont}. {parts[2]}")  # ✅ LUEGO IMPRIMIR
+        
+        arch.close()
+        
+        if cont == 0:
+            print(Fore.YELLOW + "No tienes garages asociados." + Style.RESET_ALL)
+        
+        return cont
     
     except FileNotFoundError:
         print("Archivo users-garage.csv no encontrado.")
-        return None
-
+        return 0
 
 
 def buscar_garage_asociado(email):

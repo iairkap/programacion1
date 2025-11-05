@@ -242,7 +242,7 @@ def handle_seleccionar_garage(usuario):
     """Maneja la selección de garage existente"""
     cant_garages_asociados = mostrar_garages_asociados(usuario["email"])
     if cant_garages_asociados != 0:
-        garage_seleccionado = seleccionar_solo_un_garage(usuario["email"])
+        garage_seleccionado = seleccionar_solo_un_garage(usuario["email"], cant_garages_asociados)
         if garage_seleccionado:
             print(Fore.GREEN + f"Garage '{garage_seleccionado['garage_name']}' seleccionado" + Style.RESET_ALL)
             clear_screen()
