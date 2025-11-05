@@ -65,10 +65,10 @@ def crear_nuevo_garage(usuario):
                 continue
 
 
-            slots_per_floor = int(input("Ingrese la cantidad de slots por piso (mínimo 5): ").strip())
+            slots_per_floor = int(input("Ingrese la cantidad de slots por piso (mínimo 5 - maximo 25): ").strip())
             
-            if slots_per_floor < 5:
-                print(Fore.RED + "La cantidad mínima de slots por piso es 5. Intente de nuevo." + Style.RESET_ALL)
+            if 5 <= slots_per_floor <= 25 :
+                print(Fore.RED + "La cantidad mínima de slots por piso es 5, el maximo es de 25. Intente de nuevo." + Style.RESET_ALL)
                 continue
 
         
