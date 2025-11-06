@@ -2,3 +2,4 @@ garage_id,user_email,garage_name,address,floors,slots_per_floor
 1,a@a.com,UADE,Lima 123,10,7
 2,a@a.com,Uade2,Lima 123,10,5
 3,b@b.com,Fuc,Giuffra 77,10,7
+4,km@gmail.com,x,x,6,5
