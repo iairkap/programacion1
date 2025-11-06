@@ -23,12 +23,28 @@ def buscar_por_patente(garage, patente = None):
                     continue
     return (-1, -1)
 
-def buscar_espacio_libre(garage, tipo_vehiculo):
-    for i in range(len(garage)):
-        piso = garage[i]
+def buscar_espacio_libre(garage, tipo_vehiculo=None):
+    """
+    Busca el primer espacio libre en el garage para un tipo de vehículo específico.
+    
+    Parámetros:
+    - garage: lista de pisos con slots (estructura 2D)
+    - tipo_vehiculo: int o None. Si es None, busca cualquier espacio libre sin filtrar por tipo
+    
+    Retorna:
+    - (piso, slot_id): tupla con piso y slot_id del primer espacio libre encontrado
+    - (-1, -1): si no hay espacios libres
+    """
+    for idx_piso, piso in enumerate(garage):
         for slot in piso:
-            if slot["ocupado"] == False and (tipo_vehiculo == slot["tipo_slot"] or slot["tipo_slot"] == tipo_vehiculo):
-                return (i, slot["id"])
+            # Verificar si el slot está libre
+            if slot["ocupado"] == False:
+                # Si tipo_vehiculo es None, aceptar cualquier slot libre
+                # Si no, verificar que el tipo_slot coincida (como int o string)
+                if tipo_vehiculo is None or slot["tipo_slot"] == tipo_vehiculo or slot["tipo_slot"] == str(tipo_vehiculo):
+                    piso_val = int(slot["piso"]) if "piso" in slot else idx_piso
+                    id_val = int(slot["id"]) if "id" in slot else 0
+                    return (piso_val, id_val)
     return (-1, -1)
 
 
@@ -52,6 +68,25 @@ def contar_espacios_libres_por_tipo(garage, tipo_vehiculo):
 def contar_por_tipo_vehiculo(garage, tipo_buscado):
     # Cuenta slots donde slot[6] = tipo_buscado Y slot[3] = True (ocupado)
     return sum(slot["tipo_vehiculo"] == tipo_buscado and slot["ocupado"] for piso in garage for slot in piso)
+
+
+def chequear_existencia_patente(patente, garage):
+    """
+    Verifica si una patente existe en el garage y está ocupada.
+    
+    Parámetros:
+    - patente: string con la patente a buscar
+    - garage: lista de pisos con slots (estructura 2D)
+    
+    Retorna:
+    - True: si la patente existe y el slot está ocupado
+    - False: si no se encuentra o el slot está libre
+    """
+    for piso in garage:
+        for slot in piso:
+            if slot["patente"] == patente and slot["ocupado"] == True:
+                return True
+    return False
 
 
 def mostrar_estadisticas_rapidas(garage):

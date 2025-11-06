@@ -214,7 +214,8 @@ def login(crear_usuario = False,users_path="./files/users/"):
         if respuesta == "n":
         #     # raise UsuarioNoExisteError(COLORES["alerta"] + "⚠ No se creó el usuario. Saliendo del login."+ COLORES["reset"])
             print("\n" + COLORES["bright"] + "⚠ No se creó el usuario, volvé a intentar logearte!" + COLORES["reset"])
-            login()
+            raise Exception
+            
         
         print("Creando nueva cuenta...")
         while True:
@@ -244,7 +245,8 @@ def login(crear_usuario = False,users_path="./files/users/"):
         
         except OSError:
             raise ArchivoNoAccesibleError(COLORES["error"]+"❌ No se pudo crear el archivo"+COLORES["reset"])
-           
+        except Exception:
+            print("saliendo . . .")
             
     
 
