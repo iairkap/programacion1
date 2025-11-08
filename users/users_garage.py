@@ -226,11 +226,13 @@ def crear_garage(usuario, nombre, direccion, slots_per_floor=10, floors=2):
         print(f"Error al crear el garage: {e}")
         return 
     
-def crear_data_para_actualizar_slot(slot_id, tipo_slot=None, reservado_mensual=None, ocupado=None, patente=None, hora_entrada=None, tipo_vehiculo=None):
+def crear_data_para_actualizar_slot(slot_id, tipo_slot=None, piso=None, reservado_mensual=None, ocupado=None, patente=None, hora_entrada=None, tipo_vehiculo=None):
     """Crea un diccionario con los datos a actualizar para un slot."""
     data = {"slot_id": slot_id}
     if tipo_slot is not None:
         data["tipo_slot"] =  enum_tipo_vehiculo()[tipo_slot.lower()]
+    if piso is not None:
+        data["piso"] = piso
     if reservado_mensual is not None:
         data["reservado_mensual"] = reservado_mensual
     if ocupado is not None:
@@ -269,7 +271,7 @@ def actualizar_slot( garage_id, slot_id, nuevaData):
         for linea in lineas[1:]:
             datos = linea.strip().split(",")
             
-            id_actual,piso, tipo_slot, reservado_mensual, ocupado, patente, hora_entrada, tipo_vehiculo = datos[0:]
+            id_actual, piso, tipo_slot, reservado_mensual, ocupado, patente, hora_entrada, tipo_vehiculo = datos[0:]
             
             if id_actual == str(slot_id) and str(nuevaData.get("piso")) == datos[1]:
                 piso = datos[1]
@@ -349,12 +351,15 @@ def leer_config_slots(ruta_csv=None):
                 config[tipo] = int(cantidad_str)
         return config
 
-def crear_data_para_actualizar_tipo_slots(ruta_csv):
+def crear_data_para_actualizar_tipo_slots(ruta_csv, garage):
     """Crea una lista de diccionarios con los datos a actualizar para varios slots.
     """
+    slots_por_piso = garage.get('slots_per_floor', 0)
+    pisos_totales = garage.get('floors', 0)
     try:
         slots = []
         slot_id = 0
+        pisos_slots = {}
 
         with open(ruta_csv, "r", encoding="utf-8") as f:
             lineas = f.readlines()
@@ -384,16 +389,28 @@ def crear_data_para_actualizar_tipo_slots(ruta_csv):
                 print(Fore.YELLOW + f"⚠️ Tipo desconocido: {tipo}" + Style.RESET_ALL)
                 continue
 
+            if piso not in pisos_slots:
+                pisos_slots[piso] = 0
+
             for _ in range(cantidad):
+                if pisos_slots[piso] >= slots_por_piso:
+                    print(Fore.YELLOW + f"⚠️ Piso {piso} alcanzó el máximo de {slots_por_piso} slots. Ignorando los extra." + Style.RESET_ALL)
+                    break
+
                 slot_id += 1
-                slot_data = {
+                slots.append({
                     "slot_id": slot_id,
                     "tipo_slot": tipo_slot,
                     "piso": piso
-                }
-                slots.append(slot_data)
+                })
+                pisos_slots[piso] += 1
 
+        for piso in range(0, pisos_totales):
+            count = pisos_slots.get(piso, 0)
+            if count < slots_por_piso:
+                print(Fore.YELLOW + f"⚠️ Piso {piso} tiene solo {count}/{slots_por_piso} slots definidos." + Style.RESET_ALL)
         return slots
+
     except Exception as e:
         print(Fore.RED + f"\nError al actualizar slots: {e}\n" + Style.RESET_ALL)
         return []
