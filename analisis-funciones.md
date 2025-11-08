@@ -653,6 +653,7 @@ def pedir_piso(garage):
 **✅ CORRECCIÓN:** La función SÍ se usa en `visual/menu_principal_handlers.py` (línea 41).
 
 **Uso actual:**
+
 - ✅ Importada en `menu_principal_handlers.py`
 - ✅ Usada en función `handle_mostrar_estado_garage()` para solicitar el piso a visualizar
 
