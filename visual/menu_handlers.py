@@ -15,8 +15,8 @@ from users.users_garage import (
 )
 from auxiliares.consola import clear_screen
 from colorama import Fore, Style
-from garage.garage_util import buscar_por_patente, buscar_slots_por_tipo
-from garage.slot_utils import validacion_slots_ok, buscar_piso_por_slot_id
+from garage.garage_util import buscar_por_patente
+from garage.slot_utils import validacion_slots_ok, buscar_piso_por_slot_id, get_slot_in_piso, buscar_slots_por_tipo
 from users.interaccion_usuario import pedir_patente
 
 
@@ -346,24 +346,25 @@ def handle_mover_vehiculo(garage, garage_data=None):
     try:
         patente = pedir_patente()
         piso, slot = buscar_por_patente(garage_data, patente)
-        data =  garage_data[piso][slot-1]
+        data = get_slot_in_piso(garage_data[piso], slot)
         tipo_vehiculo = data.get('tipo_vehiculo')
 
         if piso == -1 and slot == -1:
             print("Vehiculo no encontrado en el garage")
             return False
         pisos_slots_por_tipo = buscar_slots_por_tipo(garage_data, tipo_vehiculo)
-        slots_por_tipo =  [slot for sub in pisos_slots_por_tipo.values() for slot in sub]
+        slots_por_tipo = [slot for sub in pisos_slots_por_tipo.values() for slot in sub]
         while True:
             if not slots_por_tipo:
                 print("No hay mas lugares disponibles para este tipo de vehiculo.")
                 raise Exception("No hay lugar")
+            print(f"Lugares disponibles: {pisos_slots_por_tipo}/n")
             nuevo_slot_id = int(input(f"Ingrese el ID del nuevo slot debe coincidir con {slots_por_tipo}: "))
             if nuevo_slot_id < 1 or nuevo_slot_id not in slots_por_tipo:
                 print(Fore.RED + f"El ID del slot debe estar entre {slots_por_tipo}." + Style.RESET_ALL)
             else:
                 break
-        nuevo_piso = [ i for i in pisos_slots_por_tipo.keys() if nuevo_slot_id in pisos_slots_por_tipo[i]][0]
+        nuevo_piso = buscar_piso_por_slot_id(nuevo_slot_id, garage)
         old_slot_id = data.get("id")
         hora_entrada = data.get('hora_entrada')
         

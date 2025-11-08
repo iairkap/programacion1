@@ -26,15 +26,15 @@ def tipo_slot():
                     "Error: Ingrese un numero (1-3) o el tipo de vehiculo (moto/auto/suv-camioneta)")
                 
 
-def obtener_slot_por_id(garage, slot_id):
-    """Obtiene slot por ID - NUEVA función auxiliar"""
-    # Busca en todos los pisos y slots
-    for piso in garage:
-        for slot in piso:
-            # Compara con slot["id"] que es el ID del slot
-            if slot["id"] == slot_id:
-                return slot
-    return None
+def get_slot_in_piso(piso, slot_id):
+    slot_data = {}
+    for slot in piso:
+        if slot.get('id', 0) == slot_id:
+            slot_data = slot
+            break
+    if not slot_data:
+        print('Slot no encontrado')
+    return slot_data
 
 def buscar_piso_por_slot_id(slot_id, garage):
     """
@@ -99,3 +99,16 @@ def tipos_de_slot_definidos(garage, garage_data):
     """Retorna True si todos los slots ya tienen tipo, else False"""
     total_slots = garage.get('floors', 0) * garage.get('slots_per_floor', 0)
     return total_slots > 0 and all(slot.get('tipo_slot') for data in garage_data for slot in data)
+
+def buscar_slots_por_tipo(garage, tipo_slot):
+    """Busca todos los ids de slots en el garage que coinciden con el tipo de slot pasado por parametro
+    output: {piso: slots_disponibles_por_tippo}"""
+    pisos = {}
+    for num_piso, piso_data in enumerate(garage):
+        slots_por_tipo = []
+        for slot in piso_data:
+            if slot.get('tipo_slot') == tipo_slot and not slot.get('ocupado'):
+                slots_por_tipo.append(slot.get('id'))
+        if slots_por_tipo:
+            pisos.update({f'Piso {num_piso}': slots_por_tipo})
+    return pisos
