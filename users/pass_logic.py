@@ -97,8 +97,7 @@ COLORES = {
 
 limpiar_pantalla = lambda: os.system("cls") if platform.system()=="Windows" else os.system("clear")
 
-
-def login(crear_usuario = False,users_path="./files/users/"):    
+def login(crear_usuario=False, users_path="./files/users/"):    
     """
     Inicia sesión o crea un nuevo usuario administrador.
 
@@ -123,19 +122,22 @@ def login(crear_usuario = False,users_path="./files/users/"):
         # fallback: carpeta actual si no puede crear la ruta
         users_dir = Path.cwd() / "files" / "users"
         users_dir.mkdir(parents=True, exist_ok=True)
+
     print(COLORES["bright"] + "\n══════════════ LOGIN ══════════════" + COLORES["reset"])
 
-    #"""Solicita el nombre de usuario y maneja login o creación de cuenta."""    
+    # 🔁 Bucle principal del login
     while True:
+        # --- Solicitar usuario ---
         if crear_usuario: 
             user = input(COLORES["bright"] + "👤 Ingresa el nuevo mail de tu Usuario: " + COLORES["reset"]).strip()
         else:
             user = input(COLORES["bright"] + "👤 Mail del Usuario: " + COLORES["reset"]).strip()
+
         if not user:
             print(COLORES["alerta"] + "⚠ Debe ingresar un mail." + COLORES["reset"])
             continue
 
-        # Validaciones básicas de formato de email
+        # --- Validaciones básicas de formato de email ---
         if user.count("@") != 1:
             print(COLORES["alerta"] + "⚠ El mail debe contener exactamente un '@'." + COLORES["reset"])
             continue
@@ -146,108 +148,112 @@ def login(crear_usuario = False,users_path="./files/users/"):
             continue
 
         if "." not in domain:
-            print(COLORES["alerta"] + "⚠ El dominio debe contener al menos un '.'." + COLORES["reset"])
+            print(COLORES["alerta"] + "⚠ El dominio debe contener al menos un '.' después del @." + COLORES["reset"])
             continue
 
         if " " in user:
             print(COLORES["alerta"] + "⚠ El mail no puede contener espacios." + COLORES["reset"])
             continue
 
-        # Sanitizar para nombre de archivo (quitar caracteres inválidos)
+        # --- Sanitizar para nombre de archivo ---
         safe_user = "".join(c for c in user if c not in r'\/:*?"<>|')
         if not safe_user:
             print(COLORES["alerta"] + "⚠ Nombre de usuario inválido para archivo." + COLORES["reset"])
             continue
 
         user = safe_user
-        break
-    archivo_usuario = os.path.join(users_path, f"{user}.csv")
+        archivo_usuario = os.path.join(users_path, f"{user}.csv")
         
-    try:
-        with open(archivo_usuario, mode="rt", encoding="utf-8") as archivo:
-            if crear_usuario:
-                print(COLORES["alerta"] + f"⚠ El usuario '{user}' ya existe." + COLORES["reset"])
-                print(COLORES["info"] + " Ingrese su contraseña existente..." + COLORES["reset"])
-            contraseña_archivada= archivo.readline().strip()
-            #Intentamos desencriptar si tiene formato encriptado.
-            if ";" in contraseña_archivada:
-                try:
-                    enc, lista = contraseña_archivada.split(";", 1)
-                    contraseña_guardada = desencriptar(enc, enlistar(lista))
-                except Exception:
-                    raise CredencialesInvalidasError(COLORES["error"]+"✖ Error al desencriptar la contraseña guardada."+ COLORES["reset"])
-                   
-            else:
-                contraseña_guardada= contraseña_archivada
-                
-            #Hasta 3 intentos de ingreso
-            intentos=3
-
-            while intentos>0:
-                contraseña_ingresada = input(COLORES["bright"]+"🔐 Contraseña: "+COLORES["reset"])
-            
-                if contraseña_ingresada == contraseña_guardada:
-                    print(COLORES["bright"]+f"\nBienvenido, {user}!"+COLORES["reset"])
-                    return user, contraseña_guardada
-                else:
-                    intentos-=1
-                    if intentos>0:
-                        print(COLORES["error"]+ "✖ Contraseña incorrecta."+ COLORES["reset"])
-                    else:
-                        log_event("login_attempts_exceeded", "WARN", "Excediste los 3 intentos.", usuario=user, funcion="login")
-                        raise CredencialesInvalidasError(COLORES["error"]+ "Excediste los 3 intentos."+ COLORES["reset"])
-                     
-
-        
-    except OSError:
-        
-        #Usuario no encontrado -> ofrece crearlo
-        if crear_usuario:
-            respuesta = "s"
-        else:
-            print(COLORES["alerta"] + f"⚠ El usuario '{user}' no existe." + COLORES["reset"])
-            respuesta = input("Queres crear un nuevo usuario? (s/n): ").lower()
-        
-        while respuesta !="s" and respuesta !="n":
-            respuesta = input(COLORES["alerta"]+"✖ Respuesta INVALIDA, debe ingresar s o n: "+COLORES["reset"]).lower()
-        
-        if respuesta == "n":
-        #     # raise UsuarioNoExisteError(COLORES["alerta"] + "⚠ No se creó el usuario. Saliendo del login."+ COLORES["reset"])
-            print("\n" + COLORES["bright"] + "⚠ No se creó el usuario, volvé a intentar logearte!" + COLORES["reset"])
-            login()
-        
-        print("Creando nueva cuenta...")
-        while True:
-            nuevaContraseña = input(COLORES["bright"]+ "🔑 Crea tu contraseña: "+ COLORES["reset"])
-            
-            try:
-                if validar(nuevaContraseña):        # <---- Puede levantar ContraseñaInvalidaError
-                
-                    repetir=input("Repeti la contraseña ingresada: ")
-            
-                    if nuevaContraseña != repetir:
-                        print(COLORES["alerta"] + "⚠ No coinciden las contraseñas. Intenta de nuevo"+ COLORES["reset"])
-                        continue
-                    break
-            except ContraseñaInvalidaError as e:
-                print(COLORES["alerta"] + str(e) + COLORES["reset"])
-                continue        
-
         try:
-            enc, lista = encriptar(nuevaContraseña)
+            # --- Intentar leer usuario existente ---
+            with open(archivo_usuario, mode="rt", encoding="utf-8") as archivo:
+                if crear_usuario:
+                    print(COLORES["alerta"] + f"⚠ El usuario '{user}' ya existe." + COLORES["reset"])
+                    print(COLORES["info"] + "Ingrese su contraseña existente..." + COLORES["reset"])
 
-            with open(archivo_usuario, mode = "wt", encoding="utf-8") as archivo:
-                archivo.write(f"{enc};{lista}\n")
-            print(COLORES["ok"]+"✅ Cuenta creada exitosamente!"+ COLORES["reset"])
-            print(COLORES["bright"]+f"\nBienvenido, {user}!"+COLORES["reset"])
-            return user, nuevaContraseña
-        
+                contraseña_archivada = archivo.readline().strip()
+
+                # Desencriptar si corresponde
+                if ";" in contraseña_archivada:
+                    try:
+                        enc, lista = contraseña_archivada.split(";", 1)
+                        contraseña_guardada = desencriptar(enc, enlistar(lista))
+                    except Exception:
+                        raise CredencialesInvalidasError(
+                            COLORES["error"] + "✖ Error al desencriptar la contraseña guardada." + COLORES["reset"]
+                        )
+                else:
+                    contraseña_guardada = contraseña_archivada
+                
+                # Hasta 3 intentos de ingreso
+                intentos = 3
+                while intentos > 0:
+                    contraseña_ingresada = input(COLORES["bright"] + "🔐 Contraseña: " + COLORES["reset"])
+                
+                    if contraseña_ingresada == contraseña_guardada:
+                        print(COLORES["bright"] + f"\nBienvenido, {user}!" + COLORES["reset"])
+                        return user, contraseña_guardada
+                    else:
+                        intentos -= 1
+                        if intentos > 0:
+                            print(COLORES["error"] + "✖ Contraseña incorrecta." + COLORES["reset"])
+                        else:
+                            log_event(
+                                "login_attempts_exceeded", 
+                                "WARN", 
+                                "Excediste los 3 intentos.", 
+                                usuario=user, 
+                                funcion="login"
+                            )
+                            raise CredencialesInvalidasError(
+                                COLORES["error"] + "Excediste los 3 intentos." + COLORES["reset"]
+                            )
+
         except OSError:
-            raise ArchivoNoAccesibleError(COLORES["error"]+"❌ No se pudo crear el archivo"+COLORES["reset"])
-           
+            # Usuario no encontrado → ofrecer crear
+            if crear_usuario:
+                respuesta = "s"
+            else:
+                print(COLORES["alerta"] + f"⚠ El usuario '{user}' no existe." + COLORES["reset"])
+                respuesta = input("¿Querés crear un nuevo usuario? (s/n): ").lower()
             
-    
+            while respuesta not in ["s", "n"]:
+                respuesta = input(
+                    COLORES["alerta"] + "✖ Respuesta inválida, debe ingresar s o n: " + COLORES["reset"]
+                ).lower()
+            
+            if respuesta == "n":
+                print("\n" + COLORES["bright"] + "⚠ No se creó el usuario, volvé a intentar logearte!" + COLORES["reset"])
+                continue  # <--- vuelve al inicio del bucle principal
 
+            # --- Crear nueva cuenta ---
+            print("Creando nueva cuenta...")
+            while True:
+                nuevaContraseña = input(COLORES["bright"] + "🔑 Crea tu contraseña: " + COLORES["reset"])
+                
+                try:
+                    if validar(nuevaContraseña):
+                        repetir = input("Repetí la contraseña ingresada: ")
+                        if nuevaContraseña != repetir:
+                            print(COLORES["alerta"] + "⚠ No coinciden las contraseñas. Intentá de nuevo." + COLORES["reset"])
+                            continue
+                        break
+                except ContraseñaInvalidaError as e:
+                    print(COLORES["alerta"] + str(e) + COLORES["reset"])
+                    continue        
+
+            try:
+                enc, lista = encriptar(nuevaContraseña)
+                with open(archivo_usuario, mode="wt", encoding="utf-8") as archivo:
+                    archivo.write(f"{enc};{lista}\n")
+                print(COLORES["ok"] + "✅ Cuenta creada exitosamente!" + COLORES["reset"])
+                print(COLORES["bright"] + f"\nBienvenido, {user}!" + COLORES["reset"])
+                return user, nuevaContraseña
+
+            except OSError:
+                raise ArchivoNoAccesibleError(COLORES["error"] + "❌ No se pudo crear el archivo" + COLORES["reset"])
+            except Exception:
+                print("Saliendo . . .")
     
 def crear_contraseña(largo_contraseña = 20):
     """

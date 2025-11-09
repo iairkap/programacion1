@@ -5,7 +5,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import garage.slot_utils as slot_utils
 import random
 from users.interaccion_usuario import (pedir_patente, configuracion_diario_mensual)
-from garage.garage_util import buscar_por_patente
+from garage.garage_util import buscar_por_patente, buscar_espacio_libre
 from users import users_garage
 from users.users_garage import (get_garage_data, actualizar_garage)
 from cache.json import leer_estado_garage, guardar_estado_garage
@@ -46,233 +46,31 @@ def modificar_vehiculo(garage, patente, nuevo_tipo=None, nueva_patente=None, nue
         print(Fore.RED + f"Error modificando vehículo: {e}" + Style.RESET_ALL)
     return False
 
-def generar_fecha_aleatoria():
-    """Genera una fecha y hora aleatoria en formato 'YYYY-MM-DD HH:MM'"""
-    year = "2025"
-    month = str(random.randint(1, 12)).zfill(2)
-    day = str(random.randint(1, 28)).zfill(2)
-    hour = str(random.randint(0, 23)).zfill(2)
-    minute = str(random.randint(0, 59)).zfill(2)
-    return f"{year}-{month}-{day} {hour}:{minute}"
-
-
-def eliminar_fila_por_valor(valor, garage):
-    """Elimina la primera fila que contiene el valor dado, con manejo de errores."""
-    try:
-        for i in range(len(garage)):
-            if valor in garage[i]:
-                del garage[i]
-                print(Fore.GREEN + f"Fila eliminada correctamente (valor: {valor})." + Style.RESET_ALL)
-                return True
-    except Exception as e:
-        print(Fore.RED + f"Error eliminando fila: {e}" + Style.RESET_ALL)
-        return False
-    print(Fore.YELLOW + "No se encontró ninguna fila con el valor especificado." + Style.RESET_ALL)
-    return False
 
 def ingresar_patente():
-    """Solicita y valida una patente, con manejo de errores y colorama."""
+    """
+    Solicita y valida una patente nueva que no exista en el sistema.
+    Usa pedir_patente() para validar formato y solo verifica existencia.
+    """
+    garage = leer_garage_normalizado()
     while True:
         try:
-            patente = pedir_patente()
-            if chequear_existencia_patente(patente):
+            patente = pedir_patente()  # Ya valida formato completo (6 o 7 dígitos)
+            if chequear_existencia_patente(patente, garage):
                 print(Fore.RED + "Error: La patente ya existe en el sistema." + Style.RESET_ALL)
                 continue
-            if len(patente) == 6 and patente[:3].isalpha() and patente[3:].isdigit():
-                print(Fore.GREEN + "Patente válida ingresada." + Style.RESET_ALL)
-                return patente
-            else:
-                print(Fore.YELLOW + "Error: Formato de patente inválido. Intente nuevamente." + Style.RESET_ALL)
+            print(Fore.GREEN + "Patente válida ingresada." + Style.RESET_ALL)
+            return patente
         except Exception as e:
             print(Fore.RED + f"Error procesando la patente: {e}. Intente nuevamente." + Style.RESET_ALL)
+
+
 
 def acceder_a_info_de_patentes(garage):
     """Devuelve lista de dicts con slots ocupados."""
     datos = garage
     return [slot for slot in datos if slot.get("ocupado") == True]
 
-def chequear_existencia_patente(patente, garage ):
-    """Devuelve True si la patente existe y está ocupada."""
-    datos = garage
-    for slot in datos:
-        if slot["patente"] == patente and slot["ocupado"] == True:
-            return True
-    return False
-
-def es_subscripcion_mensual(patente, garage):
-    """Chequea si la subscripcion es mensual usando la vista de diccionarios.
-
-    Retorna True si el slot tiene `reservado_mensual` == "True" o es True.
-    """
-    datos = garage
-    for slot in datos:
-        if slot["patente"] == patente and slot["ocupado"] == True:
-            val = slot["reservado_mensual"]
-            # Normalizar distintos tipos (str "True"/"False" o booleano)
-            if type(val) is str:
-                return val == "True"
-            return bool(val)
-    return False
-
-def busqueda_espacio_libre(garage, tipo_vehiculo=None):
-    for piso in garage: 
-        for slot in piso:
-            if slot["ocupado"] == False:
-                if tipo_vehiculo is None or slot["tipo_slot"] == str(tipo_vehiculo) or slot["tipo_slot"] == tipo_vehiculo:
-                    piso_val = int(slot["piso"]) if "piso" in slot else 0
-                    id_val = int(slot["id"]) if "id" in slot else 0
-                    return (piso_val, id_val)
-                    
-    return (-1, -1)
-
-
-def contar_espacios_libres(garage=None):
-    """
-    Cuenta la cantidad de espacios libres en el garage.
-    Cuenta slots con 'ocupado' == 'False'.
-    """
-    datos = leer_garage_normalizado()
-    return sum(1 for slot in datos if slot["ocupado"] == "False")
-
-def calcular_costo_de_estadia(patente, hora_salida, tarifa):
-    """
-    Calcula el costo de estadía de un vehículo.
-    Lee el garage desde cache, busca la patente y calcula según tarifa (diaria o mensual).
-    
-    patente: string con la patente del vehículo
-    hora_salida: string con la hora de salida (formato YYYY-MM-DD HH:MM)
-    tarifa: lista de listas con tarifas [garage_id, tipo, periodo_mensual, precio, moneda, descripcion]
-    """
-    try:
-        # Leer el garage_id desde cache
-        cache_data = leer_estado_garage()
-        if not cache_data:
-            print(Fore.RED + "Error: No se pudo leer el estado del garage." + Style.RESET_ALL)
-            return 0
-        
-        garage_id = cache_data.get('garage_id')
-        if not garage_id:
-            print(Fore.RED + "Error: No hay garage_id en cache." + Style.RESET_ALL)
-            return 0
-        
-        # Leer el garage desde CSV
-        garage = get_garage_data(garage_id)
-        if not garage:
-            print(Fore.RED + "Error: No se pudo cargar el garage." + Style.RESET_ALL)
-            return 0
-        
-        # Buscar la patente en el garage
-        piso_idx, slot_id = buscar_por_patente(garage, patente)
-        if (piso_idx, slot_id) == (-1, -1):
-            print(Fore.RED + f"Error: Patente {patente} no encontrada." + Style.RESET_ALL)
-            return 0
-        
-        # Obtener slot del garage
-        slot = garage[piso_idx][slot_id - 1]  # slot_id comienza en 1
-        
-        # Obtener datos del slot
-        tipo_vehiculo = slot.get("tipo_vehiculo_estacionado", 0)
-        hora_entrada = slot.get("hora_entrada")
-        es_mensual = slot.get("reservado_mensual", False)
-        
-        # Convertir booleano si viene como string
-        if isinstance(es_mensual, str):
-            es_mensual = es_mensual.lower() == "true"
-        
-        # Obtener tarifa según tipo de vehículo Y período
-        precio_tarifa = _obtener_precio_tarifa(tipo_vehiculo, es_mensual, tarifa)
-        if precio_tarifa is None:
-            periodo_str = "Mensual" if es_mensual else "Diario"
-            print(Fore.RED + f"Error: No hay tarifa configurada para {periodo_str}." + Style.RESET_ALL)
-            return 0
-        
-        # Si es suscripción mensual, retorna la tarifa fija
-        if es_mensual:
-            print(Fore.CYAN + f"Suscripción Mensual - Precio fijo: ${precio_tarifa}" + Style.RESET_ALL)
-            return precio_tarifa
-        
-        # Si es diario, calcula por horas
-        if not hora_entrada:
-            print(Fore.YELLOW + "Advertencia: No se encontró hora de entrada. Cobrando tarifa mínima." + Style.RESET_ALL)
-            return precio_tarifa
-        
-        horas_transcurridas = _calcular_horas(hora_entrada, hora_salida)
-        if horas_transcurridas < 1:
-            horas_transcurridas = 1  # Mínimo 1 hora
-        
-        costo = precio_tarifa * horas_transcurridas
-        print(Fore.CYAN + f"Diario - {horas_transcurridas:.1f} horas × ${precio_tarifa}/h = ${costo}" + Style.RESET_ALL)
-        return round(costo, 2)
-    
-    except Exception as e:
-        print(Fore.RED + f"Error calculando costo: {e}" + Style.RESET_ALL)
-        return 0
-
-
-def _obtener_precio_tarifa(tipo_vehiculo, es_mensual, tarifa):
-    """Busca el precio de tarifa según tipo de vehículo y período.
-    
-    tipo_vehiculo: número (1=moto, 2=auto, 3=camioneta)
-    es_mensual: booleano (True=mensual, False=diario)
-    tarifa: lista de listas [[garage_id, tipo, periodo_mensual, precio, ...], ...]
-    Retorna: precio (float) o None si no existe
-    """
-    if not tarifa:
-        return None
-    
-    # Convertir booleano a string para comparar con CSV
-    periodo_buscado = "True" if es_mensual else "False"
-    
-    for row in tarifa:
-        # row[1] = tipo, row[2] = periodo_mensual, row[3] = precio
-        if len(row) < 4:
-            continue
-        
-        try:
-            tipo_tarifa = int(row[1]) if row[1] else 0
-            tarifa_periodo = str(row[2])
-            
-            if tipo_tarifa == tipo_vehiculo and tarifa_periodo == periodo_buscado:
-                return float(row[3])
-        except (ValueError, IndexError, TypeError):
-            continue
-    
-    return None
-
-
-def _calcular_horas(hora_entrada, hora_salida):
-    """Calcula horas transcurridas entre dos timestamps.
-    
-    Formato esperado: 'YYYY-MM-DD HH:MM'
-    Retorna: número de horas (float)
-    """
-    try:
-        # Extraer horas y minutos
-        entrada_partes = hora_entrada.split(" ")
-        salida_partes = hora_salida.split(" ")
-        
-        if len(entrada_partes) < 2 or len(salida_partes) < 2:
-            return 0
-        
-        entrada_tiempo = entrada_partes[1].split(":")
-        salida_tiempo = salida_partes[1].split(":")
-        
-        entrada_minutos = int(entrada_tiempo[0]) * 60 + int(entrada_tiempo[1])
-        salida_minutos = int(salida_tiempo[0]) * 60 + int(salida_tiempo[1])
-        
-        minutos_transcurridos = salida_minutos - entrada_minutos
-        
-        # Si es negativo, asume que es día siguiente
-        if minutos_transcurridos < 0:
-            minutos_transcurridos += 24 * 60
-        
-        horas = minutos_transcurridos / 60
-        return horas
-    
-    except (ValueError, IndexError):
-        return 0
-    
-    
 def registrar_salida_vehiculo(patente=None, tarifa=None):
     """
     Registra la salida de un vehículo del garage.
@@ -332,7 +130,7 @@ def registrar_salida_vehiculo(patente=None, tarifa=None):
         hora_salida = get_current_time_json()
         
         # Calcular costo
-        costo = calcular_costo_de_estadia(patente, hora_salida, tarifa) if tarifa else 0
+        costo = calcular_costo_de_estadia(patente, hora_salida, garage=garage, tarifa=tarifa)
         print(f"Costo de estadía para {patente}: ${costo}")
         
         # Liberar el slot
@@ -341,65 +139,41 @@ def registrar_salida_vehiculo(patente=None, tarifa=None):
         found_slot["hora_entrada"] = None
         found_slot["tipo_vehiculo"] = 0
         
-        # Actualizar CSV
-        actualizar_csv_garage(garage_id, garage)
-        
+
+        # Actualizar slot en CSV
+        slot_data = {
+            "slot_id": found_slot.get("id"),
+            "piso": found_piso_idx,
+            "tipo_slot": found_slot.get("tipo_slot"),
+            "reservado_mensual": found_slot.get("reservado_mensual", False),
+            "ocupado": False,
+            "patente": "",
+            "hora_entrada": "",
+            "tipo_vehiculo": 0
+        }
+        actualizar_garage(garage_id=garage_id, data=slot_data, bulk=False)
+
         print(Fore.GREEN + f"Salida registrada. Slot {found_slot.get('id')} liberado." + Style.RESET_ALL)
         clear_screen()
-        
-        return True
+
+        return False
+
     
     except Exception as e:
         print(Fore.RED + f"Error registrando salida: {e}" + Style.RESET_ALL)
         return False
 
 
-def actualizar_csv_garage(garage_id, garage):
-    """
-    Actualiza el CSV del garage con la estructura modificada.
-    
-    garage: lista de pisos con slots (diccionarios)
-    """
-    try:
-        csv_path = f"files/garage-{garage_id}.csv"
-        
-        with open(csv_path, "w", encoding="utf-8", newline="") as f:
-            # Escribir header
-            f.write("slot_id,piso,tipo_slot,reservado_mensual,ocupado,patente,hora_entrada,tipo_vehiculo\n")
-            
-            # Escribir slots
-            for piso_idx, piso in enumerate(garage):
-                for slot in piso:
-                    slot_id = slot.get("id", 0)
-                    piso = slot.get("piso", piso_idx)
-                    tipo_slot = slot.get("tipo_slot", 0)
-                    reservado = slot.get("reservado_mensual", False)
-                    ocupado = slot.get("ocupado", False)
-                    patente = slot.get("patente", "")
-                    hora_entrada = slot.get("hora_entrada", "")
-                    tipo_vehiculo = slot.get("tipo_vehiculo", 0)
-                    
-                    f.write(f"{slot_id},{piso},{tipo_slot},{reservado},{ocupado},{patente},{hora_entrada},{tipo_vehiculo}\n")
-        
-        print(Fore.GREEN + f"Garage {garage_id} actualizado en CSV." + Style.RESET_ALL)
-    
-    except Exception as e:
-        print(Fore.RED + f"Error actualizando CSV: {e}" + Style.RESET_ALL)
 
-def salida_tipo_vehiculo(tipo_slot):
-    """
-    Convierte un valor numérico que representa el tipo de vehículo en una cadena de texto descriptiva.
-    Si el tipo no es reconocido, retorna "Desconocido".
-    """ 
-# Diccionario de conversión tipo número -> texto
-    if tipo_slot == 1:
-        return "Moto"
-    elif tipo_slot == 2:
-        return "Auto"
-    elif tipo_slot == 3:
-        return "Camioneta"
 
-    return "Desconocido"
+def contar_por_tipo_vehiculo(garage=None, tipo_buscado=None):
+    """Cuenta vehículos estacionados de un tipo (tipo_vehiculo_estacionado)."""
+    datos = leer_garage_normalizado()
+    count = 0
+    for pisos in datos:
+        count += sum(1 for slot in pisos if slot.get("ocupado") == True and slot.get("tipo_vehiculo") == tipo_buscado)
+    return count
+
 
 def registrar_entrada_auto(garage):
     # Solicita la patente al usuario
@@ -416,7 +190,7 @@ def registrar_entrada_auto(garage):
         return False
 
     # BÚSQUEDA: Buscar un espacio libre compatible
-    piso, slot_id  = busqueda_espacio_libre(garage, tipo_vehiculo)
+    piso, slot_id = buscar_espacio_libre(garage, tipo_vehiculo)
     if (piso, slot_id) == (-1, -1):
         print(Fore.RED + "Error: No hay espacio libre disponible para este tipo de vehículo." + Style.RESET_ALL)
         return False
@@ -441,13 +215,7 @@ def registrar_entrada_auto(garage):
         clear_screen()
         return True 
     
-def contar_por_tipo_vehiculo(garage=None, tipo_buscado=None):
-    """Cuenta vehículos estacionados de un tipo (tipo_vehiculo_estacionado)."""
-    datos = leer_garage_normalizado()
-    count = 0
-    for pisos in datos:
-        count += sum(1 for slot in pisos if slot.get("ocupado") == True and slot.get("tipo_vehiculo") == tipo_buscado)
-    return count
+
 
 # CONFIGURACIÓN CONSTANTE DEL EDIFICIO
 pisos = 4

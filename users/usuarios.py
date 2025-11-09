@@ -3,6 +3,7 @@ Creacion de usuario
 """
 from colorama import Fore, Style
 from .pass_logic import login, UsuarioNoExisteError
+from auxiliares.consola import clear_screen
 
 
 def mostrar_mensaje(msg, tipo="info"):

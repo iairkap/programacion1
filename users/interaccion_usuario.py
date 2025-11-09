@@ -3,15 +3,19 @@ from constantes.tipos_vehiculos import obtener_nombre_vehiculo
 from auxiliares.consola import clear_screen
 
 def pedir_piso(garage):
+    """Solicita al usuario un número de piso válido."""
     while True:
         try:
             piso = int(input(f"Ingrese el piso que desea consultar entre 0 y {len(garage)-1}: "))
-            if piso < 0 or piso > len(garage) or len(garage) == 0:
+            if piso < 0 or piso >= len(garage):
                 print("El piso ingresado no es válido. Intente nuevamente.")
             else:
-                return piso            
+                return piso
+        except ValueError:
+            print("Por favor, ingrese un número válido.")
         except Exception as e:
-            print(e)
+            print(f"Error: {e}")
+
 
 def acceder_a_info_de_patentes(GARAGE):
     """Accede a los datos guardados de las patentes
@@ -22,27 +26,7 @@ def acceder_a_info_de_patentes(GARAGE):
             datos.append(pisos)
     return datos
 
-def chequear_existencia_patente(patente):
-    """Chequea si la patente existe en el sistema
-    retorna True si existe, else False"""
-    info_patentes = acceder_a_info_de_patentes()
-    for info in info_patentes:
-        if patente in info:
-                return True
-    return False
 
-def buscar_patente(patente):
-    info_patentes= acceder_a_info_de_patentes()
-    for info in info_patentes:
-        if patente in info:
-            return info
-    
-def es_subscripcion_mensual(patente):
-    """Chequea si la subscripcion es mensual o diaria"""
-    info_patentes = acceder_a_info_de_patentes()
-    for info in info_patentes:
-        if patente in info:
-            return info[3] 
 
 def mostrar_estado_garage(garage):
     print(Fore.GREEN + "\n--- ESTADO DEL GARAGE ---" + Style.RESET_ALL)
