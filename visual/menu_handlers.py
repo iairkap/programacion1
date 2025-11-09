@@ -17,22 +17,26 @@ from users.users_garage import (
 from auxiliares.consola import clear_screen
 from colorama import Fore, Style
 from garage.garage_util import buscar_por_patente
-from garage.slot_utils import validacion_slots_ok, buscar_piso_por_slot_id, get_slot_in_piso, buscar_slots_por_tipo
 from users.interaccion_usuario import pedir_patente
 
 
 def handle_login():
     """Maneja el login del usuario"""
-    email, password = login()
-    usuario = user_login(email)
-    if usuario:
-        print(Fore.GREEN + f"\n\n¡Bienvenido {usuario['nombre']}!" + Style.RESET_ALL)
+    try:
+        email, password = login()
+        usuario = user_login(email)
+        if usuario:
+            print(Fore.GREEN + f"\n\n¡Bienvenido {usuario['nombre']}!" + Style.RESET_ALL)
+            clear_screen()
+            return usuario
+        else:
+            print("Login fallido")
+            clear_screen()
+            return None
+    except Exception as e:
+        print(Fore.RED + f"Error durante el login. {e}" + Style.RESET_ALL)
         clear_screen()
-        return usuario
-    else:
-        print("Login fallido")
-        clear_screen()
-        return None
+        return None 
 
 def handle_registro():
     """Maneja el registro de nuevo usuario"""
@@ -69,7 +73,7 @@ def crear_nuevo_garage(usuario):
 
             slots_per_floor = int(input("Ingrese la cantidad de slots por piso (mínimo 5 - maximo 25): ").strip())
             
-            if 5 < slots_per_floor > 25 :
+            if 5 <= slots_per_floor <= 25 :
                 print(Fore.RED + "La cantidad mínima de slots por piso es 5, el maximo es de 25. Intente de nuevo." + Style.RESET_ALL)
                 continue
 
@@ -248,8 +252,6 @@ def handle_seleccionar_garage(usuario):
             print(Fore.GREEN + f"Garage '{garage_seleccionado['garage_name']}' seleccionado" + Style.RESET_ALL)
             clear_screen()
             return garage_seleccionado
-    else:
-        print(Fore.RED + "No tiene garages asociados" + Style.RESET_ALL)
     clear_screen()
     return None
 
@@ -284,23 +286,21 @@ def handle_actualizar_tipo_slots(garage, garage_data=None):
             print("Una vez editado, guarde el archivo y vuelva aquí para continuar.")
             archivo_editado = input("\n¿Ha editado y guardado el archivo? (s/n): \n").lower() == 's'
         if archivo_editado:
-            data = crear_data_para_actualizar_tipo_slots(ruta_csv, garage)
-            if validacion_slots_ok(data, garage):
-                actualizar_slots(garage_id, data)
-                print(Fore.GREEN + f"\n{garage['garage_name']} ha sido actualizado con exito." + Style.RESET_ALL)
-            else:
-                print("Actualizacion postergada")
+            # print(Fore.GREEN + "\nContinuando con la actualización desde el archivo existente..."+ Style.RESET_ALL)
+            # clear_screen()
+            data = crear_data_para_actualizar_tipo_slots(ruta_csv)
+            print(Fore.GREEN + f"\n{garage['garage_name']} ha sido actualizado con exito." + Style.RESET_ALL)
+            actualizar_slots(garage_id, data)
         else:
             print("Actualización postergada. Por favor, edite el archivo y vuelva a intentarlo.")
             return garage
     else:
         print("Actualización de un solo slot")
         slot_id = int(input("Ingrese el ID del slot a actualizar: "))
-        tipo_slot = input("Ingrese el nuevo tipo de slot para actualizar(moto/auto/camioneta): ")
-        piso = buscar_piso_por_slot_id(slot_id, garage)
+        tipo_slot = input("Ingrese el nuevo tipo de slot para actualizar: ")
         try:
             print(f"Actualizando tipo de slot para el garage '{garage['garage_name']}'...")
-            data.append(crear_data_para_actualizar_slot(slot_id=slot_id, tipo_slot=tipo_slot, piso= piso))
+            data.append(crear_data_para_actualizar_slot(slot_id=slot_id, tipo_slot=tipo_slot))
             actualizar_slots(garage_id, data)
             print(f"Garage con id {garage_id} actualizado correctamente ✅")
         except Exception as e:
@@ -347,25 +347,24 @@ def handle_mover_vehiculo(garage, garage_data=None):
     try:
         patente = pedir_patente()
         piso, slot = buscar_por_patente(garage_data, patente)
-        data = get_slot_in_piso(garage_data[piso], slot)
+        data =  garage_data[piso][slot-1]
         tipo_vehiculo = data.get('tipo_vehiculo')
 
         if piso == -1 and slot == -1:
             print("Vehiculo no encontrado en el garage")
             return False
         pisos_slots_por_tipo = buscar_slots_por_tipo(garage_data, tipo_vehiculo)
-        slots_por_tipo = [slot for sub in pisos_slots_por_tipo.values() for slot in sub]
+        slots_por_tipo =  [slot for sub in pisos_slots_por_tipo.values() for slot in sub]
         while True:
             if not slots_por_tipo:
                 print("No hay mas lugares disponibles para este tipo de vehiculo.")
                 raise Exception("No hay lugar")
-            print(f"Lugares disponibles: {pisos_slots_por_tipo}/n")
             nuevo_slot_id = int(input(f"Ingrese el ID del nuevo slot debe coincidir con {slots_por_tipo}: "))
             if nuevo_slot_id < 1 or nuevo_slot_id not in slots_por_tipo:
                 print(Fore.RED + f"El ID del slot debe estar entre {slots_por_tipo}." + Style.RESET_ALL)
             else:
                 break
-        nuevo_piso = buscar_piso_por_slot_id(nuevo_slot_id, garage)
+        nuevo_piso = [ i for i in pisos_slots_por_tipo.keys() if nuevo_slot_id in pisos_slots_por_tipo[i]][0]
         old_slot_id = data.get("id")
         hora_entrada = data.get('hora_entrada')
         
