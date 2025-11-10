@@ -6,7 +6,7 @@ from constantes.tipos_vehiculos import enum_tipo_vehiculo
 from colorama import Fore, Style
 
 
-def mostrar_garages_asociados(email):
+def mostrar_garages_asociados(email,show_all=False):
     """Mostramos todos los garages asociados al usuario"""
     if not email:
         return None
@@ -27,6 +27,9 @@ def mostrar_garages_asociados(email):
             if parts[1] == email:
                 cont += 1  # ✅ INCREMENTAR PRIMERO
                 print(f"{cont}. {parts[2]}")  # ✅ LUEGO IMPRIMIR
+            elif show_all:
+                cont += 1
+                print(f"{cont}. {parts[2]} (asociado a {parts[1]})")
         
         arch.close()
         
@@ -69,7 +72,8 @@ def buscar_garage_asociado(email):
                     "garage_name": parts[2],
                     "address": parts[3],
                     "floors": int(parts[4]),
-                    "slots_per_floor": int(parts[5])
+                    "slots_per_floor": int(parts[5]),
+                
                 }
                 garages.append(garage)
         
@@ -86,7 +90,7 @@ def buscar_garage_asociado(email):
         return None
 
 
-def seleccionar_solo_un_garage(email,cant_garages):
+def seleccionar_solo_un_garage(email,cant_garages,admin = False):
     "Se recibe como parametro una lista de garages, permitiendo al usuario seleccionar uno."
     if not email:
         return None
@@ -95,37 +99,39 @@ def seleccionar_solo_un_garage(email,cant_garages):
         while True:
             try :
                 numero_garage = int(input("Seleccione un garage: "))
-                if numero_garage > 0 and numero_garage <= cant_garages:
+                if 1 <= numero_garage <= cant_garages:
                     break
+                print(Fore.RED + f"Ingrese un número entre 1 y {cant_garages}." + Style.RESET_ALL)
+                
             except ValueError:
                 print(Fore.RED + "Entrada inválida. Por favor, ingrese un número válido." + Style.RESET_ALL)
 
-        arch = open("files/users-garage.csv", mode="r", encoding="utf-8")
-        next(arch)  # Saltear la línea de encabezado
-        garages = []
-        count = 1
-        for line in arch:
-            parts = line.strip().split(",")
-            if len(parts) < 6:
-                continue
-            
-            # Solo procesar si el email coincide
-            if parts[1] == email:
-                if count == numero_garage:
-                    garage = {
-                        "garage_id": parts[0],
-                        "user_email": parts[1],
-                        "garage_name": parts[2],
-                        "address": parts[3],
-                        "floors": int(parts[4]),
-                        "slots_per_floor": int(parts[5])
-                    }
-                    arch.close()
-                    return garage
-                else: 
-                    cont += 1
-        arch.close()
-        return None
+        with open("files/users-garage.csv", mode="r", encoding="utf-8") as arch:
+            next(arch)  # Saltear la línea de encabezado
+            garages = []
+            count = 1
+            for line in arch:
+                parts = line.strip().split(",")
+                if len(parts) < 6:
+                    continue
+                
+                # Solo procesar si el email coincide
+                if parts[1] == email or admin:
+                    if count == numero_garage:
+                        garage = {
+                            "garage_id": parts[0],
+                            "user_email": parts[1],
+                            "garage_name": parts[2],
+                            "address": parts[3],
+                            "floors": int(parts[4]),
+                            "slots_per_floor": int(parts[5])
+                        }
+                        arch.close()
+                        return garage
+                    else:
+                        count += 1
+            arch.close()
+            return None
 
     except FileNotFoundError:
         print("Archivo users-garage.csv no encontrado.")

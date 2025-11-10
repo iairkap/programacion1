@@ -3,7 +3,13 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from users.pass_logic import login
-from users.usuarios import user_login, registrar_nuevo_usuario,chequear_existencia_email
+from users.usuarios import (
+    user_login,
+    registrar_nuevo_usuario,
+    chequear_existencia_email,
+    asignar_admin,
+    eliminar_admin
+)
 from users.users_garage import (
     buscar_garage_asociado,
     seleccionar_solo_un_garage,
@@ -12,8 +18,8 @@ from users.users_garage import (
     generar_csv_slots,
     crear_data_para_actualizar_slot,
     crear_data_para_actualizar_tipo_slots,
-    mostrar_garages_asociados
-)
+    mostrar_garages_asociados,
+    )
 from auxiliares.consola import clear_screen
 from colorama import Fore, Style
 from garage.garage_util import buscar_por_patente
@@ -245,9 +251,13 @@ def save_tarifa_to_csv(garage_id, tipo_num, periodo_mensual, precio):
 
 def handle_seleccionar_garage(usuario):
     """Maneja la selección de garage existente"""
-    cant_garages_asociados = mostrar_garages_asociados(usuario["email"])
+    admin = usuario.get("admin", False) == "True"
+    if admin:
+        cant_garages_asociados = mostrar_garages_asociados(usuario["email"], show_all=True)
+    else: 
+        cant_garages_asociados = mostrar_garages_asociados(usuario["email"])
     if cant_garages_asociados != 0:
-        garage_seleccionado = seleccionar_solo_un_garage(usuario["email"], cant_garages_asociados)
+        garage_seleccionado = seleccionar_solo_un_garage(usuario["email"], cant_garages_asociados,admin=admin)
         if garage_seleccionado:
             print(Fore.GREEN + f"Garage '{garage_seleccionado['garage_name']}' seleccionado" + Style.RESET_ALL)
             clear_screen()
@@ -376,3 +386,28 @@ def handle_mover_vehiculo(garage, garage_data=None):
         print(Fore.RED + f"Error al mover el vehículo" + Style.RESET_ALL)
     return garage
 
+def handle_administrar_usuarios():
+    """Maneja la administración de usuarios del garage"""
+    print("\n=== ADMINISTRAR USUARIOS DEL GARAGE ===")
+    try:
+        
+        while True:
+            print("1- Asignar admin a un usuario")
+            print("2- Quitar admin a un usuario")
+            print("3- Volver al menú principal")
+            
+            opcion = input("Seleccione una opción: ").strip()
+            if opcion == "1":
+                asignar_admin()
+                clear_screen()
+            elif opcion == "2":
+                eliminar_admin()
+                clear_screen()
+            elif opcion == "3":
+                clear_screen()
+                break
+            else:
+                print(Fore.RED + "Opción inválida. Intente de nuevo." + Style.RESET_ALL)
+    except Exception as e:
+        print(Fore.RED + f"Error al administrar usuarios: {e}" + Style.RESET_ALL)
+    

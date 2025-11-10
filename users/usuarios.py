@@ -4,7 +4,7 @@ Creacion de usuario
 from colorama import Fore, Style
 from .pass_logic import login, UsuarioNoExisteError
 from auxiliares.consola import clear_screen
-
+import os
 
 def mostrar_mensaje(msg, tipo="info"):
     colores = {
@@ -63,6 +63,7 @@ def creacion_usuario(mail):
         if usuario['email'] is None:
             return None
         
+        usuario['admin'] = "False"
     except ValueError:
         mostrar_mensaje("Error: Entrada inválida. Intente de nuevo.", "error")
         return None
@@ -115,19 +116,20 @@ def user_login(email):
         next(arch_users)  # Saltar la primera linea (headers)
         
         for line in arch_users:
-            nombre, apellido, user_email = line.strip().split(',')
+            nombre, apellido, user_email,admin = line.strip().split(',')
             if user_email == email :
                 arch_users.close()
                 return {
                     'nombre': nombre,
                     'apellido': apellido,
                     'email': user_email,
+                    'admin': admin
                 }
         nuevo_usuario = registrar_nuevo_usuario(email)
         if nuevo_usuario:
             print(Fore.GREEN + "Usuario registrado. Ahora puede iniciar sesión." + Style.RESET_ALL)
             clear_screen()
-            return True
+            return nuevo_usuario
         mostrar_mensaje("Error: Email o contraseña incorrectos.", "error")
         arch_users.close()
         return None
@@ -142,19 +144,31 @@ def user_login(email):
 def registrar_nuevo_usuario(email):
     """Función completa para registrar un nuevo usuario"""
     crear_archivo_users()
-    usuario = creacion_usuario(email)
+    #chequear si existen usuarios previo para asignar admin 
+    cantidad_usuarios = 0
+    try:
+        with open("files/users.csv", mode="r", encoding="utf-8") as arch_users:
+            next(arch_users)  # Saltar header
+            for _ in arch_users:
+                cantidad_usuarios += 1
+    except FileNotFoundError:
+        cantidad_usuarios = 0
     
+    usuario = creacion_usuario(email)
+    if cantidad_usuarios == 0:#si es el primer usuario se logea como admin
+        usuario['admin'] = "True"
+        mostrar_mensaje("Este es el primer usuario registrado, se le ha asignado rol de administrador.", "ok")
+    else:
+        usuario['admin'] = "False"
     if not usuario:
         mostrar_mensaje("No se pudo crear el usuario.", "error")
         return False
-    
- 
-    # Escribir el usuario al archivo
+
     try:
         arch_users = open("files/users.csv", mode="a", encoding="utf-8")
-        arch_users.write(f"{usuario['nombre']},{usuario['apellido']},{usuario['email']}\n")
+        arch_users.write(f"{usuario['nombre']},{usuario['apellido']},{usuario['email']},{usuario['admin']}\n")
         arch_users.close()
-        mostrar_mensaje(f"Usuario creado exitosamente: {usuario}", "ok")
+        # mostrar_mensaje(f"Usuario creado exitosamente: {usuario}", "ok")
         return usuario
     except Exception as e:
         mostrar_mensaje(f"Error al guardar el usuario: {e}", "error")
@@ -227,3 +241,105 @@ def validacion_formato_email(email):
             return False, "El TLD debe tener solo letras"
 
     return True, "OK"
+
+def mostrar_usuarios_admin(admin = False):
+    """mostrar los usuarios que son admin o no son admin dependiendo del parametro"""
+    print("\n=== LISTA DE USUARIOS DISPONIBLES ===")
+    with open("files/users.csv", mode="r", encoding="utf-8") as arch_users:
+        next(arch_users)  # Saltar la primera linea (headers)
+        count = 0
+        for linea in arch_users:
+            nombre, apellido, user_email,admin_user = linea.strip().split(',')
+            if (admin and admin_user == "True") or (not admin and admin_user == "False"):
+                count += 1
+                print(f"{count}- {nombre} {apellido} ({user_email})")
+                
+    return count
+
+    
+def asignar_admin():
+    while True:
+        try:
+            print("\n=== ASIGNAR ADMINISTRADOR ===")
+            cantidad_usuarios_disp = mostrar_usuarios_admin(admin=False)
+            if cantidad_usuarios_disp == 0:
+                print(Fore.YELLOW + "No hay usuarios disponibles para asignar como admin." + Style.RESET_ALL)
+                return 0
+
+            indice = input("Seleccione el número del usuario a asignar como admin (o 'q' para salir): ")
+            if indice.lower() == 'q':
+                clear_screen()
+                return 0
+            if not indice.isdigit() or int(indice) < 1 or int(indice) > cantidad_usuarios_disp:
+                print(Fore.RED + "Opción inválida. Intente de nuevo." + Style.RESET_ALL)
+                continue
+
+            indice = int(indice)
+            temp_file = "files/temp_users.csv"
+
+            with open("files/users.csv", "r", encoding="utf-8") as original, \
+                 open(temp_file, "w", encoding="utf-8") as temp:
+                header = next(original)
+                temp.write(header)
+                contador_visibles = 0
+                for linea in original:
+                    nombre, apellido, user_email, admin_user = linea.strip().split(',')
+                    if admin_user == "False":
+                        contador_visibles += 1
+                        if contador_visibles == indice:
+                            temp.write(f"{nombre},{apellido},{user_email},True\n")
+                            continue
+                    temp.write(linea)
+
+            os.replace(temp_file, "files/users.csv")
+            print(Fore.GREEN + "Usuario asignado como administrador correctamente." + Style.RESET_ALL)
+            return 1
+
+        except KeyboardInterrupt:
+            print(Fore.YELLOW + "\nOperación cancelada por el usuario." + Style.RESET_ALL)
+            return 0
+
+
+def eliminar_admin():
+    while True:
+        try:
+            print("\n=== ELIMINAR ADMINISTRADOR ===")
+            cantidad_usuarios_disp = mostrar_usuarios_admin(admin=True)
+            if cantidad_usuarios_disp == 0:
+                print(Fore.YELLOW + "No hay administradores disponibles para eliminar." + Style.RESET_ALL)
+                return 0
+            if cantidad_usuarios_disp == 1:
+                print(Fore.RED + "No se puede eliminar el único administrador restante." + Style.RESET_ALL)
+                return 0
+            indice = input("Seleccione el número del administrador a eliminar (o 'q' para salir): ")
+            if indice.lower() == 'q':
+                clear_screen()
+                return 0
+            if not indice.isdigit() or int(indice) < 1 or int(indice) > cantidad_usuarios_disp:
+                print(Fore.RED + "Opción inválida. Intente de nuevo." + Style.RESET_ALL)
+                continue
+
+            indice = int(indice)
+            temp_file = "files/temp_users.csv"
+
+            with open("files/users.csv", "r", encoding="utf-8") as original, \
+                 open(temp_file, "w", encoding="utf-8") as temp:
+                header = next(original)
+                temp.write(header)
+                contador_visibles = 0
+                for linea in original:
+                    nombre, apellido, user_email, admin_user = linea.strip().split(',')
+                    if admin_user == "True":
+                        contador_visibles += 1
+                        if contador_visibles == indice:
+                            temp.write(f"{nombre},{apellido},{user_email},False\n")
+                            continue
+                    temp.write(linea)
+
+            os.replace(temp_file, "files/users.csv")
+            print(Fore.GREEN + "Administrador eliminado correctamente." + Style.RESET_ALL)
+            return 1
+
+        except KeyboardInterrupt:
+            print(Fore.YELLOW + "\nOperación cancelada por el usuario." + Style.RESET_ALL)
+            return 0

@@ -11,7 +11,8 @@ from visual.menu_handlers import (
     handle_actualizar_tipo_slots,
     handle_actualizar_slots, 
     handle_actualizar_tarifas,
-    handle_mover_vehiculo
+    handle_mover_vehiculo,  
+    handle_administrar_usuarios
 )
 from visual.menu_principal_handlers import (
     handle_consultar_espacios_libres,
@@ -43,8 +44,13 @@ def mostrar_menu_garage(usuario):
     print(Fore.GREEN+f"\n=== GESTIÓN DE GARAGES - {usuario['nombre']} ===" + Style.RESET_ALL)
     print("\n1. Seleccionar garage existente")
     print("2. Crear nuevo garage")
-    print("3. Cerrar sesión\n")
     
+    
+    if usuario.get("admin", False) == "True":
+        print("3. Administrar usuarios")
+        print("4. Cerrar sesión\n")
+    else: 
+        print("3. Cerrar sesión\n")
 
 def mostrar_menu_principal(garage_name):
     """Menú principal del sistema"""
@@ -64,7 +70,9 @@ def mostrar_menu_principal(garage_name):
     "Imprimir tarifas",
     "Mover vehículo"
     ]
-
+   
+    
+        
     print(Fore.GREEN + f"\n=== MENÚ PRINCIPAL - {garage_name['garage_name'].upper()} ===" + Style.RESET_ALL)
     for i, opcion in enumerate(opciones_menu_principal, start=1):
         print(f"{i}. {opcion}")
@@ -105,7 +113,7 @@ def menu_garage(usuario):
     continuar = True
     garage_seleccionado = None
     tarifa = []  # ✅ INICIALIZAR AQUÍ
-    
+    admin = usuario.get('admin', False) == 'True'  # Verificar si el usuario es admin
     while continuar and not garage_seleccionado:
         mostrar_menu_garage(usuario)
         opcion = input("Seleccione una opción: \n")
@@ -121,11 +129,13 @@ def menu_garage(usuario):
             if garage_seleccionado:
                 tarifa = guardar_precios_garage(garage_seleccionado['garage_id'])  # ✅ AGREGAR AQUÍ TAMBIÉN
                 continuar = False
-                    
-        elif opcion == "3":
+        elif admin:
+            if opcion == "3":
+                handle_administrar_usuarios()
+            elif opcion == "4":
+                continuar = False  # Cerrar sesión
+        elif opcion == "4":
             continuar = False  # Cerrar sesión
-            
-            
         else:
             print(Fore.RED + "Opción inválida" + Style.RESET_ALL)
     
@@ -157,13 +167,14 @@ def menu_principal(garage_actual, tarifa):
         handle_imprimir_tarifas,
         handle_mover_vehiculo
     ]
-
+    
     # Acciones especiales (no ejecutan función)
     acciones_especiales = {
         "c": "cambiar_garage",
         "x": "cerrar_sesion",
         "z": "salir",
     }
+
     try: 
         while continuar and not accion:
 
@@ -206,7 +217,6 @@ def main():
         if not usuario_actual:
             programa_activo = False
             continue
-            
         # 2. Selección/Creación de garage
         session_active = True
         while session_active and programa_activo:
