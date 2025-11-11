@@ -139,18 +139,8 @@ def registrar_salida_vehiculo(patente=None, tarifa=None):
         found_slot["hora_entrada"] = None
         found_slot["tipo_vehiculo"] = 0
         
-        # Actualizar slot en CSV
-        slot_data = {
-            "slot_id": found_slot.get("id"),
-            "piso": found_piso_idx,
-            "tipo_slot": found_slot.get("tipo_slot"),
-            "reservado_mensual": found_slot.get("reservado_mensual", False),
-            "ocupado": False,
-            "patente": "",
-            "hora_entrada": "",
-            "tipo_vehiculo": 0
-        }
-        actualizar_garage(garage_id=garage_id, data=slot_data, bulk=False)
+        # Actualizar CSV
+        actualizar_csv_garage(garage_id, garage)
         
         print(Fore.GREEN + f"Salida registrada. Slot {found_slot.get('id')} liberado." + Style.RESET_ALL)
         clear_screen()
@@ -160,6 +150,39 @@ def registrar_salida_vehiculo(patente=None, tarifa=None):
     except Exception as e:
         print(Fore.RED + f"Error registrando salida: {e}" + Style.RESET_ALL)
         return False
+
+
+def actualizar_csv_garage(garage_id, garage):
+    """
+    Actualiza el CSV del garage con la estructura modificada.
+    
+    garage: lista de pisos con slots (diccionarios)
+    """
+    try:
+        csv_path = f"files/garage-{garage_id}.csv"
+        
+        with open(csv_path, "w", encoding="utf-8", newline="") as f:
+            # Escribir header
+            f.write("slot_id,piso,tipo_slot,reservado_mensual,ocupado,patente,hora_entrada,tipo_vehiculo\n")
+            
+            # Escribir slots
+            for piso_idx, piso in enumerate(garage):
+                for slot in piso:
+                    slot_id = slot.get("id", 0)
+                    piso = slot.get("piso", piso_idx)
+                    tipo_slot = slot.get("tipo_slot", 0)
+                    reservado = slot.get("reservado_mensual", False)
+                    ocupado = slot.get("ocupado", False)
+                    patente = slot.get("patente", "")
+                    hora_entrada = slot.get("hora_entrada", "")
+                    tipo_vehiculo = slot.get("tipo_vehiculo", 0)
+                    
+                    f.write(f"{slot_id},{piso},{tipo_slot},{reservado},{ocupado},{patente},{hora_entrada},{tipo_vehiculo}\n")
+        
+        print(Fore.GREEN + f"Garage {garage_id} actualizado en CSV." + Style.RESET_ALL)
+    
+    except Exception as e:
+        print(Fore.RED + f"Error actualizando CSV: {e}" + Style.RESET_ALL)
 
 
 def contar_por_tipo_vehiculo(garage=None, tipo_buscado=None):
