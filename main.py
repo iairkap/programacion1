@@ -15,6 +15,8 @@ from garage.precios import (configurar_precios, es_subscripcion_mensual,
 from auxiliares.date import get_current_time_json
 from auxiliares.consola import clear_screen
 
+###Agregando comentario para que git detecte los cambios D:
+
 def leer_garage_normalizado():
     """
     Lee el garage y retorna una lista de diccionarios normalizados.

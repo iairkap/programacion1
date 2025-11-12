@@ -42,7 +42,7 @@ def mostrar_garages_asociados(email,show_all=False):
         print("Archivo users-garage.csv no encontrado.")
         return 0
 
-
+###Agregando comentario para que git detecte los cambios D:
 def buscar_garage_asociado(email):
     """
     Busca el garage asociado a un usuario dado su email.

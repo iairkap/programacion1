@@ -1,6 +1,6 @@
 import sys
 import os
-
+###Agregando comentario para que git detecte los cambios D:
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from users.pass_logic import login
 from users.usuarios import (
