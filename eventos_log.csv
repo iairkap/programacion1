@@ -1,0 +1,2 @@
+fecha;gravedad;evento;usuario;funcion;mensaje;extra
+2025-11-11 20:55:18;WARN;login_attempts_exceeded;a@a.com;login;Excediste los 3 intentos.;

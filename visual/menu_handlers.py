@@ -22,7 +22,7 @@ from users.users_garage import (
     )
 from auxiliares.consola import clear_screen
 from colorama import Fore, Style
-from garage.garage_util import buscar_por_patente
+from garage.garage_util import buscar_por_patente, buscar_slots_por_tipo
 from users.interaccion_usuario import pedir_patente
 
 
@@ -116,9 +116,15 @@ def crear_nuevo_garage(usuario):
     if configurar_tar:
         agregar_tarifa(garage_id, garage_name=nombre)
 
-    bulk = input(Fore.LIGHTYELLOW_EX + "\n¿Desea configurar los slots ahora? (s/n): \n" + Style.RESET_ALL).strip().lower()
-    if bulk == 's':
-        print("Ejecutar la función de actualizar tipo de slots")
+    # Preguntar por configuración de slots
+    configurar_slots = input(Fore.LIGHTYELLOW_EX + "\n¿Desea configurar los slots ahora? (s/n): \n" + Style.RESET_ALL).strip().lower() == "s"
+    if configurar_slots:
+        # Crear objeto garage temporal para pasar a la función
+        garage_temp = {
+            'garage_id': garage_id,
+            'garage_name': nombre
+        }
+        configurar_slots_bulk(garage_temp)
 
     clear_screen()
     return garage_id
@@ -284,38 +290,55 @@ def handle_crear_garage(usuario):
 def handle_actualizar_tipo_slots(garage, garage_data=None):
     """Maneja la actualización del tipo de slots en el garage"""
     print("\n=== ACTUALIZAR TIPO DE SLOTS ===")
-    garage_id = garage['garage_id']
+    
+    # Preguntar si quiere actualizar múltiples slots o uno solo
     bulk = input("¿Desea actualizar el tipo de varios slots a la vez? (s/n): ").lower() == 's'
-    data = []
-    archivo_editado = False
+    
     if bulk:
-        print("\nSe creara un csv en directorio actual llamado 'config_slots.csv' para actualizar los tipos de slots\n")
-        ruta_csv = generar_csv_slots(garage)
-        if os.path.exists(ruta_csv):
-            print(Fore.RED + f"Por favor, edite el archivo en: {os.path.abspath(ruta_csv)}" + Style.RESET_ALL)
-            print("Una vez editado, guarde el archivo y vuelva aquí para continuar.")
-            archivo_editado = input("\n¿Ha editado y guardado el archivo? (s/n): \n").lower() == 's'
+        configurar_slots_bulk(garage)
+    else:
+        configurar_slot_individual(garage)
+    
+    return garage
+
+
+def configurar_slots_bulk(garage):
+    """Lógica para configurar múltiples slots mediante CSV"""
+    garage_id = garage['garage_id']
+    garage_name = garage['garage_name']
+    
+    print("\nSe creará un csv en directorio actual llamado 'config_slots.csv' para actualizar los tipos de slots\n")
+    ruta_csv = generar_csv_slots(garage)
+    
+    if os.path.exists(ruta_csv):
+        print(Fore.RED + f"Por favor, edite el archivo en: {os.path.abspath(ruta_csv)}" + Style.RESET_ALL)
+        print("Una vez editado, guarde el archivo y vuelva aquí para continuar.")
+        archivo_editado = input("\n¿Ha editado y guardado el archivo? (s/n): \n").lower() == 's'
+        
         if archivo_editado:
-            # print(Fore.GREEN + "\nContinuando con la actualización desde el archivo existente..."+ Style.RESET_ALL)
-            # clear_screen()
             data = crear_data_para_actualizar_tipo_slots(ruta_csv)
-            print(Fore.GREEN + f"\n{garage['garage_name']} ha sido actualizado con exito." + Style.RESET_ALL)
             actualizar_slots(garage_id, data)
+            print(Fore.GREEN + f"\n{garage_name} ha sido actualizado con éxito." + Style.RESET_ALL)
         else:
             print("Actualización postergada. Por favor, edite el archivo y vuelva a intentarlo.")
-            return garage
-    else:
-        print("Actualización de un solo slot")
-        slot_id = int(input("Ingrese el ID del slot a actualizar: "))
-        tipo_slot = input("Ingrese el nuevo tipo de slot para actualizar: ")
-        try:
-            print(f"Actualizando tipo de slot para el garage '{garage['garage_name']}'...")
-            data.append(crear_data_para_actualizar_slot(slot_id=slot_id, tipo_slot=tipo_slot))
-            actualizar_slots(garage_id, data)
-            print(f"Garage con id {garage_id} actualizado correctamente ✅")
-        except Exception as e:
-            print(f"Error al actualizar el garage: {e}")
-    return garage
+
+
+def configurar_slot_individual(garage):
+    """Lógica para configurar un solo slot"""
+    garage_id = garage['garage_id']
+    garage_name = garage['garage_name']
+    
+    print("Actualización de un solo slot")
+    slot_id = int(input("Ingrese el ID del slot a actualizar: "))
+    tipo_slot = input("Ingrese el nuevo tipo de slot para actualizar: ")
+    
+    try:
+        print(f"Actualizando tipo de slot para el garage '{garage_name}'...")
+        data = [crear_data_para_actualizar_slot(slot_id=slot_id, tipo_slot=tipo_slot)]
+        actualizar_slots(garage_id, data)
+        print(Fore.GREEN + f"Garage con id {garage_id} actualizado correctamente ✅" + Style.RESET_ALL)
+    except Exception as e:
+        print(Fore.RED + f"Error al actualizar el garage: {e}" + Style.RESET_ALL)
 
 
 def handle_actualizar_slots(garage, garage_data=None):
@@ -379,7 +402,11 @@ def handle_mover_vehiculo(garage, garage_data=None):
         hora_entrada = data.get('hora_entrada')
         
         print(f"Moviendo vehículo con patente {patente} al slot {nuevo_slot_id}...")
-        data_actualizada = [{"slot_id": old_slot_id, "piso": piso, "ocupado": False, "patente": "", "hora_entrada": "", "tipo_vehiculo": ""}, {"slot_id": nuevo_slot_id, "piso": nuevo_piso, "ocupado": True, "patente": patente, "hora_entrada": hora_entrada, "tipo_vehiculo": tipo_vehiculo}]
+        # Liberar el slot antiguo y ocupar el nuevo
+        data_actualizada = [
+            {"slot_id": old_slot_id, "piso": piso, "ocupado": False, "patente": "", "hora_entrada": "", "tipo_vehiculo": 0},
+            {"slot_id": nuevo_slot_id, "piso": nuevo_piso, "ocupado": True, "patente": patente, "hora_entrada": hora_entrada, "tipo_vehiculo": tipo_vehiculo}
+        ]
         actualizar_slots(garage['garage_id'],  data_actualizada)
         print(Fore.GREEN + f"Vehículo con patente {patente} movido al slot {nuevo_slot_id} correctamente." + Style.RESET_ALL)
     except Exception as e:
