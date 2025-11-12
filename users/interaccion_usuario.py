@@ -60,6 +60,9 @@ def pedir_patente():
             elif digitos == 7 :
                 if patente[:2].isalpha() and patente[2:5].isdigit() and patente[5:].isalpha():
                     return patente
+            elif not patente:
+                print("No se ingreso ninguna patente")
+                return 
             else: 
                 print(Fore.RED + "La patente no tiene el formato correcto ej: AB123CD o ABC123" + Style.RESET_ALL)
                 

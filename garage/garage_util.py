@@ -47,17 +47,6 @@ def buscar_espacio_libre(garage, tipo_vehiculo=None):
                     return (piso_val, id_val)
     return (-1, -1)
 
-def buscar_slots_por_tipo(garage, tipo_slot):
-    """Busca todos los ids de slots en el garage que coinciden con el tipo de slot."""
-    slots_por_tipo = []
-    pisos = {}
-    for num_piso, piso_data in enumerate(garage):
-        for slot in piso_data:
-            if slot.get('tipo_slot') == tipo_slot and not slot.get('ocupado'):
-                slots_por_tipo.append(slot.get('id'))
-        pisos.update({num_piso: slots_por_tipo})
-    return pisos
-
 
 def contar_espacios_libres(garage):
     cont = 0

@@ -31,6 +31,7 @@ from colorama import Back, Fore, Style
 from auxiliares.consola import clear_screen
 from constantes.tipos_vehiculos import enum_tipo_vehiculo
 from users.users_garage import actualizar_slot
+from garage.slot_utils import tipos_de_slot_definidos
 
 def handle_consultar_espacios_libres(garage, garage_data):
     """Maneja la consulta de espacios libres"""
@@ -88,7 +89,11 @@ def handle_consultar_vehiculos_estacionados(garage, garage_data):
 
 def handle_ingresar_vehiculo(garage, garage_data):
     """Maneja el ingreso de vehículos"""
+    if not tipos_de_slot_definidos(garage, garage_data):
+        print(f"Debe definir tipos de slots en garage con id {garage.get('garage_id')} antes de ingresar vehiculos.")
+        return
     registrar_entrada_auto(garage_data)
+
 
 def handle_registrar_salida(garage, garage_data, tarifa):
     """Maneja la salida de vehículos"""

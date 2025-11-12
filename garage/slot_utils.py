@@ -35,3 +35,120 @@ def get_slot_in_piso(piso, slot_id):
     if not slot_data:
         print('Slot no encontrado')
     return slot_data
+
+def buscar_piso_por_slot_id(slot_id, garage):
+    """
+    Calcula a qué piso pertenece un slot según su número y cantidad de slots por piso.
+    """
+    slots_por_piso = garage.get("slots_per_floor")
+    if slot_id <= 0:
+        return None  # IDs negativos o 0 no son válidos
+    piso = ((slot_id - 1) // slots_por_piso)
+    return piso
+
+def validacion_slots_ok(data, garage):
+    """Valida que la cantidad de slots a actualizar coincida con la configuración del garage,
+    y detecta pisos con más o menos slots de los esperados.
+    """
+    slots_per_floor = garage.get("slots_per_floor", 0)
+    floors = garage.get("floors", 0)
+    total_slots = floors * slots_per_floor
+    data_len = len(data)
+
+    if not data:
+        print("❌ No se recibieron datos para actualizar.")
+        return False
+
+    pisos_count = {}
+    for slot in data:
+        piso = slot.get('piso')
+        if piso is None:
+            continue
+        if piso is None or piso < 0 or piso > floors:
+            print(f"⚠️ Piso inválido detectado: {piso}")
+            errores = True
+            continue
+        pisos_count[piso] = pisos_count.get(piso, 0) + 1
+
+    if data_len < total_slots:
+        print(f"⚠️ Estás modificando menos slots que los totales ({data_len}/{total_slots}).")
+    elif data_len > total_slots:
+        print(f"❌ Estás intentando modificar más slots ({data_len}) de los existentes ({total_slots}).")
+    else:
+        print("✅ La cantidad total de slots a actualizar es correcta.")
+    
+    continuar= True
+    if data_len != total_slots:
+        continuar = input("¿Desea continuar con la actualización? (s/n): ").strip().lower() == 's'
+    if not continuar:
+        return False
+
+    print("\n📊 Revisión por piso:")
+    errores = False
+    for piso in range(0, floors):
+        count = pisos_count.get(piso, 0)
+        if count < slots_per_floor:
+            print(f"  Piso {piso}: {count}/{slots_per_floor} → faltan {slots_per_floor - count}")
+        elif count > slots_per_floor:
+            print(f"  Piso {piso}: {count}/{slots_per_floor} → sobran {count - slots_per_floor}")
+        else:
+            print(f"  Piso {piso}: {count}/{slots_per_floor} ✅ correcto")
+    return not errores
+
+def tipos_de_slot_definidos(garage, garage_data):
+    """Retorna True si todos los slots ya tienen tipo, else False"""
+    total_slots = garage.get('floors', 0) * garage.get('slots_per_floor', 0)
+    return total_slots > 0 and all(slot.get('tipo_slot') for data in garage_data for slot in data)
+
+def buscar_slots_por_tipo(garage, tipo_slot):
+    """Busca todos los ids de slots en el garage que coinciden con el tipo de slot pasado por parametro
+    output: {piso: slots_disponibles_por_tippo}"""
+    pisos = {}
+    for num_piso, piso_data in enumerate(garage):
+        slots_por_tipo = []
+        for slot in piso_data:
+            if slot.get('tipo_slot') == tipo_slot and not slot.get('ocupado'):
+                slots_por_tipo.append(slot.get('id'))
+        if slots_por_tipo:
+            pisos.update({f'Piso {num_piso}': slots_por_tipo})
+    return pisos
+
+def pedir_slot_id():
+    slot_id = None
+    while True: 
+        id = input("Ingrese el ID del slot a actualizar (o 'q' para salir): ")
+        if id.lower() == 'q':
+                break
+        if isinstance(id, (str, float)):
+                print('El slot_id debe ser un valor numerico')
+                continue
+        else: 
+            slot_id = id
+        return slot_id
+
+def pedir_dato_s_n(pregunta):
+    dato = None
+    while True and isinstance(pregunta, str):
+        dato= input(f"{pregunta} (s/n): ").lower()
+        if dato != 's' or dato != 'n':
+            print('Dato invalido, ingrese S o N')
+        if dato == 's':
+            dato = True 
+            break
+        if dato == 'n':
+            dato = False
+            break
+    return dato
+
+def pedir_tipo_de_vehiculo():
+    tipo_vehiculo= None
+    while True:
+        tipo_vehiculo =input("Ingrese el tipo de vehículo (moto/auto/camioneta): ").strip().lower()
+        if tipo_vehiculo != 'auto' or tipo_vehiculo != 'moto' or tipo_vehiculo != 'camioneta':
+            print("Ingrese un vehiculo valido")
+            continue
+        elif not tipo_vehiculo:
+            break
+        else:
+            break
+    return tipo_vehiculo
