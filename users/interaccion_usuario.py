@@ -1,7 +1,7 @@
 from colorama import Fore, Style
 from constantes.tipos_vehiculos import obtener_nombre_vehiculo
 from auxiliares.consola import clear_screen
-
+###Agregando comentario para que git detecte los cambios D:
 def pedir_piso(garage):
     while True:
         try:

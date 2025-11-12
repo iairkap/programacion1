@@ -5,7 +5,7 @@ import os
 from constantes.tipos_vehiculos import enum_tipo_vehiculo
 from colorama import Fore, Style
 
-
+###Agregando comentario para que git detecte los cambios D:
 def buscar_garage_asociado(email):
     """
     Busca el garage asociado a un usuario dado su email.

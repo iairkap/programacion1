@@ -2,6 +2,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+###Agregando comentario para que git detecte los cambios D:
 from garage.garage_util import (
     contar_espacios_libres,
     buscar_por_patente,

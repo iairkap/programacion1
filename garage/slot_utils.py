@@ -1,6 +1,6 @@
 import datetime
 from colorama import Fore, Style
-
+###Agregando comentario para que git detecte los cambios D:
 
 def tipo_slot():
     while True:

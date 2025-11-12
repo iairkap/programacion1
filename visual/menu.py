@@ -31,6 +31,8 @@ from cache.json import leer_estado_garage, guardar_estado_garage
 from colorama import Fore, Style
 from auxiliares.consola import clear_screen
 
+###Agregando comentario para que git detecte los cambios D:
+
 def mostrar_menu_inicial():
     """Menú de inicio de sesión y registro"""
     print(Fore.GREEN + "\n=== BIENVENIDO A SLOTMASTER ===" + Style.RESET_ALL)
