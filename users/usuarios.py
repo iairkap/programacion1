@@ -94,7 +94,7 @@ def chequear_existencia_email(email):
         next(arch_users)  # Saltar la primera linea (headers)
         
         for line in arch_users:
-            nombre, apellido, user_email = line.strip().split(',')
+            nombre, apellido, user_email, admin = line.strip().split(',')
             if user_email == email:
                 arch_users.close()
                 return True

@@ -121,6 +121,59 @@ def calcular_costo_de_estadia(patente, hora_salida=None, garage=None, tarifa=Non
         print(Fore.CYAN + f"Suscripción Mensual - Precio fijo: ${precio_tarifa}" + Style.RESET_ALL)
         return precio_tarifa
     
+    # Cálculo por horas (no mensual)
+    if not hora_entrada:
+        print(Fore.RED + "Error: No se encontró la hora de entrada del vehículo." + Style.RESET_ALL)
+        return 0
+    
+    # Usar hora actual si no se proporciona hora_salida
+    if hora_salida is None:
+        hora_salida = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    # Calcular diferencia de horas
+    try:
+        # Soportar formato con y sin segundos
+        formatos = ["%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M"]
+        entrada_dt = None
+        salida_dt = None
+        
+        for formato in formatos:
+            try:
+                entrada_dt = datetime.strptime(hora_entrada, formato)
+                break
+            except ValueError:
+                continue
+        
+        for formato in formatos:
+            try:
+                salida_dt = datetime.strptime(hora_salida, formato)
+                break
+            except ValueError:
+                continue
+        
+        if entrada_dt is None or salida_dt is None:
+            print(Fore.RED + f"Error: Formato de fecha inválido. Entrada: {hora_entrada}, Salida: {hora_salida}" + Style.RESET_ALL)
+            return 0
+        
+        # Calcular diferencia en horas
+        diferencia = salida_dt - entrada_dt
+        horas = diferencia.total_seconds() / 3600
+        
+        # Redondear hacia arriba (mínimo 1 hora)
+        if horas < 1:
+            horas = 1
+        else:
+            # Redondear hacia arriba al entero más cercano
+            horas = int(horas) + (1 if horas % 1 > 0 else 0)
+        
+        costo_total = precio_tarifa * horas
+        print(Fore.GREEN + f"Estadía de {horas} hora(s) a ${precio_tarifa}/h = ${costo_total}" + Style.RESET_ALL)
+        return costo_total
+        
+    except Exception as e:
+        print(Fore.RED + f"Error al calcular costo: {e}" + Style.RESET_ALL)
+        return 0
+
 
 def _obtener_precio_tarifa(tipo_vehiculo, es_mensual, tarifa):
     """Busca el precio de tarifa según tipo de vehículo y período.

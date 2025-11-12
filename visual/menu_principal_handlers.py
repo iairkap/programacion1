@@ -132,8 +132,10 @@ def handle_buscar_vehiculo(garage, garage_data):
     pos = buscar_por_patente(garage_data, patente)
     if pos != (-1, -1):
         print(f"Vehículo encontrado en Piso {pos[0]}, Slot {pos[1]}")
+        clear_screen()
     else:
         print("Vehículo no encontrado.")
+        clear_screen()
 
 def handle_estadisticas_rapidas(garage, garage_data= None):
     """Maneja las estadísticas rápidas"""

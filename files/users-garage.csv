@@ -1,10 +1,2 @@
 garage_id,user_email,garage_name,address,floors,slots_per_floor
-1,a@a.com,UADE,Lima 123,10,7
-2,a@a.com,Uade2,Lima 123,10,5
-3,b@b.com,Fuc,Giuffra 77,10,7
-4,km@gmail.com,x,x,6,5
-5,hoho123@gmail.com,lasdfjk,23223,1,7
-6,yami123@gmail.com,lololo,asdf,3,23
-7,yoyo123@gmail.com,UADE,Lima 123,10,5
-8,yami123@gmail.com,Ugarteche,Ugarteche 123,10,5
-9,yami123@gmail.com,LIMA,lima 123,10,5
+1,pami123@gmail.com,Pami,9 de Julio 123,10,5

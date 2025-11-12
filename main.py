@@ -189,6 +189,7 @@ def registrar_entrada_auto(garage):
     posicion_existente = buscar_por_patente(garage, patente)
     if posicion_existente != (-1, -1):
         print(Fore.RED + f"Error: La patente {patente} ya está en el garage" + Style.RESET_ALL)
+        clear_screen()
         return False
 
     # BÚSQUEDA: Buscar un espacio libre compatible
