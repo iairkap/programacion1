@@ -113,42 +113,12 @@ def buscar_slots_por_tipo(garage, tipo_slot):
             pisos.update({f'Piso {num_piso}': slots_por_tipo})
     return pisos
 
-def pedir_slot_id():
-    slot_id = None
-    while True: 
-        id = input("Ingrese el ID del slot a actualizar (o 'q' para salir): ")
-        if id.lower() == 'q':
-                break
-        if isinstance(id, (str, float)):
-                print('El slot_id debe ser un valor numerico')
-                continue
-        else: 
-            slot_id = id
-        return slot_id
-
-def pedir_dato_s_n(pregunta):
-    dato = None
-    while True and isinstance(pregunta, str):
-        dato= input(f"{pregunta} (s/n): ").lower()
-        if dato != 's' or dato != 'n':
-            print('Dato invalido, ingrese S o N')
-        if dato == 's':
-            dato = True 
+def slot_ocupado(garage_data, slot_id):
+    ocupado = False
+    for piso in garage_data:
+        slot_data = get_slot_in_piso(piso, slot_id)
+        if slot_data:
+            ocupado = slot_data.get('ocupado')
             break
-        if dato == 'n':
-            dato = False
-            break
-    return dato
-
-def pedir_tipo_de_vehiculo():
-    tipo_vehiculo= None
-    while True:
-        tipo_vehiculo =input("Ingrese el tipo de vehículo (moto/auto/camioneta): ").strip().lower()
-        if tipo_vehiculo != 'auto' or tipo_vehiculo != 'moto' or tipo_vehiculo != 'camioneta':
-            print("Ingrese un vehiculo valido")
-            continue
-        elif not tipo_vehiculo:
-            break
-        else:
-            break
-    return tipo_vehiculo
+    return ocupado
+    

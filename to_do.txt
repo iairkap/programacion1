@@ -41,3 +41,7 @@ CREAR NUEVO GARAGE mejorar manejo de errores
 ingresar vehiculo- mandatorio haber elegido los tipos de slots
 salida de vehiculo, mandatorio haber puestos las
 
+
+Actualizar tipo de slot bulk. 
+Cuando ya se definieron tipos de slots, ver si no dejat definir mas en bulk. 
+Agregar advertencia. 
