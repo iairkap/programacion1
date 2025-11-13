@@ -24,7 +24,7 @@ from auxiliares.consola import clear_screen
 from colorama import Fore, Style
 from garage.garage_util import buscar_por_patente
 from users.interaccion_usuario import pedir_patente
-from garage.slot_utils import validacion_slots_ok, buscar_piso_por_slot_id, get_slot_in_piso, buscar_slots_por_tipo, pedir_slot_id, pedir_dato_s_n, pedir_tipo_de_vehiculo
+from garage.slot_utils import validacion_slots_ok, buscar_piso_por_slot_id, get_slot_in_piso, buscar_slots_por_tipo, tipos_de_slot_definidos, slot_ocupado
 import datetime
 
 def handle_login():
@@ -289,15 +289,38 @@ def handle_crear_garage(usuario):
         clear_screen()
     return None
 
+def handle_actualizar_tipo_slot(garage_data, garage):
+     data = []
+     garage_id = garage.get('garage_id', 0)
+     print("Actualización de un solo slot")
+     slot_id = int(input("Ingrese el ID del slot a actualizar: "))
+     if not slot_ocupado(garage_data, slot_id):
+        while True:
+            tipo_slot = input("Ingrese el nuevo tipo de slot para actualizar(moto/auto/camioneta): ")
+            if tipo_slot not in ('moto', 'auto', 'camioneta'):
+                print('El tipo de slot es invalido')
+            else:
+                break
+        piso = buscar_piso_por_slot_id(slot_id, garage)
+        try:
+            print(f"Actualizando tipo de slot para el garage '{garage['garage_name']}'...")
+            data.append(crear_data_para_actualizar_slot(slot_id=slot_id, tipo_slot=tipo_slot, piso= piso))
+            actualizar_slots(garage_id, data)
+            print(f"Garage con id {garage_id} actualizado correctamente ✅")
+        except Exception as e:
+            print(f"Error al actualizar el garage: {e}")
+     else:
+        print(Fore.YELLOW + "El SLOT ESTA OCUPADO, puede actualizar tipo solo si esta vacio." + Style.RESET_ALL)
 
 def handle_actualizar_tipo_slots(garage, garage_data=None):
     """Maneja la actualización del tipo de slots en el garage"""
     print("\n=== ACTUALIZAR TIPO DE SLOTS ===")
     garage_id = garage['garage_id']
-    bulk = input("¿Desea actualizar el tipo de varios slots a la vez? (s/n): ").lower() == 's'
     data = []
     archivo_editado = False
-    if bulk:
+    tipos_slots = tipos_de_slot_definidos(garage, garage_data)
+    bulk = input("¿Desea actualizar el tipo de varios slots a la vez? (s/n): ").lower() == 's'
+    if bulk and not tipos_slots:
         print("\nSe creara un csv en directorio actual llamado 'config_slots.csv' para actualizar los tipos de slots\n")
         ruta_csv = generar_csv_slots(garage)
         if os.path.exists(ruta_csv):
@@ -310,22 +333,14 @@ def handle_actualizar_tipo_slots(garage, garage_data=None):
                 actualizar_slots(garage_id, data)
                 print(Fore.GREEN + f"\n{garage['garage_name']} ha sido actualizado con exito." + Style.RESET_ALL)
             else:
-                print("Actualizacion postergada")
+                print(Fore.YELLOW + "Actualizacion postergada" + Style.RESET_ALL)
         else:
-            print("Actualización postergada. Por favor, edite el archivo y vuelva a intentarlo.")
+            print(Fore.YELLOW + "Actualización postergada. Por favor, edite el archivo y vuelva a intentarlo." + Style.RESET_ALL )
             return garage
+    elif bulk and tipos_slots:
+        print(Fore.RED + "LOS TIPOS DE SLOTS YA HAN SIDO DEFINIDOS EN BULK, no se pueden definir de este formato, actualice uno por uno" + Style.RESET_ALL)
     else:
-        print("Actualización de un solo slot")
-        slot_id = int(input("Ingrese el ID del slot a actualizar: "))
-        tipo_slot = input("Ingrese el nuevo tipo de slot para actualizar(moto/auto/camioneta): ")
-        piso = buscar_piso_por_slot_id(slot_id, garage)
-        try:
-            print(f"Actualizando tipo de slot para el garage '{garage['garage_name']}'...")
-            data.append(crear_data_para_actualizar_slot(slot_id=slot_id, tipo_slot=tipo_slot, piso= piso))
-            actualizar_slots(garage_id, data)
-            print(f"Garage con id {garage_id} actualizado correctamente ✅")
-        except Exception as e:
-            print(f"Error al actualizar el garage: {e}")
+        handle_actualizar_tipo_slot(garage_data, garage)
     return garage
 
 
@@ -351,55 +366,27 @@ def configurar_slots_bulk(garage):
     else:
         print(Fore.RED + "No se pudo generar el archivo CSV. Operación cancelada." + Style.RESET_ALL)
 
-
-def configurar_slot_individual(garage):
-    """Lógica para configurar un solo slot"""
-    garage_id = garage['garage_id']
-    garage_name = garage['garage_name']
+def mover_vehiculo(patente, garage_data, tipo_vehiculo, data, garage, piso):
+    pisos_slots_por_tipo = buscar_slots_por_tipo(garage_data, tipo_vehiculo)
+    slots_por_tipo = [slot for sub in pisos_slots_por_tipo.values() for slot in sub]
+    while True:
+        if not slots_por_tipo:
+            print("No hay mas lugares disponibles para este tipo de vehiculo.")
+            raise Exception("No hay lugar")
+        print(f"Lugares disponibles: {pisos_slots_por_tipo}/n")
+        nuevo_slot_id = int(input(f"Ingrese el ID del nuevo slot debe coincidir con {slots_por_tipo}: "))
+        if nuevo_slot_id < 1 or nuevo_slot_id not in slots_por_tipo:
+            print(Fore.RED + f"El ID del slot debe estar entre {slots_por_tipo}." + Style.RESET_ALL)
+        else:
+            break
+    nuevo_piso = buscar_piso_por_slot_id(nuevo_slot_id, garage)
+    old_slot_id = data.get("id")
+    hora_entrada = data.get('hora_entrada')
     
-    print("Actualización de un solo slot")
-    slot_id = int(input("Ingrese el ID del slot a actualizar: "))
-    tipo_slot = input("Ingrese el nuevo tipo de slot para actualizar: ")
-    
-    try:
-        print(f"Actualizando tipo de slot para el garage '{garage_name}'...")
-        data = [crear_data_para_actualizar_slot(slot_id=slot_id, tipo_slot=tipo_slot)]
-        actualizar_slots(garage_id, data)
-        print(Fore.GREEN + f"Garage con id {garage_id} actualizado correctamente ✅" + Style.RESET_ALL)
-    except Exception as e:
-        print(Fore.RED + f"Error al actualizar el garage: {e}" + Style.RESET_ALL)
-
-
-###### Fixear #### 
-def handle_actualizar_slots(garage, garage_data=None):
-    """Maneja la actualización de información de slots en el garage"""
-    print("\n=== ACTUALIZAR INFORMACIÓN DE SLOTS ===")
-    data = []
-    garage_id = garage['garage_id']
-    seguir_actualizando = True
-    print(f"Actualizando slots para el garage '{garage['garage_name']}'...")
-    try:
-        while seguir_actualizando:
-            slot_id = pedir_slot_id()
-            ocupado = pedir_dato_s_n("¿El slot esta ocupado?")
-            reservado_mensual = pedir_dato_s_n("¿El slot es reservado mensual?")
-            patente = pedir_patente()
-            hora_entrada = datetime.datetime.today().strftime("%d/%m/%Y, %H:%M:%S") if pedir_dato_s_n("¿Desea setear hora de entrada de vehiculo?") else None
-            tipo_vehiculo = pedir_tipo_de_vehiculo()
-            data_slot = crear_data_para_actualizar_slot(
-                slot_id=slot_id,
-                ocupado=ocupado,
-                reservado_mensual=reservado_mensual,
-                patente=patente if patente else None,
-                hora_entrada=hora_entrada,
-                tipo_vehiculo=tipo_vehiculo)
-            data.append(data_slot)
-            seguir_actualizando = pedir_dato_s_n("¿Desea actualizar otro slot?")
-        actualizar_slots(garage_id, data)
-        print(f"Slot {slot_id} actualizado correctamente.")
-    except Exception as e:
-        print(f"Error al actualizar el garage: {e}")
-    return garage
+    print(f"Moviendo vehículo con patente {patente} al slot {nuevo_slot_id}...")
+    data_actualizada = [{"slot_id": old_slot_id, "piso": piso, "ocupado": False, "patente": "", "hora_entrada": "", "tipo_vehiculo": ""}, {"slot_id": nuevo_slot_id, "piso": nuevo_piso, "ocupado": True, "patente": patente, "hora_entrada": hora_entrada, "tipo_vehiculo": tipo_vehiculo}]
+    actualizar_slots(garage['garage_id'],  data_actualizada)
+    print(Fore.GREEN + f"Vehículo con patente {patente} movido al slot {nuevo_slot_id} correctamente." + Style.RESET_ALL)
 
 
 def handle_mover_vehiculo(garage, garage_data=None):
@@ -414,26 +401,7 @@ def handle_mover_vehiculo(garage, garage_data=None):
         if piso == -1 and slot == -1:
             print("Vehiculo no encontrado en el garage")
             return False
-        pisos_slots_por_tipo = buscar_slots_por_tipo(garage_data, tipo_vehiculo)
-        slots_por_tipo = [slot for sub in pisos_slots_por_tipo.values() for slot in sub]
-        while True:
-            if not slots_por_tipo:
-                print("No hay mas lugares disponibles para este tipo de vehiculo.")
-                raise Exception("No hay lugar")
-            print(f"Lugares disponibles: {pisos_slots_por_tipo}/n")
-            nuevo_slot_id = int(input(f"Ingrese el ID del nuevo slot debe coincidir con {slots_por_tipo}: "))
-            if nuevo_slot_id < 1 or nuevo_slot_id not in slots_por_tipo:
-                print(Fore.RED + f"El ID del slot debe estar entre {slots_por_tipo}." + Style.RESET_ALL)
-            else:
-                break
-        nuevo_piso = buscar_piso_por_slot_id(nuevo_slot_id, garage)
-        old_slot_id = data.get("id")
-        hora_entrada = data.get('hora_entrada')
-        
-        print(f"Moviendo vehículo con patente {patente} al slot {nuevo_slot_id}...")
-        data_actualizada = [{"slot_id": old_slot_id, "piso": piso, "ocupado": False, "patente": "", "hora_entrada": "", "tipo_vehiculo": ""}, {"slot_id": nuevo_slot_id, "piso": nuevo_piso, "ocupado": True, "patente": patente, "hora_entrada": hora_entrada, "tipo_vehiculo": tipo_vehiculo}]
-        actualizar_slots(garage['garage_id'],  data_actualizada)
-        print(Fore.GREEN + f"Vehículo con patente {patente} movido al slot {nuevo_slot_id} correctamente." + Style.RESET_ALL)
+        mover_vehiculo(patente, garage_data, tipo_vehiculo, data, garage)
     except Exception as e:
         print(Fore.RED + f"Error al mover el vehículo" + Style.RESET_ALL)
     return garage

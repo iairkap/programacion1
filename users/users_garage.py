@@ -296,7 +296,7 @@ def actualizar_slot( garage_id, slot_id, nuevaData):
             # Reescribir filas
             for fila in nuevas_lineas[1:]:
                 file.write(",".join(fila) + "\n")
-
+        return True
     except FileNotFoundError:
         print(f"Archivo garage-{garage_id}.csv no encontrado.")
     except Exception as e:
@@ -312,8 +312,9 @@ def generar_csv_slots(garage):
     try:
         ruta_base = os.path.expanduser('~')
         ruta_data = os.path.join(ruta_base, "Documents", "data")
+        _id = garage.get('garage_id', 0)
         os.makedirs(ruta_data, exist_ok=True)
-        ruta_csv = os.path.join(ruta_data, "config_slots.csv")
+        ruta_csv = os.path.join(ruta_data, f"config_slots_{_id}.csv")
 
         if not os.path.exists(ruta_csv):
             with open(ruta_csv, "w", encoding='utf-8') as file:

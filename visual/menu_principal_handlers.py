@@ -20,18 +20,16 @@ from main import (
     registrar_entrada_auto,
     contar_por_tipo_vehiculo,
     registrar_salida_vehiculo,
-    modificar_vehiculo,
 )
 
-
 from constantes.tarifa import print_tarifas
-
 
 from colorama import Back, Fore, Style
 from auxiliares.consola import clear_screen
 from constantes.tipos_vehiculos import enum_tipo_vehiculo
 from users.users_garage import actualizar_slot
-from garage.slot_utils import tipos_de_slot_definidos
+from garage.slot_utils import tipos_de_slot_definidos, get_slot_in_piso
+from visual.menu_handlers import mover_vehiculo
 
 def handle_consultar_espacios_libres(garage, garage_data):
     """Maneja la consulta de espacios libres"""
@@ -103,22 +101,60 @@ def handle_registrar_salida(garage, garage_data, tarifa):
     else:
         print("Patente no encontrada.")
 
+def menu_editar_vehiculo():
+    """Menu para editar vehiculo"""
+    print(Fore.GREEN+ "\n=== MENU EDITAR VEHICULO ===" + Style.RESET_ALL)
+    print("1. Editar patente")
+    print("2. Editar tipo de vehiculo")
+    print("3. Editar estadia")
+    print("z. Volver atras")
+
+    while True:
+        opcion = input("Seleccione una opción: \n")
+        if opcion == 'z':
+            break
+        if opcion not in ('1','2','3'):
+            print("opcion invalida, intente de nuevo")
+        return opcion
+
+    
 def handle_editar_vehiculo(garage, garage_data):
     """Maneja la edición de vehículos guardados"""
+    opcion = menu_editar_vehiculo()
+    if not opcion:
+        return
+    
     patente = pedir_patente()
     piso, slot = buscar_por_patente(garage_data, patente)
     if piso == -1 and slot ==-1:
-        print('Patente no encontrada')
+        print(Fore.RED + 'Patente no encontrada en el garage' + Style.RESET_ALL)
         return
-    nuevo_tipo = pedir_tipo_vehiculo()
-    nueva_patente = input("Nueva patente (dejar vacío para no cambiar): ").strip().upper()
-    nueva_estadia = int(input("Ingrese el tipo de abono para el vehiculo (1/Diario. 2/Mensual)"))
-    estadia = True if nueva_estadia == 2 else False
-    if not patente:
-        print("Patente no encontrada.")
-        return
-    data = {"patente": patente, "tipo_vehiculo": nuevo_tipo, "reservado_mensual": estadia }
+    nueva_patente = None
+    nueva_estadia = None
+    nuevo_tipo = None
+    if opcion == '1':
+        nueva_patente = pedir_patente()
+    elif opcion == '2':
+        nuevo_tipo = pedir_tipo_vehiculo()
+    elif opcion == '3':
+        while True:
+            nueva_estadia = int(input("Ingrese la nueva estadía (1/mensual,2/diaria): "))
+            if nueva_estadia != 1 or nueva_estadia != 2:
+                print("Valor invalido, intente otra vez")
+                continue
+            else:
+                break
+    slot_data = get_slot_in_piso(garage_data[piso], slot)
+    tipo_vehiculo = slot_data.get("tipo_vehiculo")
+    nueva_patente = nueva_patente if nueva_patente else patente
+    nuevo_tipo = nuevo_tipo if nuevo_tipo else tipo_vehiculo
+    nueva_estadia = nueva_estadia if nueva_estadia else slot_data.get("reservado_mensual")
+
+    data = {"patente": nueva_patente, "tipo_vehiculo": nuevo_tipo, "reservado_mensual": nueva_estadia, 'piso': piso }
     if actualizar_slot(garage.get('garage_id'), slot, data):
+        if nuevo_tipo != int(tipo_vehiculo):
+            print(Fore.YELLOW + "SE EDITO EL TIPO DE VEHICULO, debe mover el vehiculo a un slot acorde al nuevo tipo" + Style.RESET_ALL)
+            mover_vehiculo(nueva_patente, garage_data, nuevo_tipo, slot_data, garage, piso)
         print("Vehículo modificado correctamente.")
     return True
 
@@ -132,10 +168,8 @@ def handle_buscar_vehiculo(garage, garage_data):
     pos = buscar_por_patente(garage_data, patente)
     if pos != (-1, -1):
         print(f"Vehículo encontrado en Piso {pos[0]}, Slot {pos[1]}")
-        clear_screen()
     else:
         print("Vehículo no encontrado.")
-        clear_screen()
 
 def handle_estadisticas_rapidas(garage, garage_data= None):
     """Maneja las estadísticas rápidas"""

@@ -9,7 +9,6 @@ from visual.menu_handlers import (
     handle_seleccionar_garage, 
     handle_crear_garage,
     handle_actualizar_tipo_slots,
-    handle_actualizar_slots, 
     handle_actualizar_tarifas,
     handle_mover_vehiculo,  
     handle_administrar_usuarios
@@ -67,13 +66,10 @@ def mostrar_menu_principal(garage_name):
     "Buscar vehículo por patente",
     "Estadísticas rápidas",
     "Actualizar tipo de slot",
-    "Actualizar info de slots",
     "Actualizar tarifas",
     "Imprimir tarifas",
     "Mover vehículo"
     ]
-   
-    
         
     print(Fore.GREEN + f"\n=== MENÚ PRINCIPAL - {garage_name['garage_name'].upper()} ===" + Style.RESET_ALL)
     for i, opcion in enumerate(opciones_menu_principal, start=1):
@@ -164,7 +160,6 @@ def menu_principal(garage_actual, tarifa):
         handle_buscar_vehiculo,
         handle_estadisticas_rapidas,
         handle_actualizar_tipo_slots,
-        handle_actualizar_slots, 
         handle_actualizar_tarifas,
         handle_imprimir_tarifas,
         handle_mover_vehiculo
