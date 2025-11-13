@@ -296,7 +296,7 @@ def actualizar_slot( garage_id, slot_id, nuevaData):
             # Reescribir filas
             for fila in nuevas_lineas[1:]:
                 file.write(",".join(fila) + "\n")
-
+        return True
     except FileNotFoundError:
         print(f"Archivo garage-{garage_id}.csv no encontrado.")
     except Exception as e:

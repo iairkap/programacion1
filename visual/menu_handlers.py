@@ -364,7 +364,7 @@ def configurar_slots_bulk(garage):
         else:
             print("Actualización postergada. Por favor, edite el archivo y vuelva a intentarlo.")
 
-def mover_vehiculo(patente, garage_data, tipo_vehiculo, data, garage):
+def mover_vehiculo(patente, garage_data, tipo_vehiculo, data, garage, piso):
     pisos_slots_por_tipo = buscar_slots_por_tipo(garage_data, tipo_vehiculo)
     slots_por_tipo = [slot for sub in pisos_slots_por_tipo.values() for slot in sub]
     while True:

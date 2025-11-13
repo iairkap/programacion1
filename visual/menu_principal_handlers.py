@@ -144,11 +144,17 @@ def handle_editar_vehiculo(garage, garage_data):
                 continue
             else:
                 break
-    data = {"patente": nueva_patente, "tipo_vehiculo": nuevo_tipo, "reservado_mensual": nueva_estadia }
+    slot_data = get_slot_in_piso(garage_data[piso], slot)
+    tipo_vehiculo = slot_data.get("tipo_vehiculo")
+    nueva_patente = nueva_patente if nueva_patente else patente
+    nuevo_tipo = nuevo_tipo if nuevo_tipo else tipo_vehiculo
+    nueva_estadia = nueva_estadia if nueva_estadia else slot_data.get("reservado_mensual")
+
+    data = {"patente": nueva_patente, "tipo_vehiculo": nuevo_tipo, "reservado_mensual": nueva_estadia, 'piso': piso }
     if actualizar_slot(garage.get('garage_id'), slot, data):
-        if nuevo_tipo:
-            data = get_slot_in_piso(garage_data[piso], slot)
-            mover_vehiculo(nueva_patente, garage_data, nuevo_tipo, data, garage)
+        if nuevo_tipo != int(tipo_vehiculo):
+            print(Fore.YELLOW + "SE EDITO EL TIPO DE VEHICULO, debe mover el vehiculo a un slot acorde al nuevo tipo" + Style.RESET_ALL)
+            mover_vehiculo(nueva_patente, garage_data, nuevo_tipo, slot_data, garage, piso)
         print("Vehículo modificado correctamente.")
     return True
 
