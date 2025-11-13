@@ -29,7 +29,6 @@ from auxiliares.consola import clear_screen
 from constantes.tipos_vehiculos import enum_tipo_vehiculo
 from users.users_garage import actualizar_slot
 from garage.slot_utils import tipos_de_slot_definidos, get_slot_in_piso
-from visual.menu_handlers import mover_vehiculo
 
 def handle_consultar_espacios_libres(garage, garage_data):
     """Maneja la consulta de espacios libres"""
@@ -138,23 +137,27 @@ def handle_editar_vehiculo(garage, garage_data):
         nuevo_tipo = pedir_tipo_vehiculo()
     elif opcion == '3':
         while True:
-            nueva_estadia = int(input("Ingrese la nueva estadía (1/mensual,2/diaria): "))
-            if nueva_estadia != 1 or nueva_estadia != 2:
-                print("Valor invalido, intente otra vez")
+            try:
+                nueva_estadia_input = int(input("Ingrese la nueva estadía (1/mensual, 2/diaria): "))
+                if nueva_estadia_input not in [1, 2]:
+                    print("Valor invalido, intente otra vez")
+                    continue
+                else:
+                    nueva_estadia = True if nueva_estadia_input == 1 else False
+                    break
+            except ValueError:
+                print("Por favor ingrese 1 o 2")
                 continue
-            else:
-                break
     slot_data = get_slot_in_piso(garage_data[piso], slot)
     tipo_vehiculo = slot_data.get("tipo_vehiculo")
     nueva_patente = nueva_patente if nueva_patente else patente
     nuevo_tipo = nuevo_tipo if nuevo_tipo else tipo_vehiculo
-    nueva_estadia = nueva_estadia if nueva_estadia else slot_data.get("reservado_mensual")
+    nueva_estadia = nueva_estadia if nueva_estadia is not None else slot_data.get("reservado_mensual")
 
     data = {"patente": nueva_patente, "tipo_vehiculo": nuevo_tipo, "reservado_mensual": nueva_estadia, 'piso': piso }
     if actualizar_slot(garage.get('garage_id'), slot, data):
         if nuevo_tipo != int(tipo_vehiculo):
-            print(Fore.YELLOW + "SE EDITO EL TIPO DE VEHICULO, debe mover el vehiculo a un slot acorde al nuevo tipo" + Style.RESET_ALL)
-            mover_vehiculo(nueva_patente, garage_data, nuevo_tipo, slot_data, garage, piso)
+            print(Fore.YELLOW + "SE EDITO EL TIPO DE VEHICULO. Use la opción 'Mover vehículo' del menú para moverlo a un slot acorde al nuevo tipo." + Style.RESET_ALL)
         print("Vehículo modificado correctamente.")
     return True
 

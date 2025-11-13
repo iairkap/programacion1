@@ -184,11 +184,11 @@ def menu_principal(garage_actual, tarifa):
                 if 0 <= indice < len(handlers):
                     if indice == 3:  # Opción 4: registrar salida
                         handlers[indice](garage_actual, garage_data, tarifa)
-                    elif indice == 10:  # Opción 11: actualizar tarifas
+                    elif indice == 9:  # Opción 10: actualizar tarifas
                         handlers[indice](garage_actual, tarifa)
                         tarifa = guardar_precios_garage(garage_actual['garage_id'])
                         
-                    elif indice == 11:  # Opción 12: imprimir tarifas
+                    elif indice == 10:  # Opción 11: imprimir tarifas
                         handlers[indice](tarifa)
                     else:
                         handlers[indice](garage_actual, garage_data)

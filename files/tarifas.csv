@@ -11,3 +11,15 @@ garage_id,tipo,periodo_mensual,precio
 4,1,False,1500.0
 4,2,False,2500.0
 4,3,False,4500.0
+6,1,False,1500.0
+6,2,False,2500.0
+6,3,False,3500.0
+6,1,True,1700.0
+6,2,True,2500.0
+6,3,True,2300.0
+7,1,False,3200.0
+7,1,True,32000.0
+7,2,False,2900.0
+7,2,True,39000.0
+7,3,False,4000.0
+7,3,True,40000.0

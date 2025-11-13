@@ -13,7 +13,7 @@ slot_id,piso,tipo_slot,reservado_mensual,ocupado,patente,hora_entrada,tipo_vehic
 12,2,2,False,True,GHI789,2025-11-13 10:30:00,2
 13,2,1,False,False,,,0
 14,2,1,False,True,MOT654,2025-11-13 12:00:00,1
-15,2,3,False,True,CAM111,2025-11-13 08:00:00,3
+15,2,3,False,False,,,0
 16,3,2,False,True,FAB123,2025-11-13 15:27:42,2
 17,3,2,False,True,JKL012,2025-11-13 09:30:00,2
 18,3,1,False,True,MOT987,2025-11-13 11:00:00,1
@@ -24,3 +24,8 @@ slot_id,piso,tipo_slot,reservado_mensual,ocupado,patente,hora_entrada,tipo_vehic
 23,4,1,False,False,,,0
 24,4,1,False,True,MOT147,2025-11-13 10:45:00,1
 25,4,3,True,True,VIP888,2025-11-13 06:30:00,3
+26,5,2,False,False,,,
+27,5,2,False,False,,,
+28,5,1,False,False,,,
+29,5,1,False,False,,,
+30,5,3,False,False,,,

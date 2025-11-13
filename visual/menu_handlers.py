@@ -140,49 +140,120 @@ def handle_actualizar_tarifas(garage, garage_data=None):
 
 
 def agregar_tarifa(garage_id, garage_name=None):
-    """Función independiente para agregar tarifas a files/tarifas.csv.
-    Guarda valores numéricos: tipo (1/2/3), periodo_mensual (True/False)"""
-    tipo_map = {"1": (1, ":moto"), "2": (2, ":auto"), "3": (3, ":camioneta")}
-    periodo_map = {"1": (False, ":diario"), "2": (True, ":mensual")}
-
-    display_name = f" '{garage_name}'" if garage_name else f" id={garage_id}"
-    print(f"\nConfigurar tarifas para el garage{display_name}. Escriba 'fin' para terminar.")
+    """Función mejorada para actualizar tarifas con vista previa y confirmación"""
+    from constantes.tarifa import guardar_precios_garage
     
+    # Obtener tarifas actuales (retorna lista de listas)
+    tarifas_lista = guardar_precios_garage(garage_id)
+    
+    # Convertir a diccionario {(tipo, periodo_mensual): precio}
+    tarifas_actuales = {}
+    for tarifa in tarifas_lista:
+        if len(tarifa) >= 4:
+            try:
+                tipo = int(tarifa[1])
+                periodo_mensual = tarifa[2] == "True"
+                precio = float(tarifa[3])
+                tarifas_actuales[(tipo, periodo_mensual)] = precio
+            except (ValueError, IndexError):
+                continue
+    
+    display_name = f"'{garage_name}'" if garage_name else f"ID {garage_id}"
+    print(f"\n{Fore.CYAN}Garage: {display_name}{Style.RESET_ALL}")
+    print(f"{Fore.YELLOW}{'='*60}{Style.RESET_ALL}")
+    
+    # Mostrar tarifas actuales
+    print(f"\n{Fore.CYAN}TARIFAS ACTUALES:{Style.RESET_ALL}")
+    print(f"{Fore.YELLOW}{'-'*60}{Style.RESET_ALL}")
+    print(f"{'VEHÍCULO':<20} {'DIARIO':<20} {'MENSUAL':<20}")
+    print(f"{Fore.YELLOW}{'-'*60}{Style.RESET_ALL}")
+    
+    # Mostrar moto
+    moto_d = tarifas_actuales.get((1, False), 0)
+    moto_m = tarifas_actuales.get((1, True), 0)
+    print(f"{'Moto':<20} ${moto_d:<19.2f} ${moto_m:<19.2f}")
+    
+    # Mostrar auto
+    auto_d = tarifas_actuales.get((2, False), 0)
+    auto_m = tarifas_actuales.get((2, True), 0)
+    print(f"{'Auto':<20} ${auto_d:<19.2f} ${auto_m:<19.2f}")
+    
+    # Mostrar camioneta
+    cam_d = tarifas_actuales.get((3, False), 0)
+    cam_m = tarifas_actuales.get((3, True), 0)
+    print(f"{'Camioneta/SUV':<20} ${cam_d:<19.2f} ${cam_m:<19.2f}")
+    print(f"{Fore.YELLOW}{'-'*60}{Style.RESET_ALL}\n")
+    
+    # Estructura para las nuevas tarifas
+    nuevas_tarifas = []
+    tipo_nombres = {1: "Moto", 2: "Auto", 3: "Camioneta/SUV"}
+    periodo_nombres = {False: "Diario", True: "Mensual"}
+    
+    print(f"{Fore.GREEN}Ingrese las nuevas tarifas (presione ENTER para mantener actual):{Style.RESET_ALL}\n")
+    
+    # Pedir tarifas para cada tipo y periodo
+    for tipo_num in [1, 2, 3]:
+        for periodo_mensual in [False, True]:
+            tipo_nombre = tipo_nombres[tipo_num]
+            periodo_nombre = periodo_nombres[periodo_mensual]
+            actual = tarifas_actuales.get((tipo_num, periodo_mensual), 0)
+            
+            while True:
+                precio_str = input(f"{tipo_nombre} {periodo_nombre} (actual: ${actual:.2f}): $").strip()
+                
+                # Si presiona ENTER, mantener valor actual
+                if precio_str == "":
+                    nuevas_tarifas.append((tipo_num, periodo_mensual, actual))
+                    break
+                
+                # Validar precio
+                try:
+                    precio = float(precio_str)
+                    if precio < 0:
+                        print(Fore.RED + "  ❌ El precio no puede ser negativo" + Style.RESET_ALL)
+                        continue
+                    nuevas_tarifas.append((tipo_num, periodo_mensual, precio))
+                    break
+                except ValueError:
+                    print(Fore.RED + "  ❌ Ingrese un número válido" + Style.RESET_ALL)
+    
+    # Mostrar resumen de cambios
+    print(f"\n{Fore.CYAN}RESUMEN DE CAMBIOS:{Style.RESET_ALL}")
+    print(f"{Fore.YELLOW}{'-'*60}{Style.RESET_ALL}")
+    hay_cambios = False
+    
+    for tipo_num, periodo_mensual, precio_nuevo in nuevas_tarifas:
+        precio_actual = tarifas_actuales.get((tipo_num, periodo_mensual), 0)
+        if precio_nuevo != precio_actual:
+            hay_cambios = True
+            tipo_nombre = tipo_nombres[tipo_num]
+            periodo_nombre = periodo_nombres[periodo_mensual]
+            print(f"{tipo_nombre} {periodo_nombre}: ${precio_actual:.2f} → {Fore.GREEN}${precio_nuevo:.2f}{Style.RESET_ALL}")
+    
+    if not hay_cambios:
+        print(f"{Fore.YELLOW}No hay cambios para guardar{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}{'-'*60}{Style.RESET_ALL}")
+        clear_screen()
+        return True
+    
+    print(f"{Fore.YELLOW}{'-'*60}{Style.RESET_ALL}")
+    
+    # Confirmar cambios
     while True:
-        tipo_slot_in = input("Tipo (1: Moto, 2: Auto, 3: Camioneta/suv) o 'fin' ").strip().lower()
-        if tipo_slot_in == "fin":
-            break
-
-        if tipo_slot_in not in tipo_map:
-            print(Fore.RED + "Tipo inválido. Use 1/2/3." + Style.RESET_ALL)
-            continue
-        
-        tipo_num, tipo_nombre = tipo_map[tipo_slot_in]
-
-        periodo_in = input("Periodo (1: diario, 2: mensual): ").strip()
-        if periodo_in not in periodo_map:
-            print(Fore.RED + "Periodo inválido. Use 1 o 2." + Style.RESET_ALL)
-            continue
-
-        periodo_mensual, periodo_nombre = periodo_map[periodo_in]
-
-        precio_str = input("Precio (número): ").strip()
-        try:
-            precio = float(precio_str)
-            if precio < 0:
-                raise ValueError
-        except ValueError:
-            print(Fore.RED + "Precio inválido. Ingrese un número mayor o igual a 0." + Style.RESET_ALL)
-            continue
-
-
-        # Guardar con valores numéricos
-        save_tarifa_to_csv(garage_id, tipo_num, periodo_mensual, precio)
-        print(Fore.GREEN + f"Tarifa guardada: {tipo_nombre}/{periodo_nombre} = {precio}" + Style.RESET_ALL)
-
-    # fin de la configuración de tarifas
-    clear_screen()
-    return True
+        confirmacion = input(f"\n{Fore.YELLOW}¿Guardar cambios? (s/n): {Style.RESET_ALL}").strip().lower()
+        if confirmacion in ['s', 'si', 'yes', 'y']:
+            # Guardar todas las tarifas
+            for tipo_num, periodo_mensual, precio in nuevas_tarifas:
+                save_tarifa_to_csv(garage_id, tipo_num, periodo_mensual, precio)
+            print(f"\n{Fore.GREEN}✅ Tarifas actualizadas exitosamente{Style.RESET_ALL}")
+            clear_screen()
+            return True
+        elif confirmacion in ['n', 'no']:
+            print(f"{Fore.RED}❌ Cambios cancelados{Style.RESET_ALL}")
+            clear_screen()
+            return False
+        else:
+            print(Fore.RED + "Responda 's' o 'n'" + Style.RESET_ALL)
 
 
 def save_tarifa_to_csv(garage_id, tipo_num, periodo_mensual, precio):
@@ -384,7 +455,7 @@ def mover_vehiculo(patente, garage_data, tipo_vehiculo, data, garage, piso):
     hora_entrada = data.get('hora_entrada')
     
     print(f"Moviendo vehículo con patente {patente} al slot {nuevo_slot_id}...")
-    data_actualizada = [{"slot_id": old_slot_id, "piso": piso, "ocupado": False, "patente": "", "hora_entrada": "", "tipo_vehiculo": ""}, {"slot_id": nuevo_slot_id, "piso": nuevo_piso, "ocupado": True, "patente": patente, "hora_entrada": hora_entrada, "tipo_vehiculo": tipo_vehiculo}]
+    data_actualizada = [{"slot_id": old_slot_id, "piso": piso, "ocupado": False, "patente": "", "hora_entrada": "", "tipo_vehiculo": 0}, {"slot_id": nuevo_slot_id, "piso": nuevo_piso, "ocupado": True, "patente": patente, "hora_entrada": hora_entrada, "tipo_vehiculo": tipo_vehiculo}]
     actualizar_slots(garage['garage_id'],  data_actualizada)
     print(Fore.GREEN + f"Vehículo con patente {patente} movido al slot {nuevo_slot_id} correctamente." + Style.RESET_ALL)
 
@@ -392,18 +463,121 @@ def mover_vehiculo(patente, garage_data, tipo_vehiculo, data, garage, piso):
 def handle_mover_vehiculo(garage, garage_data=None):
     """Maneja el movimiento de un vehículo dentro del garage"""
     print("\n=== MOVER VEHÍCULO ===")
+    
+    # Validar que garage_data no sea None
+    if garage_data is None:
+        print(Fore.RED + "Error: No se pudo cargar la información del garage" + Style.RESET_ALL)
+        clear_screen()
+        return garage
+    
     try:
+        # 1. Pedir patente y buscar vehículo
         patente = pedir_patente()
-        piso, slot = buscar_por_patente(garage_data, patente)
-        data = get_slot_in_piso(garage_data[piso], slot)
-        tipo_vehiculo = data.get('tipo_vehiculo')
-
-        if piso == -1 and slot == -1:
-            print("Vehiculo no encontrado en el garage")
+        piso_actual, slot_id_actual = buscar_por_patente(garage_data, patente)
+        
+        if piso_actual == -1 and slot_id_actual == -1:
+            print(Fore.RED + "Vehículo no encontrado en el garage" + Style.RESET_ALL)
+            clear_screen()
             return False
-        mover_vehiculo(patente, garage_data, tipo_vehiculo, data, garage)
+        
+        # 2. Obtener datos del vehículo actual
+        slot_actual = None
+        for piso in garage_data:
+            for slot in piso:
+                if slot.get('piso') == piso_actual and slot.get('id') == slot_id_actual:
+                    slot_actual = slot
+                    break
+            if slot_actual:
+                break
+        
+        if not slot_actual:
+            print(Fore.RED + "Error: No se pudo obtener información del slot" + Style.RESET_ALL)
+            clear_screen()
+            return False
+        
+        tipo_slot_vehiculo = slot_actual.get('tipo_slot')
+        hora_entrada = slot_actual.get('hora_entrada')
+        tipo_vehiculo = slot_actual.get('tipo_vehiculo')
+        reservado_mensual = slot_actual.get('reservado_mensual')
+        
+        # 3. Buscar slots disponibles del mismo tipo
+        slots_disponibles = []
+        for piso in garage_data:
+            for slot in piso:
+                # Slot debe ser del mismo tipo, estar libre, y no ser el slot actual
+                if (slot.get('tipo_slot') == tipo_slot_vehiculo and 
+                    not slot.get('ocupado') and 
+                    slot.get('id') != slot_id_actual):
+                    slots_disponibles.append({
+                        'id': slot.get('id'),
+                        'piso': slot.get('piso')
+                    })
+        
+        # 4. Verificar si hay slots disponibles
+        if not slots_disponibles:
+            print(Fore.RED + f"No hay slots disponibles del mismo tipo (tipo {tipo_slot_vehiculo})" + Style.RESET_ALL)
+            clear_screen()
+            return False
+        
+        # 5. Mostrar slots disponibles
+        print(Fore.GREEN + f"\nSlots disponibles para mover el vehículo (tipo {tipo_slot_vehiculo}):" + Style.RESET_ALL)
+        for slot_disp in slots_disponibles:
+            print(f"  - Slot ID: {slot_disp['id']}, Piso: {slot_disp['piso']}")
+        
+        # 6. Pedir al usuario que elija un slot
+        ids_disponibles = [s['id'] for s in slots_disponibles]
+        while True:
+            try:
+                nuevo_slot_id = int(input(Fore.YELLOW + f"\nIngrese el ID del nuevo slot {ids_disponibles}: " + Style.RESET_ALL))
+                if nuevo_slot_id not in ids_disponibles:
+                    print(Fore.RED + f"ID inválido. Debe ser uno de: {ids_disponibles}" + Style.RESET_ALL)
+                    continue
+                break
+            except ValueError:
+                print(Fore.RED + "Por favor ingrese un número válido" + Style.RESET_ALL)
+        
+        # 7. Obtener piso del nuevo slot
+        nuevo_piso = None
+        for slot_disp in slots_disponibles:
+            if slot_disp['id'] == nuevo_slot_id:
+                nuevo_piso = slot_disp['piso']
+                break
+        
+        # 8. Mover el vehículo (liberar slot actual y ocupar nuevo slot)
+        print(f"\nMoviendo vehículo con patente {patente} al slot {nuevo_slot_id} (piso {nuevo_piso})...")
+        
+        data_actualizada = [
+            # Liberar slot actual
+            {
+                "slot_id": slot_id_actual, 
+                "piso": piso_actual, 
+                "ocupado": False, 
+                "patente": "", 
+                "hora_entrada": "", 
+                "tipo_vehiculo": 0
+            },
+            # Ocupar nuevo slot
+            {
+                "slot_id": nuevo_slot_id, 
+                "piso": nuevo_piso, 
+                "ocupado": True, 
+                "patente": patente, 
+                "hora_entrada": hora_entrada, 
+                "tipo_vehiculo": tipo_vehiculo,
+                "reservado_mensual": reservado_mensual
+            }
+        ]
+        
+        actualizar_slots(garage['garage_id'], data_actualizada)
+        print(Fore.GREEN + f"✅ Vehículo movido exitosamente al slot {nuevo_slot_id} (piso {nuevo_piso})" + Style.RESET_ALL)
+        clear_screen()
+        
     except Exception as e:
-        print(Fore.RED + f"Error al mover el vehículo" + Style.RESET_ALL)
+        print(Fore.RED + f"Error al mover el vehículo: {e}" + Style.RESET_ALL)
+        import traceback
+        traceback.print_exc()
+        clear_screen()
+    
     return garage
 
 def handle_administrar_usuarios():
