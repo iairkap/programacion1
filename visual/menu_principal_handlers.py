@@ -112,8 +112,8 @@ def handle_editar_vehiculo(garage, garage_data):
         return
     nuevo_tipo = pedir_tipo_vehiculo()
     nueva_patente = input("Nueva patente (dejar vacío para no cambiar): ").strip().upper()
-    nueva_estadia = input("Ingrese la nueva estadía (mensual/diaria): ").strip().lower()
-    estadia = True if nueva_estadia == "mensual" else False
+    nueva_estadia = int(input("Ingrese el tipo de abono para el vehiculo (1/Diario. 2/Mensual)"))
+    estadia = True if nueva_estadia == 2 else False
     if not patente:
         print("Patente no encontrada.")
         return

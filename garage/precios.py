@@ -79,8 +79,19 @@ def calcular_costo_de_estadia(patente, hora_salida=None, garage=None, tarifa=Non
         print(Fore.RED + f"Error: Patente {patente} no encontrada." + Style.RESET_ALL)
         return 0
 
-    # Obtener slot del garage
-    slot = garage[piso_idx][slot_id - 1]  # slot_id comienza en 1
+    # Buscar el slot en el piso correcto
+    slot = None
+    for piso in garage:
+        for s in piso:
+            if s.get("piso") == piso_idx and s.get("id") == slot_id:
+                slot = s
+                break
+        if slot:
+            break
+    
+    if not slot:
+        print(Fore.RED + f"Error: No se pudo encontrar el slot {slot_id} en piso {piso_idx}." + Style.RESET_ALL)
+        return 0
     
     # Obtener datos del slot
     tipo_vehiculo = slot.get("tipo_vehiculo", 0)

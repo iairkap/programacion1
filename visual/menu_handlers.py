@@ -123,7 +123,9 @@ def crear_nuevo_garage(usuario):
         # Crear objeto garage temporal para pasar a la función
         garage_temp = {
             'garage_id': garage_id,
-            'garage_name': nombre
+            'garage_name': nombre,
+            'floors': floors,
+            'slots_per_floor': slots_per_floor
         }
         configurar_slots_bulk(garage_temp)
 
@@ -335,17 +337,19 @@ def configurar_slots_bulk(garage):
     print("\nSe creará un csv en directorio actual llamado 'config_slots.csv' para actualizar los tipos de slots\n")
     ruta_csv = generar_csv_slots(garage)
     
-    if os.path.exists(ruta_csv):
+    if ruta_csv and os.path.exists(ruta_csv):
         print(Fore.RED + f"Por favor, edite el archivo en: {os.path.abspath(ruta_csv)}" + Style.RESET_ALL)
         print("Una vez editado, guarde el archivo y vuelva aquí para continuar.")
         archivo_editado = input("\n¿Ha editado y guardado el archivo? (s/n): \n").lower() == 's'
         
         if archivo_editado:
-            data = crear_data_para_actualizar_tipo_slots(ruta_csv)
+            data = crear_data_para_actualizar_tipo_slots(ruta_csv, garage)
             actualizar_slots(garage_id, data)
             print(Fore.GREEN + f"\n{garage_name} ha sido actualizado con éxito." + Style.RESET_ALL)
         else:
             print("Actualización postergada. Por favor, edite el archivo y vuelva a intentarlo.")
+    else:
+        print(Fore.RED + "No se pudo generar el archivo CSV. Operación cancelada." + Style.RESET_ALL)
 
 
 def configurar_slot_individual(garage):

@@ -1,3 +1,7 @@
 garage_id,user_email,garage_name,address,floors,slots_per_floor
 1,pami123@gmail.com,Pami,9 de Julio 123,10,5
 2,yami123@gmail.com,LIMA,LIMA,10,5
+3,cami123@gmail.com,Julian Alvarez,Julian Alvarez 1212,10,5
+4,cami123@gmail.com,Juncal,Juncal,5,5
+5,cami123@gmail.com,fafa,fa,10,5
+6,cami123@gmail.com,fofo,fofo,10,5

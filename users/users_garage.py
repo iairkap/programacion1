@@ -320,7 +320,7 @@ def generar_csv_slots(garage):
                 file.write("tipo_de_slot,cantidad,piso\n")
                 for piso in range(garage.get('floors')):
                     file.write(f"auto,0,{piso}\n")
-                    file.write(f"moto,0,0{piso}\n")
+                    file.write(f"moto,0,{piso}\n")
                     file.write(f"camioneta,0,{piso}\n")
             print(Fore.GREEN + f"✅ Archivo de configuración CREADO en: {os.path.abspath(ruta_csv)}" + Style.RESET_ALL) 
         else:
@@ -332,6 +332,7 @@ def generar_csv_slots(garage):
     except Exception as e:
         print(Fore.RED + f"❌ Ocurrió un error al intentar gestionar el archivo CSV: {e}" + Style.RESET_ALL)
         print("Asegurate de que tu usuario tenga permisos para escribir en la carpeta 'Documents'.")
+        return None
 
 def leer_config_slots(ruta_csv=None):
     """
