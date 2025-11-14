@@ -198,7 +198,8 @@ def menu_principal(garage_actual, tarifa):
                 continuar = False
             else:
                 print(Fore.RED + "Opción inválida. Intente de nuevo." + Style.RESET_ALL)
-    
+    except KeyboardInterrupt:
+        print(Fore.RED + "\nOperación cancelada por el usuario." + Style.RESET_ALL)
     except Exception as e:
         print(Fore.RED + f"Ocurrió un error: {e}" + Style.RESET_ALL)
     return accion
@@ -206,44 +207,73 @@ def menu_principal(garage_actual, tarifa):
 
 def main():
     """Función principal que coordina todo el flujo"""
-    programa_activo = True
-    
-    while programa_activo:
-        # 1. Login/Registro
-        usuario_actual = menu_inicial()
-        if not usuario_actual:
-            programa_activo = False
-            continue
-        # 2. Selección/Creación de garage
-        session_active = True
-        while session_active and programa_activo:
-            (garage_actual, tarifa) = menu_garage(usuario_actual)
-            guardar_estado_garage(garage_actual)#guardo el garage actual en el json para acceder desde todo el proyecto
-            
-            if not garage_actual:
-                session_active = False
-                continue
 
-            # 3. Menú principal
-            menu_activo = True
-            while menu_activo and session_active:
-                resultado = menu_principal(garage_actual, tarifa)
-                # ✅ ACTUALIZAR TARIFA EN MEMORIA SI SE CAMBIÓ DE GARAGE
-                tarifa = guardar_precios_garage(garage_actual['garage_id'])
-                
-                if resultado == "cambiar_garage":
-                    menu_activo = False
-                    clear_screen()
-                elif resultado == "cerrar_sesion":
-                    session_active = False
-                    menu_activo = False
-                    clear_screen()
-                elif resultado == "salir":
-                    print("¡Hasta luego!")
+    while True: 
+        try:
+            programa_activo = True
+
+            while programa_activo:
+               
+                usuario_actual = menu_inicial()
+                if not usuario_actual:
                     programa_activo = False
-                    session_active = False
-                    menu_activo = False
-                    clear_screen()
+                    continue
+
+             
+                session_active = True
+                while session_active and programa_activo:
+                    (garage_actual, tarifa) = menu_garage(usuario_actual)
+                    guardar_estado_garage(garage_actual)
+
+                    if not garage_actual:
+                        session_active = False
+                        continue
+
+             
+                    menu_activo = True
+                    while menu_activo and session_active:
+                        resultado = menu_principal(garage_actual, tarifa)
+                        tarifa = guardar_precios_garage(garage_actual['garage_id'])
+
+                        if resultado == "cambiar_garage":
+                            menu_activo = False
+                            clear_screen()
+
+                        elif resultado == "cerrar_sesion":
+                            session_active = False
+                            menu_activo = False
+                            clear_screen()
+
+                        elif resultado == "salir":
+                            print("¡Hasta luego!")
+                            programa_activo = False
+                            session_active = False
+                            menu_activo = False
+                            clear_screen()
+
+            
+            break
+
+        except KeyboardInterrupt:
+            print(Fore.RED + "\n\n⚠️ Ejecución cancelada por el usuario (Ctrl + C)." + Style.RESET_ALL)
+            print("Saliendo de la aplicación...")
+            break
+
+        except Exception as e:
+            print(Fore.RED + "\n❌ Ocurrió un error inesperado:" + Style.RESET_ALL)
+            print(str(e))
+            print("\n¿Qué deseas hacer?")
+            print("1) Reintentar")
+            print("2) Salir")
+
+            opcion = input("> ").strip()
+            if opcion == "1":
+                print("\n🔄 Reiniciando la aplicación...\n")
+                continue   
+            else:
+                print("\n👋 Saliendo debido al error inesperado...")
+                break
+
 
 if __name__ == "__main__":
     main()

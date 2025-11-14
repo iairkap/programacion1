@@ -87,7 +87,8 @@ def handle_consultar_vehiculos_estacionados(garage, garage_data):
 def handle_ingresar_vehiculo(garage, garage_data):
     """Maneja el ingreso de vehículos"""
     if not tipos_de_slot_definidos(garage, garage_data):
-        print(f"Debe definir tipos de slots en garage con id {garage.get('garage_id')} antes de ingresar vehiculos.")
+        print(f"Debe definir tipos de slots en garage con id {garage.get('garage_id')} antes de ingresar vehiculos.🚩🚩🚩")
+        clear_screen()
         return
     registrar_entrada_auto(garage_data)
 
