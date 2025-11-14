@@ -177,7 +177,7 @@ def menu_principal(garage_actual, tarifa):
 
             mostrar_menu_principal(garage_actual)
             garage_data = get_garage_data(garage_actual['garage_id'])
-            opcion = input("Seleccione una opción: \n")
+            opcion = input("Seleccione una opción: \n").lower()
 
             if opcion.isdigit():
                 indice = int(opcion) - 1  # la lista empieza en 0 y el menú en 1

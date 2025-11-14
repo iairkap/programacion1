@@ -440,6 +440,9 @@ def handle_actualizar_tipo_slots(garage, garage_data=None):
         if os.path.exists(ruta_csv):
             print(Fore.RED + f"Por favor, edite el archivo en: {os.path.abspath(ruta_csv)}" + Style.RESET_ALL)
             print("Una vez editado, guarde el archivo y vuelva aquí para continuar.")
+            print("Es un Archivo csv, que contiene las siguientes columnas: tipo_de_slot,cantidad,piso")
+            print(Fore.RED +"Cambiar la 'CANTIDAD' para indicar el valor requerido"+ Style.RESET_ALL)
+
             archivo_editado = input("\n¿Ha editado y guardado el archivo? (s/n): \n").lower() == 's'
         if archivo_editado:
             data = crear_data_para_actualizar_tipo_slots(ruta_csv, garage)
@@ -469,6 +472,9 @@ def configurar_slots_bulk(garage):
     if ruta_csv and os.path.exists(ruta_csv):
         print(Fore.RED + f"Por favor, edite el archivo en: {os.path.abspath(ruta_csv)}" + Style.RESET_ALL)
         print("Una vez editado, guarde el archivo y vuelva aquí para continuar.")
+
+        
+
         archivo_editado = input("\n¿Ha editado y guardado el archivo? (s/n): \n").lower() == 's'
         
         if archivo_editado:
