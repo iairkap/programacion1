@@ -1,7 +1,7 @@
 from colorama import Fore, Style
 from constantes.tipos_vehiculos import obtener_nombre_vehiculo
 from auxiliares.consola import clear_screen
-
+###Agregando comentario para que git detecte los cambios D:
 def pedir_piso(garage):
     """Solicita al usuario un número de piso válido."""
     while True:
@@ -51,7 +51,7 @@ def pedir_patente():
     while True:
         try:
             patente = input(Fore.YELLOW + "\nIngrese la patente:" + Style.RESET_ALL).strip().upper()
-            digitos = len(patente)
+            digitos = len(patente) 
             if digitos != 6 and digitos != 7:
                 print(Fore.RED + "\nLas nuevas patentes tienen 7 digitos y las antiguas 6\n" + Style.RESET_ALL)
             elif digitos == 6 :
@@ -63,7 +63,7 @@ def pedir_patente():
             else: 
                 print(Fore.RED + "La patente no tiene el formato correcto ej: AB123CD o ABC123" + Style.RESET_ALL)
                 
-            print("Volve a intentarlo") #####Arreglar esto
+            print("Volve a intentarlo")
 
         except Exception as e:
             print(e)

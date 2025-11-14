@@ -67,47 +67,48 @@ def obtener_precio_tipo_periodo(tarifas, tipo_vehiculo, periodo_mensual):
     return None
 
 def print_tarifas(tarifas):
-    """Imprime las tarifas en formato de tabla con colores."""
+    """Imprime las tarifas en formato de tabla mejorado."""
     if not tarifas:
         print(Fore.YELLOW + "No hay tarifas disponibles para este garage." + Style.RESET_ALL)
         return
     
-    print(Fore.CYAN + "\n" + "="*70 + Style.RESET_ALL)
-    print(Fore.CYAN + "TARIFAS DEL GARAGE" + Style.RESET_ALL)
-    print(Fore.CYAN + "="*70 + Style.RESET_ALL)
+    print(f"\n{Fore.CYAN}TARIFAS DEL GARAGE{Style.RESET_ALL}")
+    print(f"{Fore.YELLOW}{'='*60}{Style.RESET_ALL}")
+    print(f"{'VEHÍCULO':<20} {'DIARIO':<20} {'MENSUAL':<20}")
+    print(f"{Fore.YELLOW}{'-'*60}{Style.RESET_ALL}")
     
-    # Encabezados
-    print(Fore.LIGHTWHITE_EX + f"{'Tipo':<15} {'Período':<15} {'Precio':<15} {'Moneda':<10}" + Style.RESET_ALL)
-    print(Fore.CYAN + "-"*70 + Style.RESET_ALL)
+    # Organizar tarifas por tipo
+    tarifas_por_tipo = {1: {}, 2: {}, 3: {}}  # moto, auto, camioneta
     
-    # Datos
     for tarifa in tarifas:
-        # Validar que tenga al menos: garage_id, tipo, periodo, precio
         if len(tarifa) < 4:
             continue
-        
         try:
             tipo_numero = int(tarifa[1])
-            tipo = obtener_nombre_vehiculo(tipo_numero)
+            periodo_mensual = tarifa[2] == "True"
+            precio = float(tarifa[3])
             
-            periodo = "Mensual" if tarifa[2] == "True" else "Diario"
-            precio = tarifa[3]
-            moneda = tarifa[4] if len(tarifa) > 4 else "ARS"
-            
-            # Colorear según tipo
-            if tipo == "moto":
-                color = Fore.GREEN
-            elif tipo == "auto":
-                color = Fore.YELLOW
-            elif tipo == "camioneta":
-                color = Fore.RED
-            else:
-                color = Fore.WHITE
-            
-            print(color + f"{tipo.capitalize():<15} {periodo:<15} ${precio:<14} {moneda:<10}" + Style.RESET_ALL)
-        
+            if tipo_numero in tarifas_por_tipo:
+                tarifas_por_tipo[tipo_numero][periodo_mensual] = precio
         except (ValueError, IndexError):
             continue
     
-    print(Fore.CYAN + "="*70 + Style.RESET_ALL)
-    print()
+    # Imprimir moto
+    tipo_nombre = Fore.GREEN + "Moto" + Style.RESET_ALL
+    diario = tarifas_por_tipo[1].get(False, 0)
+    mensual = tarifas_por_tipo[1].get(True, 0)
+    print(f"{tipo_nombre:<29} ${diario:<19.2f} ${mensual:<19.2f}")
+    
+    # Imprimir auto
+    tipo_nombre = Fore.YELLOW + "Auto" + Style.RESET_ALL
+    diario = tarifas_por_tipo[2].get(False, 0)
+    mensual = tarifas_por_tipo[2].get(True, 0)
+    print(f"{tipo_nombre:<29} ${diario:<19.2f} ${mensual:<19.2f}")
+    
+    # Imprimir camioneta
+    tipo_nombre = Fore.RED + "Camioneta/SUV" + Style.RESET_ALL
+    diario = tarifas_por_tipo[3].get(False, 0)
+    mensual = tarifas_por_tipo[3].get(True, 0)
+    print(f"{tipo_nombre:<29} ${diario:<19.2f} ${mensual:<19.2f}")
+    
+    print(f"{Fore.YELLOW}{'='*60}{Style.RESET_ALL}\n")
