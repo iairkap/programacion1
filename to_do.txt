@@ -1,6 +1,0 @@
-decidir que hacer con el actualizar tipo de slot cuando la ejecuto con autos ya estacionados. ->
-
-
-Actualizar tipo de slot bulk. 
-Cuando ya se definieron tipos de slots, ver si no dejat definir mas en bulk. 
-Agregar advertencia. 

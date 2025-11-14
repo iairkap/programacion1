@@ -106,41 +106,59 @@ def chequear_existencia_email(email):
         mostrar_mensaje("Error: El archivo de usuarios no existe.", "error")
         return False
 
-
 def user_login(email):
     """Funcion para loguearse - retorna el usuario completo"""
+
     try:
-        # email = input("Ingrese su email: ")
-        # password = input("Ingrese su contraseña: ")
-        arch_users = open("files/users.csv", mode="r", encoding="utf-8")
-        next(arch_users)  # Saltar la primera linea (headers)
-        
-        for line in arch_users:
-            nombre, apellido, user_email,admin = line.strip().split(',')
-            if user_email == email :
-                arch_users.close()
+        with open("files/users.csv", mode="r", encoding="utf-8") as arch_users:
+            lineas = [l.strip() for l in arch_users.readlines() if l.strip()]
+
+        # Si no hay líneas o solo hay header → registrar primer usuario
+        if len(lineas) <= 1:
+            nuevo_usuario = registrar_nuevo_usuario(email)
+            if nuevo_usuario:
+                print(Fore.GREEN + "Usuario registrado. Ahora puede iniciar sesión." + Style.RESET_ALL)
+                clear_screen()
+                return nuevo_usuario
+            return None
+
+        # Procesar cada línea después del header
+        for line in lineas[1:]:
+            partes = line.split(",")
+
+            # Validar que la línea es correcta
+            if len(partes) != 4:
+                # línea corrupta → ignorar
+                continue
+
+            nombre, apellido, user_email, admin = partes
+
+            if user_email == email:
                 return {
-                    'nombre': nombre,
-                    'apellido': apellido,
-                    'email': user_email,
-                    'admin': admin
+                    "nombre": nombre,
+                    "apellido": apellido,
+                    "email": user_email,
+                    "admin": admin
                 }
+
+        # Si no existe, registrar
         nuevo_usuario = registrar_nuevo_usuario(email)
         if nuevo_usuario:
             print(Fore.GREEN + "Usuario registrado. Ahora puede iniciar sesión." + Style.RESET_ALL)
             clear_screen()
             return nuevo_usuario
-        mostrar_mensaje("Error: Email o contraseña incorrectos.", "error")
-        arch_users.close()
+
+        mostrar_mensaje("Error: Email incorrecto.", "error")
         return None
-    
+
     except FileNotFoundError:
         mostrar_mensaje("Error: El archivo de usuarios no existe.", "error")
         return None
+
     except UsuarioNoExisteError as e:
-        Print(e, "se cancelo la creacion del usuario ")
+        print(e, "Se canceló la creación del usuario")
         return None
-        
+
 def registrar_nuevo_usuario(email):
     """Función completa para registrar un nuevo usuario"""
     crear_archivo_users()
@@ -156,6 +174,7 @@ def registrar_nuevo_usuario(email):
     
     usuario = creacion_usuario(email)
     if cantidad_usuarios == 0:#si es el primer usuario se logea como admin
+        print("al ser el primer usuario registrado, se le asignara rol de administrador")
         usuario['admin'] = "True"
         mostrar_mensaje("Este es el primer usuario registrado, se le ha asignado rol de administrador.", "ok")
     else:
@@ -168,7 +187,7 @@ def registrar_nuevo_usuario(email):
         arch_users = open("files/users.csv", mode="a", encoding="utf-8")
         arch_users.write(f"{usuario['nombre']},{usuario['apellido']},{usuario['email']},{usuario['admin']}\n")
         arch_users.close()
-        # mostrar_mensaje(f"Usuario creado exitosamente: {usuario}", "ok")
+        
         return usuario
     except Exception as e:
         mostrar_mensaje(f"Error al guardar el usuario: {e}", "error")
