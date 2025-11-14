@@ -25,7 +25,7 @@ from colorama import Fore, Style
 from garage.garage_util import buscar_por_patente
 from users.interaccion_usuario import pedir_patente
 from garage.slot_utils import validacion_slots_ok, buscar_piso_por_slot_id, get_slot_in_piso, buscar_slots_por_tipo, tipos_de_slot_definidos, slot_ocupado
-import datetime
+from menu_principal_handlers import handle_mostrar_estado_garage
 
 def handle_login():
     """Maneja el login del usuario"""
@@ -360,28 +360,71 @@ def handle_crear_garage(usuario):
         clear_screen()
     return None
 
+
 def handle_actualizar_tipo_slot(garage_data, garage):
-     data = []
-     garage_id = garage.get('garage_id', 0)
-     print("Actualización de un solo slot")
-     slot_id = int(input("Ingrese el ID del slot a actualizar: "))
-     if not slot_ocupado(garage_data, slot_id):
-        while True:
-            tipo_slot = input("Ingrese el nuevo tipo de slot para actualizar(moto/auto/camioneta): ")
-            if tipo_slot not in ('moto', 'auto', 'camioneta'):
-                print('El tipo de slot es invalido')
-            else:
-                break
-        piso = buscar_piso_por_slot_id(slot_id, garage)
+    data = []
+    garage_id = garage.get('garage_id', 0)
+
+    print("Actualización de un solo slot")
+
+    while True:
+        slot_input = input(
+            "Ingrese el ID del slot a actualizar (o 'v' para ver slots disponibles | 's' para salir): "
+        ).strip().lower()
+
+        if slot_input == "s":
+            return
+
+        if slot_input == "v":
+            print("\n📌 Slots disponibles:")
+            handle_mostrar_estado_garage(garage, garage_data)
+            print("")
+            continue
+
         try:
-            print(f"Actualizando tipo de slot para el garage '{garage['garage_name']}'...")
-            data.append(crear_data_para_actualizar_slot(slot_id=slot_id, tipo_slot=tipo_slot, piso= piso))
-            actualizar_slots(garage_id, data)
-            print(f"Garage con id {garage_id} actualizado correctamente ✅")
-        except Exception as e:
-            print(f"Error al actualizar el garage: {e}")
-     else:
-        print(Fore.YELLOW + "El SLOT ESTA OCUPADO, puede actualizar tipo solo si esta vacio." + Style.RESET_ALL)
+            slot_id = int(slot_input)
+        except ValueError:
+            print("❌ Debe ingresar un número válido, 'v' o 's'. Intente de nuevo.")
+            continue
+
+        if slot_ocupado(garage_data, slot_id):
+            print(Fore.YELLOW +
+                  "⚠️ El slot está ocupado. Solo puede actualizar el tipo si está vacío."
+                  + Style.RESET_ALL)
+            return
+        else:
+            break
+
+    while True:
+        tipo_slot = input("Ingrese el nuevo tipo de slot (moto/auto/camioneta | 's' para salir): ").strip().lower()
+
+        if tipo_slot == "s":
+            return
+
+        if tipo_slot not in ('moto', 'auto', 'camioneta'):
+            print("❌ El tipo de slot es inválido. Intente nuevamente.")
+        else:
+            break
+
+    piso = buscar_piso_por_slot_id(slot_id, garage)
+
+    try:
+        print(f"\nActualizando tipo de slot para el garage '{garage['garage_name']}'...")
+
+        data.append(
+            crear_data_para_actualizar_slot(
+                slot_id=slot_id,
+                tipo_slot=tipo_slot,
+                piso=piso
+            )
+        )
+
+        actualizar_slots(garage_id, data)
+
+        print(f"Garage con ID {garage_id} actualizado correctamente ✅")
+
+    except Exception as e:
+        print(f"❌ Error al actualizar el garage: {e}")
 
 def handle_actualizar_tipo_slots(garage, garage_data=None):
     """Maneja la actualización del tipo de slots en el garage"""

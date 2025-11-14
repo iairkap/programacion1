@@ -23,3 +23,9 @@ garage_id,tipo,periodo_mensual,precio
 7,2,True,39000.0
 7,3,False,4000.0
 7,3,True,40000.0
+8,1,False,399.0
+8,1,True,3939.0
+8,2,False,9999.0
+8,2,True,393993.0
+8,3,False,3929392.0
+8,3,True,232939.0
